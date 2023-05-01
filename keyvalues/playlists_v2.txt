@@ -1,0 +1,62 @@
+playlists
+{
+    Gamemodes
+    {
+        pk
+		{
+			inherit defaults
+			vars
+			{
+				name "Parkour"
+				lobbytitle "Lobby: Parkour"
+				description "The gauntlet, but on multiplayer maps."
+				hint "The gauntlet, but on multiplayer maps."
+				abbreviation "PK"
+				
+				max_players 16
+				max_teams 2
+				classic_mp 1
+				scorelimit 100
+				timelimit 10
+				roundtimelimit 3
+				roundscorelimit 5
+				
+				gamemode_score_hint #GAMEMODE_SCORE_HINT_TDM
+			}
+		}
+    }
+    Playlists
+    {
+        pk
+		{
+			inherit defaults
+			vars
+			{
+				name "Parkour"
+				lobbytitle "Lobby: Parkour"
+				description "The gauntlet, but on multiplayer maps."
+				hint "The gauntlet, but on multiplayer maps."
+				abbreviation "PK"
+				image ffa
+				max_players 16
+				max_teams 2
+				classic_mp 1
+				scorelimit 5
+				roundtimelimit 2
+				roundscorelimit 5
+				
+				gamemode_score_hint #GAMEMODE_SCORE_HINT_TDM
+			}	
+			gamemodes
+			{
+				pk
+				{
+					maps
+					{
+                        mp_thaw 1
+					}
+				}
+			}
+		}
+    }
+}

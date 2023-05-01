@@ -1,17 +1,32 @@
 {
-   "Name": "Example.Mod",
-   "Description": "A cool mod that does cool stuff",
-   "Version": "1.0.0",
-   "DownloadLink": "https://northstar.thunderstore.io/package/download/Example/Mod/",
-
-   "LoadPriority": 0,
-   "ConVars": [],
-   "Scripts": [{
-      "Path": "example.nut",
-      "RunOn": "(CLIENT || SERVER) && MP",
-      "ClientCallback": {
-         "Before":"example_callback"
-      }
-   }],
-   "Localisation": []
+    "Name": "Parkour",
+    "Description": "The gauntlet, but on multiplayer maps.",
+    "LoadPriority": 2,
+    "Version": "1.0.0",
+    "RequiredOnClient": true,
+    "ConVars": [],
+    "Scripts": [
+        {
+            "Path": "gamemodes/sh_gamemode_pk.nut",
+            "RunOn": "SERVER || CLIENT",
+            "ServerCallback": {
+                "Before": "PKMode_Init"
+            },
+            "ClientCallback": {
+                "Before": "PKMode_Init"
+            }
+        },
+        {
+            "Path": "gamemodes/cl_gamemode_pk.nut",
+            "RunOn": "CLIENT"
+        },
+        {
+            "Path": "classes/checkpoint.nut",
+            "RunOn": "SERVER"
+        },
+        {
+            "Path": "gamemodes/_gamemode_pk.nut",
+            "RunOn": "SERVER"
+        }
+    ]
 }
