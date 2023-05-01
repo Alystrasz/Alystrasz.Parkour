@@ -1,0 +1,49 @@
+name: Publish package
+
+on:
+  release:
+    types: [published] # run when a new release is published
+    
+env:
+  name: ${{github.event.repository.name}} # Edit this if the package name differs from the repo name
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get clean version
+        run: |
+          echo cleanVersion=$(echo ${{github.ref_name}} | sed s/v//g) >> $GITHUB_ENV
+      - name: Check that version matches
+        run: |
+          if [[ "$(grep -Po "\d+\.\d+\.\d+" $(find ./ -name mod.json))" != "${{ env.cleanVersion }}" ]]; then
+            echo "::debug::${{env.cleanVersion}}"
+            echo "::debug::$(cat $(find ./ -name mod.json ))"
+            echo "::error::Version in mod.json does not match tag version"
+            exit 1
+          fi
+  publish:
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v3
+      - name: Upload Thunderstore Package
+        uses: GreenTF/upload-thunderstore-package@v3.1
+        with:
+          community: northstar
+          # Name of the team to publish the mod under
+          # This should be modified if your github username is different than your team name on Thunderstore
+          namespace: ${{ github.repository_owner }} # <------ DOUBLE CHECK THIS
+          # Name of the package
+          name: ${{ env.name }} # This can be modified if the package name differs from the repo name
+          # Package version to publish
+          version: ${{ github.ref_name }} # This is the tag that was created in the release
+          # Description of the mod
+          description: Example mod description # <----------- UPDATE THIS
+          # Thunderstore API token
+          token: ${{ secrets.TS_KEY }} 
+          # Directory to wrap the contents of the repo in
+          wrap: mods/${{ github.repository_owner }}.${{ env.name }} # This will wrap your Author.ModName folder in a mods/ folder before publishing
+          #deps: "northstar-Northstar@1.9.3" # <------------- Uncomment this line to add dependencies to your mod, each sparated by a space
+          categories: "mods" # <----------------------------- Add more categories as needed, separated by spaces

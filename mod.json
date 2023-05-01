@@ -1,0 +1,17 @@
+{
+   "Name": "Example.Mod",
+   "Description": "A cool mod that does cool stuff",
+   "Version": "1.0.0",
+   "DownloadLink": "https://northstar.thunderstore.io/package/download/Example/Mod/",
+
+   "LoadPriority": 0,
+   "ConVars": [],
+   "Scripts": [{
+      "Path": "example.nut",
+      "RunOn": "(CLIENT || SERVER) && MP",
+      "ClientCallback": {
+         "Before":"example_callback"
+      }
+   }],
+   "Localisation": []
+}
