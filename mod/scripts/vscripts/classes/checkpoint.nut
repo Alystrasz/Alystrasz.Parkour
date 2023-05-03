@@ -24,6 +24,7 @@ entity function SpawnEndTrigger( vector origin )
 {
 	entity point = CreateEntity( "prop_dynamic" )
     point.SetOrigin( origin )
+    point.Hide()
     DispatchSpawn( point )
     thread FinishTriggerThink()
     return point
