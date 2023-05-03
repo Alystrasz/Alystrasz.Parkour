@@ -63,6 +63,7 @@ void function Cl_Parkour_Init()
     file.selfLeaderboard = tRui
 
     thread Cl_Parkour_Create_Start()
+    Cl_Parkour_Create_End()
 }
 
 void function Cl_Parkour_Update()
@@ -113,6 +114,15 @@ void function Cl_Parkour_Create_Start()
 	var topo = CreateTopology(origin + <0,0,165>, angles, 120, 80)
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
+}
+
+void function Cl_Parkour_Create_End()
+{
+    vector origin = < -399.065, -2906.22, -83.9688>
+    vector angles = <0, -90, 0>
+	var topo = CreateTopology(origin + <0,0,40>, angles, 120, 80)
+    var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
 }
 
 void function DestroyRemainingRUIs()
