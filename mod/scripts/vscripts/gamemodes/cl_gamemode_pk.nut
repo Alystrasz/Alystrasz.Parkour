@@ -49,14 +49,11 @@ void function UpdateTopology( var topo, vector org, vector ang, float width, flo
 
 void function Cl_Parkour_Init()
 {
-    vector origin = <520.893, -3574.1, -232.072>
+    // leaderboard
+    vector origin = < -536, -2929.38, -101>
     vector angles = <0, 90, 0>
-    var topo = CreateTopology(origin + <0,0,65>, angles, 100, 80)
+    var topo = CreateTopology(origin + <0,0,65>, angles, 80, 75)
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
-
-    var persoTopo = CreateTopology(origin + < -120,0,65>, angles, 120, 80)
-    var tRui = RuiCreate( $"ui/gauntlet_results_display.rpak", persoTopo, RUI_DRAW_WORLD, 0 )
-
     file.leaderboard = rui
 
     thread Cl_Parkour_Create_Start()
