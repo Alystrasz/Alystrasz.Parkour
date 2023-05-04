@@ -33,7 +33,7 @@ global array<vector> checkpoints = [
 	< -399.065, -2906.22, -83.9688>
 ]
 
-array<entity> checkpointEntities = []
+global array<entity> checkpointEntities = []
 
 
 void function _PK_Init() {
@@ -65,62 +65,4 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	player.SetOrigin( checkpoint )
 
 	player.SetAngles(localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
-}
-
-void function SpawnStartTrigger()
-{
-	while (true)
-	{
-		foreach(player in GetPlayerArray())
-		{
-			string playerName = player.GetPlayerName()
-
-			if (PointIsWithinBounds( player.GetOrigin(), < -157.2, -3169.45, -200>, < -68.0326, -2931.55, -53.4112> ))
-			{
-				if (localStats[playerName].isRunning) {
-					Chat_ServerBroadcast(playerName + " is in start trigger but is already running!")
-				}
-				else
-				{
-					Chat_ServerBroadcast(playerName + " starts a new run!")
-					localStats[playerName].startTime = Time()
-					localStats[playerName].isRunning = true
-					Remote_CallFunction_NonReplay( player, "ServerCallback_StartRun" )
-					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle() )
-				}
-			}
-		}
-		WaitFrame()
-	}
-}
-
-void function SpawnCheckpoints()
-{
-	foreach (int index, vector checkpoint in checkpoints)
-	{
-		if (index == 0) 
-		{
-			thread SpawnStartTrigger()
-		}
-		else if (index == checkpoints.len()-1)
-		{
-			checkpointEntities.append( SpawnEndTrigger( checkpoint ) )
-		}
-		else
-		{
-			entity checkpoint = CreateCheckpoint(checkpoint, void function (entity player): (index) {
-				PlayerStats pStats = localStats[player.GetPlayerName()]
-
-				// Only update player info if their currentCheckpoint index is the previous one!
-				if (pStats.isRunning && pStats.currentCheckpoint == index-1)
-				{
-					pStats.checkpointAngles.append( player.GetAngles() )
-					pStats.currentCheckpoint = index
-					player.SetPlayerNetInt( "currentCheckpoint", index )
-					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[index].GetEncodedEHandle() )
-				}
-			})
-			checkpointEntities.append( checkpoint )
-		}
-	}
 }
