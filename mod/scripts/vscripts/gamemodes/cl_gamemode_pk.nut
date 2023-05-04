@@ -1,6 +1,5 @@
 global function Cl_Parkour_Init
 global function Cl_Parkour_Update
-global function Cl_Parkour_Update_Self_Leaderboard
 global function ServerCallback_StartRun
 global function UpdateCheckpointMarker
 global function ServerCallback_UpdateNextCheckpointMarker
@@ -13,7 +12,6 @@ struct {
     table< int, entity > cache
 
     var leaderboard
-    var selfLeaderboard
     var timerRUI
     var splashStartRUI
     var splashEndRUI
@@ -60,7 +58,6 @@ void function Cl_Parkour_Init()
     var tRui = RuiCreate( $"ui/gauntlet_results_display.rpak", persoTopo, RUI_DRAW_WORLD, 0 )
 
     file.leaderboard = rui
-    file.selfLeaderboard = tRui
 
     thread Cl_Parkour_Create_Start()
     Cl_Parkour_Create_End()
@@ -81,30 +78,6 @@ void function Cl_Parkour_Update()
     //      => blue with jumping pilot leading icon
     // RuiSetInt( file.leaderboard, "activeEntryIdx", leaderboardIdx )
 }
-
-void function Cl_Parkour_Update_Self_Leaderboard()
-{
-    // RuiSetBool( file.selfLeaderboard, "runFinished", true )
-
-    // Elapsed time
-    RuiSetGameTime( file.selfLeaderboard, "startTime", 42 )
-    RuiSetFloat( file.selfLeaderboard, "finalTime", 42+5 )
-    RuiSetFloat( file.selfLeaderboard, "bestTime", 100 )
-
-    // Tip
-    RuiSetString( file.selfLeaderboard, "tipString", "hello I'm a tip" )
-
-    // Targets eliminated
-    RuiSetInt( file.selfLeaderboard, "numEnemies", 18 )
-	RuiSetInt( file.selfLeaderboard, "enemiesKilled", 42 )
-
-    // Stats
-    RuiSetFloat( file.selfLeaderboard, "avgSpeed", 38.89 )
-    RuiSetFloat( file.selfLeaderboard, "topSpeed", 42.2 )
-    RuiSetFloat( file.selfLeaderboard, "highSpeedPercent", 82 )
-    RuiSetInt( file.selfLeaderboard, "highSpeedKills", 7 )
-}
-
 
 // Start/end "barrier" world UI
 void function Cl_Parkour_Create_Start()
