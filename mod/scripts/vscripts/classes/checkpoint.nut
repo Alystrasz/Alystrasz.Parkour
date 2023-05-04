@@ -1,6 +1,41 @@
-global function CreateCheckpoint
-global function SpawnEndTrigger
-global function SpawnCheckpoints
+global function SpawnEntities
+
+
+void function SpawnEntities()
+{
+    SpawnCheckpoints()
+}
+
+void function SpawnCheckpoints()
+{
+	foreach (int index, vector checkpoint in checkpoints)
+	{
+		if (index == 0) 
+		{
+			thread SpawnStartTrigger()
+		}
+		else if (index == checkpoints.len()-1)
+		{
+			checkpointEntities.append( SpawnEndTrigger( checkpoint ) )
+		}
+		else
+		{
+			entity checkpoint = CreateCheckpoint(checkpoint, void function (entity player): (index) {
+				PlayerStats pStats = localStats[player.GetPlayerName()]
+
+				// Only update player info if their currentCheckpoint index is the previous one!
+				if (pStats.isRunning && pStats.currentCheckpoint == index-1)
+				{
+					pStats.checkpointAngles.append( player.GetAngles() )
+					pStats.currentCheckpoint = index
+					player.SetPlayerNetInt( "currentCheckpoint", index )
+					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[index].GetEncodedEHandle() )
+				}
+			})
+			checkpointEntities.append( checkpoint )
+		}
+	}
+}
 
 entity function CreateCheckpoint(vector origin, void functionref(entity) callback, float size = 0.5, string color = "0 155 0")
 {
@@ -87,36 +122,5 @@ void function FinishTriggerThink()
 			}
 		}
 		WaitFrame()
-	}
-}
-
-void function SpawnCheckpoints()
-{
-	foreach (int index, vector checkpoint in checkpoints)
-	{
-		if (index == 0) 
-		{
-			thread SpawnStartTrigger()
-		}
-		else if (index == checkpoints.len()-1)
-		{
-			checkpointEntities.append( SpawnEndTrigger( checkpoint ) )
-		}
-		else
-		{
-			entity checkpoint = CreateCheckpoint(checkpoint, void function (entity player): (index) {
-				PlayerStats pStats = localStats[player.GetPlayerName()]
-
-				// Only update player info if their currentCheckpoint index is the previous one!
-				if (pStats.isRunning && pStats.currentCheckpoint == index-1)
-				{
-					pStats.checkpointAngles.append( player.GetAngles() )
-					pStats.currentCheckpoint = index
-					player.SetPlayerNetInt( "currentCheckpoint", index )
-					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[index].GetEncodedEHandle() )
-				}
-			})
-			checkpointEntities.append( checkpoint )
-		}
 	}
 }

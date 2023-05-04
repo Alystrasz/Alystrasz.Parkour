@@ -46,7 +46,8 @@ void function _PK_Init() {
 	AddCallback_OnClientConnected( OnPlayerConnected )
 	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
 
-	thread SpawnCheckpoints()
+	// Prepare map for parkour gamemode
+	SpawnEntities()
 }
 
 void function OnPlayerConnected(entity player)
