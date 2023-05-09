@@ -20,6 +20,8 @@ void function SpawnEntities()
  **/
 void function SpawnCheckpoints()
 {
+	int checkpointsCount = checkpoints.len()-1
+
 	foreach (int index, vector checkpoint in checkpoints)
 	{
 		if (index == 0)
@@ -33,7 +35,7 @@ void function SpawnCheckpoints()
 		}
 		else
 		{
-			entity checkpoint = CreateCheckpoint(checkpoint, void function (entity player): (index) {
+			entity checkpoint = CreateCheckpoint(checkpoint, void function (entity player): (index, checkpointsCount) {
 				PlayerStats pStats = localStats[player.GetPlayerName()]
 
 				// Only update player info if their currentCheckpoint index is the previous one!
@@ -47,6 +49,10 @@ void function SpawnCheckpoints()
 						"ServerCallback_UpdateNextCheckpointMarker",
 						checkpointEntities[index].GetEncodedEHandle()
 					)
+
+					// Update checkpoint UI
+					string id = localStats[player.GetPlayerName()].playerIdentifier
+    				NSEditStatusMessageOnPlayer(player, "[" + pStats.currentCheckpoint + "/" + checkpointsCount + "]", "checkpoints reached", id)
 				}
 			})
 			checkpointEntities.append( checkpoint )
@@ -87,6 +93,8 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
  **/
 void function SpawnStartTrigger()
 {
+	int checkpointsCount = checkpoints.len()-1
+
 	while (true)
 	{
 		foreach(player in GetPlayerArray())
@@ -105,6 +113,11 @@ void function SpawnStartTrigger()
 					localStats[playerName].isRunning = true
 					Remote_CallFunction_NonReplay( player, "ServerCallback_StartRun" )
 					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle() )
+
+					// Update checkpoint UI
+					string id = UniqueString(playerName)
+					localStats[playerName].playerIdentifier = id
+    				NSCreateStatusMessageOnPlayer(player, "[0/" + checkpointsCount + "]", "checkpoints reached", id)
 				}
 			}
 		}
@@ -159,6 +172,9 @@ void function FinishTriggerThink()
                     }
 
                     Remote_CallFunction_NonReplay( player, "ServerCallback_StopRun", duration, isBestTime )
+
+					// Update checkpoint UI
+					NSDeleteStatusMessageOnPlayer( player, playerStats.playerIdentifier )
 				}
 			}
 		}

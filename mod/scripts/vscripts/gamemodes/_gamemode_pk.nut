@@ -10,6 +10,7 @@ global struct PlayerStats
 	array<vector> checkpointAngles = [<0, 0, 0>]
 	float startTime
 	float bestTime = 65535
+	string playerIdentifier
 }
 
 global table< string, PlayerStats > localStats = {}
