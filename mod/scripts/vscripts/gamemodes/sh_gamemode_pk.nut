@@ -46,7 +46,4 @@ void function PKRegisterNetworkVars()
     Remote_RegisterFunction( "ServerCallback_StopRun" )
 
     RegisterNetworkedVariable( "currentCheckpoint", SNDC_PLAYER_GLOBAL, SNVT_INT, 0 )
-    #if CLIENT
-    RegisterNetworkedVariableChangeCallback_int( "currentCheckpoint", UpdateCheckpointMarker )
-    #endif
 }

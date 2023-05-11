@@ -1,7 +1,6 @@
 global function Cl_Parkour_Init
 global function Cl_Parkour_Update
 global function ServerCallback_StartRun
-global function UpdateCheckpointMarker
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 
@@ -146,18 +145,6 @@ void function ServerCallback_StartRun()
 	RuiSetImage( rui, "imageName", $"rui/hud/gametype_icons/ctf/ctf_flag_neutral" )
 	RuiSetBool( rui, "isVisible", true )
     file.nextCheckpointRui = rui
-}
-
-void function UpdateCheckpointMarker( entity player, int old, int new, bool actuallyChanged )
-{
-    AnnouncementData announcement = Announcement_Create( "Reached checkpoint #" + new )
-	Announcement_SetSubText( announcement, "Your progression has been saved." )
-	Announcement_SetTitleColor( announcement, <1,0,0> )
-	Announcement_SetPurge( announcement, true )
-	Announcement_SetPriority( announcement, 200 )
-	Announcement_SetSoundAlias( announcement, SFX_HUD_ANNOUNCE_QUICK )
-	Announcement_SetStyle( announcement, ANNOUNCEMENT_STYLE_QUICK )
-	AnnouncementFromClass( GetLocalViewPlayer(), announcement )
 }
 
 void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle )

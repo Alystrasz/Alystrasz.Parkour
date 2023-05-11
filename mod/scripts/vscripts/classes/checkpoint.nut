@@ -53,6 +53,7 @@ void function SpawnCheckpoints()
 					// Update checkpoint UI
 					string id = localStats[player.GetPlayerName()].playerIdentifier
     				NSEditStatusMessageOnPlayer(player, "[" + pStats.currentCheckpoint + "/" + checkpointsCount + "]", "checkpoints reached", id)
+					EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
 				}
 			})
 			checkpointEntities.append( checkpoint )
