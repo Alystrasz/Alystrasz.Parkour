@@ -1,6 +1,7 @@
 global function Cl_Parkour_Init
 global function Cl_Parkour_Update
 global function ServerCallback_StartRun
+global function ServerCallback_UpdateLeaderboard
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 
@@ -145,6 +146,19 @@ void function ServerCallback_StartRun()
 	RuiSetImage( rui, "imageName", $"rui/hud/gametype_icons/ctf/ctf_flag_neutral" )
 	RuiSetBool( rui, "isVisible", true )
     file.nextCheckpointRui = rui
+}
+
+void function ServerCallback_UpdateLeaderboard( int playerHandle, float time, int index )
+{
+    entity player = GetEntityFromEncodedEHandle( playerHandle )
+	if (!IsValid(player))
+		return
+
+    string nameArg = "entry" + index + "Name"
+    string timeArg = "entry" + index + "Time"
+
+    RuiSetString( file.leaderboard, nameArg, player.GetPlayerName() )
+    RuiSetFloat( file.leaderboard, timeArg, time )
 }
 
 void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle )
