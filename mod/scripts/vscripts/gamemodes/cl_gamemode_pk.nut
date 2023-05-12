@@ -110,6 +110,11 @@ void function DestroyRemainingRUIs()
         RuiDestroyIfAlive( file.splashEndRUI )
         file.splashEndRUI = null
     }
+    if ( file.nextCheckpointRui != null )
+    {
+        RuiDestroyIfAlive( file.nextCheckpointRui )
+        file.nextCheckpointRui = null
+    }
 }
 
 void function ServerCallback_StartRun()
@@ -195,7 +200,7 @@ void function ServerCallback_StopRun( float runDuration, bool isBestTime )
     }
 
     float stopRunRUIsDuration = 5
-    
+
     // Finish splash message
     file.splashEndRUI = RuiCreate( $"ui/gauntlet_splash.rpak", clGlobal.topoCockpitHud, RUI_DRAW_COCKPIT, 0 )
 	RuiSetFloat( file.splashEndRUI, "duration", stopRunRUIsDuration )
