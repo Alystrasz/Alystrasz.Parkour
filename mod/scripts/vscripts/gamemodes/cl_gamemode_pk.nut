@@ -4,6 +4,7 @@ global function ServerCallback_StartRun
 global function ServerCallback_UpdateLeaderboard
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
+global function ServerCallback_ResetRun
 
 struct {
     entity mover
@@ -146,6 +147,20 @@ void function ServerCallback_StartRun()
 	RuiSetImage( rui, "imageName", $"rui/hud/gametype_icons/ctf/ctf_flag_neutral" )
 	RuiSetBool( rui, "isVisible", true )
     file.nextCheckpointRui = rui
+
+    // Reset hint message
+    thread ShowResetHint()
+}
+
+void function ShowResetHint()
+{
+    wait 5
+    AddPlayerHint( 5.0, 0.5, $"", "Tip: press %use% to restart the run." )
+}
+
+void function ServerCallback_ResetRun()
+{
+    DestroyRemainingRUIs()
 }
 
 void function ServerCallback_UpdateLeaderboard( int playerHandle, float time, int index )

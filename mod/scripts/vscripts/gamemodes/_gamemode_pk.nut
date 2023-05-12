@@ -59,6 +59,7 @@ void function _PK_Init() {
 	// Prepare map for parkour gamemode
 	SpawnEntities()
 	InitLeaderboard()
+	thread CheckPlayersForReset()
 }
 
 void function InitLeaderboard()
@@ -111,4 +112,38 @@ void function UpdatePlayersLeaderboard()
 	}
 
 	// TODO find a way to transmit `results` variable to all players
+}
+
+void function CheckPlayersForReset()
+{
+	table times = {}
+	int resetDelay = 1
+
+	while (true)
+	{
+		float currTime = Time()
+
+		foreach(player in GetPlayerArray())
+		{
+			string playerName = player.GetPlayerName()
+			if(player.UseButtonPressed() && localStats[playerName].isRunning)
+			{
+				if (!(playerName in times)) {
+					times[playerName] <- currTime
+				}
+
+				if (currTime - times[playerName] >= resetDelay) {
+					delete times[playerName]
+					player.Die()
+					OnPlayerConnected(player)
+					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
+					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
+				}
+			}
+			else {
+				times[playerName] <- currTime
+			}
+		}
+		WaitFrame()
+	}
 }
