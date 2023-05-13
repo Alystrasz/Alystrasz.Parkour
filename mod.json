@@ -21,7 +21,7 @@
             "RunOn": "CLIENT"
         },
         {
-            "Path": "classes/checkpoint.nut",
+            "Path": "utils/checkpoint.nut",
             "RunOn": "SERVER"
         },
         {
