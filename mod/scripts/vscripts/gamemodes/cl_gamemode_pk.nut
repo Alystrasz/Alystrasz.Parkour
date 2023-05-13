@@ -1,5 +1,4 @@
 global function Cl_Parkour_Init
-global function Cl_Parkour_Update
 global function ServerCallback_StartRun
 global function ServerCallback_UpdateLeaderboard
 global function ServerCallback_UpdateNextCheckpointMarker
@@ -59,22 +58,6 @@ void function Cl_Parkour_Init()
 
     thread Cl_Parkour_Create_Start()
     Cl_Parkour_Create_End()
-}
-
-void function Cl_Parkour_Update()
-{
-    int leaderboardIdx = 9
-    string nameArg = "entry" + leaderboardIdx + "Name"
-    string timeArg = "entry" + leaderboardIdx + "Time"
-
-    RuiSetString( file.leaderboard, nameArg, "Alystrasz" )
-    RuiSetFloat( file.leaderboard, timeArg, 192.42 )
-
-    // Highlight entries
-    //      => yellow with pilot helmet leading icon
-    // RuiSetInt( file.leaderboard, "highlightNameIdx", 5 )
-    //      => blue with jumping pilot leading icon
-    // RuiSetInt( file.leaderboard, "activeEntryIdx", leaderboardIdx )
 }
 
 // Start/end "barrier" world UI

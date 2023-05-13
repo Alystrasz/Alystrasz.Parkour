@@ -5,7 +5,7 @@ global const PK_NAME = "Parkour"
 global const PK_DESC = "The gauntlet mission, but on multiplayer maps."
 
 void function PKMode_Init() {
-    AddCallback_OnCustomGamemodesInit( CreateGamemode )	
+    AddCallback_OnCustomGamemodesInit( CreateGamemode )
 	AddCallback_OnRegisteringCustomNetworkVars( PKRegisterNetworkVars )
 }
 
@@ -13,7 +13,7 @@ void function CreateGamemode() {
     GameMode_Create( GAMEMODE_PK )
     GameMode_SetName( GAMEMODE_PK, PK_NAME )
     GameMode_SetDesc( GAMEMODE_PK, PK_DESC )
-    
+
     // Green because batteries are green.. idk
 	GameMode_SetColor( GAMEMODE_PK, [56, 181, 34, 255] )
 
@@ -21,7 +21,7 @@ void function CreateGamemode() {
 	GameMode_SetDefaultTimeLimits( GAMEMODE_PK, 3, 0 )
 	GameMode_SetDefaultScoreLimits( GAMEMODE_PK, 5, 0 )
 	GameMode_SetEvacEnabled( GAMEMODE_PK, false )
-    
+
     // IDK what this is but it works
     GameMode_SetGameModeAnnouncement( GAMEMODE_PK, "gnrc_modeDesc" )
 
@@ -32,7 +32,6 @@ void function CreateGamemode() {
     GameMode_SetPilotSpawnpointsRatingFunc( GAMEMODE_PK, RateSpawnpoints_Generic )
     #elseif CLIENT
     GameMode_AddClientInit( GAMEMODE_PK, Cl_Parkour_Init )
-    GameMode_AddClientInit( GAMEMODE_PK, Cl_Parkour_Update )
     #endif
 }
 
