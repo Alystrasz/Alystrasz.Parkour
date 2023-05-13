@@ -2,6 +2,7 @@ untyped
 global function _PK_Init
 global bool IS_PK = false
 global function UpdatePlayersLeaderboard
+global function StoreNewLeaderboardEntry
 
 global struct PlayerStats
 {
@@ -67,7 +68,7 @@ void function InitLeaderboard()
 	LeaderboardEntry entry1 = {
 		playerName = "Alystrasz"
 		time = 42
-	} 
+	}
 	leaderboard[1] <- entry1
 
 	LeaderboardEntry entry2 = {
@@ -145,5 +146,23 @@ void function CheckPlayersForReset()
 			}
 		}
 		WaitFrame()
+	}
+}
+
+void function StoreNewLeaderboardEntry( entity player, float duration )
+{
+	// TODO check if new entry changes table
+	// TODO if yes, send new state to all players
+	print("New time for " + player.GetPlayerName() + ": " + duration)
+	TransmitNewScoreToAllPlayers( player, duration )
+}
+
+// TODO compute new leaderboard index
+// TODO check if score is among 10 best before updating all clients
+void function TransmitNewScoreToAllPlayers( entity nPlayer, float duration )
+{
+	foreach(player in GetPlayerArray())
+	{
+		Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateLeaderboard", nPlayer.GetEncodedEHandle(), duration, 0 )
 	}
 }

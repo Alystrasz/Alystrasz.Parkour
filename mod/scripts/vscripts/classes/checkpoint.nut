@@ -178,22 +178,11 @@ void function FinishTriggerThink()
 					NSDeleteStatusMessageOnPlayer( player, playerStats.playerIdentifier )
 
 					// Score update
-					TransmitNewScoreToAllPlayers( player, duration )
+					StoreNewLeaderboardEntry( player, duration )
 				}
 			}
 		}
 		WaitFrame()
-	}
-}
-
-
-// TODO compute new leaderboard index
-// TODO check if score is among 10 best before updating all clients
-void function TransmitNewScoreToAllPlayers( entity nPlayer, float duration )
-{
-	foreach(player in GetPlayerArray())
-	{
-		Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateLeaderboard", nPlayer.GetEncodedEHandle(), duration, 0 )
 	}
 }
 
