@@ -81,7 +81,7 @@ void function CheckPlayersForReset()
 
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
-					player.Die()
+					player.TakeDamage( player.GetMaxHealth() + 1, null, null, { damageSourceId=damagedef_suicide } )
 					OnPlayerConnected(player)
 					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
