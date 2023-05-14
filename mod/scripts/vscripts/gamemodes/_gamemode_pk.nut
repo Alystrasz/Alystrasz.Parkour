@@ -154,6 +154,25 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 	// TODO check if new entry changes table
 	// TODO if yes, send new state to all players
 	print("New time for " + player.GetPlayerName() + ": " + duration)
+
+	int insertionIndex = 0
+	foreach(int index, LeaderboardEntry entry in leaderboard)
+	{
+		if (duration < entry.time)
+		{
+			// TODO add new entry
+			insertionIndex = index
+			break;
+		}
+	}
+
+	// If new player time does not change the leaderboard, don't
+	// send leaderboard updates to client.
+	if (insertionIndex == 0)
+	{
+		return;
+	}
+
 	TransmitNewScoreToAllPlayers( player, duration )
 }
 
