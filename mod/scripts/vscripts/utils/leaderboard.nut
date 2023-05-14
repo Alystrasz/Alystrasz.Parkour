@@ -90,11 +90,3 @@ void function UpdatePlayersLeaderboard( int startIndex )
 		}
 	}
 }
-
-void function TransmitNewScoreToAllPlayers( entity nPlayer, float duration, int leaderboardIndex )
-{
-	foreach(player in GetPlayerArray())
-	{
-		Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateLeaderboard", nPlayer.GetEncodedEHandle(), duration, leaderboardIndex )
-	}
-}
