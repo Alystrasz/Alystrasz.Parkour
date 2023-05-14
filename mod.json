@@ -21,6 +21,10 @@
             "RunOn": "CLIENT"
         },
         {
+            "Path": "utils/map.nut",
+            "RunOn": "SERVER"
+        },
+        {
             "Path": "utils/leaderboard.nut",
             "RunOn": "SERVER"
         },
