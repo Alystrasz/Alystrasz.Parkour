@@ -26,7 +26,6 @@ void function SpawnCheckpoints()
 	{
 		if (index == 0)
 		{
-			// TODO this actually does not use coordinates from `checkpoints` global entry
 			thread SpawnStartTrigger()
 		}
 		else if (index == checkpoints.len()-1)
@@ -95,6 +94,7 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
 void function SpawnStartTrigger()
 {
 	int checkpointsCount = checkpoints.len()-1
+	TriggerVolume coordinates = GetMapStartVolume()
 
 	while (true)
 	{
@@ -102,7 +102,7 @@ void function SpawnStartTrigger()
 		{
 			string playerName = player.GetPlayerName()
 
-			if (PointIsWithinBounds( player.GetOrigin(), < -157.2, -3169.45, -200>, < -68.0326, -2931.55, -53.4112> ))
+			if (PointIsWithinBounds( player.GetOrigin(), coordinates.mins, coordinates.maxs ))
 			{
 				if (localStats[playerName].isRunning) {
 					// Chat_ServerBroadcast(playerName + " is in start trigger but is already running!")
@@ -149,14 +149,15 @@ entity function SpawnEndTrigger( vector origin )
  **/
 void function FinishTriggerThink()
 {
+	TriggerVolume coordinates = GetMapFinishVolume()
+
     while (true)
 	{
 		foreach(player in GetPlayerArray())
 		{
 			string playerName = player.GetPlayerName()
 
-			// TODO import coordinates from `checkpoints` global array
-			if (PointIsWithinBounds( player.GetOrigin(), < -468.13, -3125.91, -139.767>, < -334.145, -2914.39, -7.99543> ))
+			if (PointIsWithinBounds( player.GetOrigin(), coordinates.mins, coordinates.maxs ))
 			{
                 PlayerStats playerStats = localStats[playerName]
 				if (playerStats.isRunning && playerStats.currentCheckpoint == checkpoints.len()-2) {
