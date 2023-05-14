@@ -3,6 +3,14 @@ global function GetMapCheckpointLocations
 
 array<vector> function GetMapCheckpointLocations()
 {
+    array<vector> checkpoints = _GetMapCheckpointLocations()
+    checkpoints.append( _GetMapEndLocation() )
+    return checkpoints
+}
+
+// Return checkpoints player must go through during run.
+array<vector> function _GetMapCheckpointLocations()
+{
     string mapName = GetMapName()
 
     switch( mapName )
@@ -22,13 +30,29 @@ array<vector> function GetMapCheckpointLocations()
                 < -488.85, -956.027, -191.969>,
                 < -1806.92, -1307.96, -319.969>,
                 < -1206.72, -766.02, 328.031>,
-                < -1844.4, -1307.25, 949.407>,
-
-                // End
-                < -399.065, -2906.22, -83.9688>
+                < -1844.4, -1307.25, 949.407>
             ]
         default:
             throw format( "Checkpoints were not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+/**
+ * Returns location of the finish line.
+ * This is used to display the icon on players UI.
+ **/
+vector function _GetMapEndLocation()
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            return < -399.065, -2906.22, -83.9688>
+        default:
+            throw format( "End location was not found for map \"%s\".", mapName )
     }
 
     unreachable
