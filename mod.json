@@ -21,6 +21,10 @@
             "RunOn": "CLIENT"
         },
         {
+            "Path": "utils/leaderboard.nut",
+            "RunOn": "SERVER"
+        },
+        {
             "Path": "utils/checkpoint.nut",
             "RunOn": "SERVER"
         },
