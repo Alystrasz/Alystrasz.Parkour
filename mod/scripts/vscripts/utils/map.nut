@@ -28,7 +28,7 @@ array<vector> function GetMapCheckpointLocations()
                 < -399.065, -2906.22, -83.9688>
             ]
         default:
-            // TODO throw
+            throw format( "Checkpoints were not found for map \"%s\".", mapName )
     }
 
     unreachable
