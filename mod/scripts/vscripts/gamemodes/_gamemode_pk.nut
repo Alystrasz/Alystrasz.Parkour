@@ -134,33 +134,45 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 	// TODO if yes, send new state to all players
 	print("New time for " + player.GetPlayerName() + ": " + duration)
 
-	int insertionIndex = 0
+	int insertionIndex = -1
 	foreach(int index, LeaderboardEntry entry in leaderboard)
 	{
 		if (duration < entry.time)
 		{
-			// TODO add new entry
 			insertionIndex = index
+
+			// Add entry to leaderboard
+			LeaderboardEntry entry = { ... }
+			entry.playerName = player.GetPlayerName()
+			entry.time = duration
+			leaderboard.insert( insertionIndex, entry )
+
 			break;
 		}
 	}
 
-	// If new player time does not change the leaderboard, don't
-	// send leaderboard updates to client.
-	if (insertionIndex == 0)
+	
+	if (insertionIndex == -1)
 	{
-		return;
+		// If new player time does not change the leaderboard, don't
+		// send leaderboard updates to client.
+		if (leaderboard.len() != 0)
+			return;
+
+		// Otherwise, it means this is the first leaderboard entry.
+		insertionIndex = 0
 	}
 
-	TransmitNewScoreToAllPlayers( player, duration )
+
+	TransmitNewScoreToAllPlayers( player, duration, insertionIndex )
 }
 
 // TODO compute new leaderboard index
 // TODO check if score is among 10 best before updating all clients
-void function TransmitNewScoreToAllPlayers( entity nPlayer, float duration )
+void function TransmitNewScoreToAllPlayers( entity nPlayer, float duration, int leaderboardIndex )
 {
 	foreach(player in GetPlayerArray())
 	{
-		Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateLeaderboard", nPlayer.GetEncodedEHandle(), duration, 0 )
+		Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateLeaderboard", nPlayer.GetEncodedEHandle(), duration, leaderboardIndex )
 	}
 }
