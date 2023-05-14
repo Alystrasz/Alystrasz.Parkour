@@ -20,6 +20,7 @@ global table< string, PlayerStats > localStats = {}
 global struct LeaderboardEntry
 {
 	string playerName
+	int playerHandle
 	float time
 }
 
@@ -81,19 +82,6 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	player.SetAngles(localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
 }
 
-// Unfinished
-void function UpdatePlayersLeaderboard()
-{
-	string results = ""
-
-	foreach(int index, LeaderboardEntry entry in leaderboard)
-	{
-		results += index + ";" + entry.playerName + ";" + entry.time + "\n"
-	}
-
-	// TODO find a way to transmit `results` variable to all players
-}
-
 void function CheckPlayersForReset()
 {
 	table times = {}
@@ -130,45 +118,84 @@ void function CheckPlayersForReset()
 
 void function StoreNewLeaderboardEntry( entity player, float duration )
 {
-	// TODO check if new entry changes table
-	// TODO if yes, send new state to all players
 	print("New time for " + player.GetPlayerName() + ": " + duration)
+	int insertionIndex = 0
+	bool leaderboardNeedsUpdating = false
 
-	int insertionIndex = -1
-	foreach(int index, LeaderboardEntry entry in leaderboard)
+
+	// Check if new entry will fit leaderboard
 	{
-		if (duration < entry.time)
+		// Check if there's a previous time (and if player improved his time)
+		foreach (LeaderboardEntry entry in leaderboard)
 		{
-			insertionIndex = index
+			if (entry.playerName == player.GetPlayerName())
+			{
+				if (entry.time < duration)
+					return
+				break
+			}
+		}
 
-			// Add entry to leaderboard
-			LeaderboardEntry entry = { ... }
-			entry.playerName = player.GetPlayerName()
-			entry.time = duration
-			leaderboard.insert( insertionIndex, entry )
+		// If leaderboard is not full, new entry will fit
+		if (leaderboard.len() < 10)
+			leaderboardNeedsUpdating = true
 
-			break;
+		// Check if input time should appear in leaderboard
+		if (!leaderboardNeedsUpdating && leaderboard.len() == 10)
+		{
+			float lastTime = leaderboard[9].time
+			if (duration < lastTime)
+			{
+				leaderboardNeedsUpdating = true
+			}
 		}
 	}
 
-	
-	if (insertionIndex == -1)
-	{
-		// If new player time does not change the leaderboard, don't
-		// send leaderboard updates to client.
-		if (leaderboard.len() != 0)
-			return;
 
-		// Otherwise, it means this is the first leaderboard entry.
-		insertionIndex = 0
+	// 2. Insert entry
+	{
+		if (!leaderboardNeedsUpdating)
+			return
+
+		// Remove eventual previous player entry 
+		array<string> entriesNames = []
+		foreach (LeaderboardEntry entry in leaderboard) {
+			entriesNames.append( entry.playerName )
+		}
+		int playerIndex = entriesNames.find( player.GetPlayerName() )
+		if (playerIndex != -1)
+			leaderboard.remove( playerIndex )	
+
+		// Add actual entry
+		LeaderboardEntry entry = { ... }
+		entry.playerName = player.GetPlayerName()
+		entry.playerHandle = player.GetEncodedEHandle()
+		entry.time = duration
+		leaderboard.append( entry )
+
+		leaderboard.sort(int function(LeaderboardEntry a, LeaderboardEntry b) {
+			if (a.time > b.time) return 1
+			else if (b.time < a.time) return -1
+			return 0;
+		})
+
+		// TODO update insertionIndex
 	}
 
-
-	TransmitNewScoreToAllPlayers( player, duration, insertionIndex )
+	UpdatePlayersLeaderboard( insertionIndex )
 }
 
-// TODO compute new leaderboard index
-// TODO check if score is among 10 best before updating all clients
+void function UpdatePlayersLeaderboard( int startIndex )
+{
+	foreach(player in GetPlayerArray())
+	{
+		for (int i=startIndex; i<leaderboard.len(); i++)
+		{
+			LeaderboardEntry entry = leaderboard[i]
+			Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateLeaderboard", entry.playerHandle, entry.time, i )
+		}
+	}
+}
 void function TransmitNewScoreToAllPlayers( entity nPlayer, float duration, int leaderboardIndex )
 {
 	foreach(player in GetPlayerArray())
