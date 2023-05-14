@@ -22,7 +22,8 @@ global struct LeaderboardEntry
 	string playerName
 	float time
 }
-global table<int, LeaderboardEntry> leaderboard = {}
+
+global array<LeaderboardEntry> leaderboard = []
 
 global array<vector> checkpoints = [
 	// Start
@@ -59,29 +60,7 @@ void function _PK_Init() {
 
 	// Prepare map for parkour gamemode
 	SpawnEntities()
-	InitLeaderboard()
 	thread CheckPlayersForReset()
-}
-
-void function InitLeaderboard()
-{
-	LeaderboardEntry entry1 = {
-		playerName = "Alystrasz"
-		time = 42
-	}
-	leaderboard[1] <- entry1
-
-	LeaderboardEntry entry2 = {
-		playerName = "Gecko"
-		time = 55.45
-	}
-	leaderboard[2] <- entry2
-
-	LeaderboardEntry entry3 = {
-		playerName = "uniboi"
-		time = 169.56
-	}
-	leaderboard[3] <- entry3
 }
 
 void function OnPlayerConnected(entity player)
