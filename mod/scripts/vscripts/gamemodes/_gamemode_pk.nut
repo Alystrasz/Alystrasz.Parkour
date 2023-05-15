@@ -43,13 +43,19 @@ void function _PK_Init() {
 	thread CheckPlayersForReset()
 }
 
-void function OnPlayerConnected(entity player)
+void function ResetPlayerRun(entity player)
 {
 	PlayerStats stats = {
 		...
 	}
 	localStats[player.GetPlayerName()] <- stats
 	RespawnPlayerToConfirmedCheckpoint(player)
+}
+
+void function OnPlayerConnected(entity player)
+{
+	ResetPlayerRun(player)
+	UpdatePlayersLeaderboard( 0 )
 }
 
 void function RespawnPlayerToConfirmedCheckpoint(entity player)
@@ -82,7 +88,7 @@ void function CheckPlayersForReset()
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
 					player.TakeDamage( player.GetMaxHealth() + 1, null, null, { damageSourceId=damagedef_suicide } )
-					OnPlayerConnected(player)
+					ResetPlayerRun(player)
 					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
 				}

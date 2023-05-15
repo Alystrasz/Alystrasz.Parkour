@@ -1,4 +1,5 @@
 global function StoreNewLeaderboardEntry
+global function UpdatePlayersLeaderboard
 
 void function StoreNewLeaderboardEntry( entity player, float duration )
 {
