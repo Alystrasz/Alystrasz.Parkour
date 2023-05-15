@@ -79,6 +79,7 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 /**
  * If a new time enters the leaderboard, we don't need to send all 10 entries to all players
  * (if new entry has 7th position, we only need to send 7th, 8th, 9th and 10th entries for instance).
+ * TODO check what happens when player appearing on the leaderboard is disconnected, and server sends leaderboard state to clients
  **/
 void function UpdatePlayersLeaderboard( int startIndex )
 {
