@@ -1,10 +1,16 @@
 global function GetMapCheckpointLocations
 global function GetMapStartVolume
 global function GetMapFinishVolume
+global function GetMapZiplinesCoordinates
 
 global struct TriggerVolume {
     vector mins
     vector maxs
+}
+
+global struct ZiplineCoordinates {
+    vector start
+    vector end
 }
 
 
@@ -112,6 +118,36 @@ TriggerVolume function GetMapFinishVolume()
             return coordinates
         default:
             throw format( "End location was not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+/**
+ * Returns ziplines coordinates for the current map.
+ **/
+array<ZiplineCoordinates> function GetMapZiplinesCoordinates()
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            ZiplineCoordinates zip1 = {
+                start = < -246.983, -2767.25, -55.6686>,
+                end = < -1007.05, -2070.53, 207.528>
+            }
+            ZiplineCoordinates zip2 = {
+                start = <1278.67, -4188.2, 117.5001>,
+                end = <1280.04, -3168.49, 79.5001>
+            }
+            ZiplineCoordinates zip3 = {
+                start = <1604.62, -2300.76, 465.017>,
+                end = <1601.41, -1298.66, 521.017>
+            }
+            return [ zip1, zip2, zip3 ]
+        default:
+            throw format( "Ziplines coordinates were not found for map \"%s\".", mapName )
     }
 
     unreachable

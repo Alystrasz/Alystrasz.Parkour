@@ -191,11 +191,12 @@ void function FinishTriggerThink()
 
 
 /**
- * I think this one is pretty much self-explanatory.
+ * Retrieves ziplines coordinates for the current map, and spawns them accordingly.
  **/
 void function SpawnZiplines()
 {
-    CreateZipline(< -246.983, -2767.25, -55.6686>, < -1007.05, -2070.53, 207.528>)
-    CreateZipline(<1278.67, -4188.2, 117.5001>, <1280.04, -3168.49, 79.5001>)
-    CreateZipline(<1604.62, -2300.76, 465.017>, <1601.41, -1298.66, 521.017>)
+	foreach (coordinates in GetMapZiplinesCoordinates())
+	{
+		CreateZipline( coordinates.start, coordinates.end )
+	}
 }
