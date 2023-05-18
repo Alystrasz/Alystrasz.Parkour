@@ -114,11 +114,9 @@ void function CheckPlayersForReset()
 				// Player held `use` button long enough, trigger run reset
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
-					player.TakeDamage( player.GetMaxHealth() + 1, null, null, { damageSourceId=damagedef_suicide } )
-
+					MovePlayerToMapStart(player)
 					// TODO fix: this removes player's best time while it shouldn't
 					ResetPlayerRun(player)
-
 					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
 				}
@@ -129,4 +127,19 @@ void function CheckPlayersForReset()
 		}
 		WaitFrame()
 	}
+}
+
+void function MovePlayerToMapStart( entity player )
+{
+	PhaseShift(player, 0, 1)
+	entity mover = CreateOwnedScriptMover (player)
+	player.SetParent(mover)
+	mover.NonPhysicsMoveTo (checkpoints[0], 1, 0, 0.0)
+	wait 1
+
+	player.SetVelocity(<0,0,0>)
+	player.ClearParent()
+	mover.Destroy()
+
+	player.SetOrigin( checkpoints[0] )
 }
