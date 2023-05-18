@@ -126,6 +126,7 @@ void function CheckPlayersForReset()
 					ResetPlayerRun( player, true )
 					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
+					player.AddToPlayerGameStat( PGS_DEFENSE_SCORE, 1 )
 				}
 			}
 			else {

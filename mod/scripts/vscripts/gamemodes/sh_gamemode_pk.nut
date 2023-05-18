@@ -14,6 +14,12 @@ void function CreateGamemode() {
     GameMode_SetName( GAMEMODE_PK, PK_NAME )
     GameMode_SetDesc( GAMEMODE_PK, PK_DESC )
 
+    // Game statistics
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Started runs", PGS_PILOT_KILLS, 2)
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Finished runs", PGS_ASSAULT_SCORE, 2)
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Resets", PGS_DEFENSE_SCORE, 2)
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Top 3 scores", PGS_TITAN_KILLS, 2 )
+
     // Green because batteries are green.. idk
 	GameMode_SetColor( GAMEMODE_PK, [56, 181, 34, 255] )
 

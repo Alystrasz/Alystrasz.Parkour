@@ -119,6 +119,7 @@ void function SpawnStartTrigger()
 					string id = UniqueString(playerName)
 					localStats[playerName].playerIdentifier = id
     				NSCreateStatusMessageOnPlayer(player, "[0/" + checkpointsCount + "]", "checkpoints reached", id)
+					player.AddToPlayerGameStat( PGS_PILOT_KILLS, 1 )
 				}
 			}
 		}
@@ -180,6 +181,7 @@ void function FinishTriggerThink()
 
 					// Score update
 					StoreNewLeaderboardEntry( player, duration )
+					player.AddToPlayerGameStat( PGS_ASSAULT_SCORE, 1 )
 				}
 			}
 		}

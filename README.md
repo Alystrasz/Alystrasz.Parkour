@@ -36,4 +36,4 @@ A template repository for Northstar mods with a ~~mostly~~ pre-configured github
 - [ ] Add electric smoke volumes
 - [x] Prevent titans from being called
 - [x] Put all players in the same team
-- [ ] Add run statistics to "tab leaderboard"
+- [x] Add run statistics to "tab leaderboard"

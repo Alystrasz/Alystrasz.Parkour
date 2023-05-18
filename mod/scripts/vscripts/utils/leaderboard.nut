@@ -71,6 +71,10 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 		}
 		insertionIndex = entriesNames.find( player.GetPlayerName() )
 		Assert(insertionIndex != -1)
+
+		// Update player stats
+		if (insertionIndex <= 2)
+			player.AddToPlayerGameStat( PGS_TITAN_KILLS, 1 )
 	}
 
 	UpdatePlayersLeaderboard( insertionIndex )
