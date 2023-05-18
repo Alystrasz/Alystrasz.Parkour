@@ -122,7 +122,7 @@ void function CheckPlayersForReset()
 				// Player held `use` button long enough, trigger run reset
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
-					MovePlayerToMapStart(player)
+					thread MovePlayerToMapStart(player)
 					ResetPlayerRun( player, true )
 					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
@@ -151,4 +151,5 @@ void function MovePlayerToMapStart( entity player )
 	mover.Destroy()
 
 	player.SetOrigin( checkpoints[0] )
+	player.SetAngles( <0, 0, 0> )
 }
