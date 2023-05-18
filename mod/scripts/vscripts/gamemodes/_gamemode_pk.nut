@@ -73,6 +73,8 @@ void function ResetPlayerRun(entity player, bool preserveBestTime = false)
  **/
 void function OnPlayerConnected(entity player)
 {
+	// Put all players in the same team
+	SetTeam( player, TEAM_IMC )
 	ResetPlayerRun(player)
 	UpdatePlayersLeaderboard( 0 )
 }
