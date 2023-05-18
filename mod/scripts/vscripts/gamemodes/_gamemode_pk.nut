@@ -51,12 +51,18 @@ void function _PK_Init() {
  * Resets a player's run statistics (check the PlayerStats struct for default
  * values), and respawns them to the last checkpoint they crossed.
  **/
-void function ResetPlayerRun(entity player)
+void function ResetPlayerRun(entity player, bool preserveBestTime = false)
 {
+	string playerName = player.GetPlayerName()
 	PlayerStats stats = {
 		...
 	}
-	localStats[player.GetPlayerName()] <- stats
+
+	if (preserveBestTime) {
+		stats.bestTime = localStats[playerName].bestTime
+	}
+
+	localStats[playerName] <- stats	
 	RespawnPlayerToConfirmedCheckpoint(player)
 }
 
@@ -115,8 +121,7 @@ void function CheckPlayersForReset()
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
 					MovePlayerToMapStart(player)
-					// TODO fix: this removes player's best time while it shouldn't
-					ResetPlayerRun(player)
+					ResetPlayerRun( player, true )
 					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
 				}
