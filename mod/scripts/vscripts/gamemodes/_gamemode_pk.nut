@@ -37,6 +37,10 @@ void function _PK_Init() {
 	AddCallback_OnClientConnected( OnPlayerConnected )
 	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
 
+	// Disable titans and boosts
+	Riff_ForceTitanAvailability( eTitanAvailability.Never )
+	Riff_ForceBoostAvailability( eBoostAvailability.Disabled )
+
 	// Prepare map for parkour gamemode
 	checkpoints = GetMapCheckpointLocations()
 	SpawnEntities()
