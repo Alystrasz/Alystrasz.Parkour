@@ -134,7 +134,8 @@ void function MovePlayerToMapStart( entity player )
 	PhaseShift(player, 0, 1)
 	entity mover = CreateOwnedScriptMover (player)
 	player.SetParent(mover)
-	mover.NonPhysicsMoveTo (checkpoints[0], 1, 0, 0.0)
+	mover.NonPhysicsMoveTo (checkpoints[0], 1, 0, 0)
+	mover.NonPhysicsRotateTo (<0,0,0>, 1, 0, 0)
 	wait 1
 
 	player.SetVelocity(<0,0,0>)
