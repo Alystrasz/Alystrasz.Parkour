@@ -50,9 +50,10 @@ void function UpdateTopology( var topo, vector org, vector ang, float width, flo
 void function Cl_Parkour_Init()
 {
     // leaderboard
-    vector origin = < -536, -2929.38, -101>
-    vector angles = <0, 90, 0>
-    var topo = CreateTopology(origin + <0,0,65>, angles, 80, 75)
+    vector origin = GetMapLeaderboardOrigin()
+    vector angles = GetMapLeaderboardAngles()
+    array<float> coordinates = GetMapLeaderboardDimensions()
+    var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
     file.leaderboard = rui
 
@@ -63,18 +64,20 @@ void function Cl_Parkour_Init()
 // Start/end "barrier" world UI
 void function Cl_Parkour_Create_Start()
 {
-	vector origin = < -160.82, -3041.79, -200>
-    vector angles = <0, 0, 0>
-	var topo = CreateTopology(origin + <0,0,165>, angles, 120, 80)
+	vector origin = GetMapStartLineOrigin()
+    vector angles = GetMapStartLineAngles()
+    array<float> coordinates = GetMapStartLineDimensions()
+	var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
 }
 
 void function Cl_Parkour_Create_End()
 {
-    vector origin = < -399.065, -2906.22, -83.9688>
-    vector angles = <0, -90, 0>
-	var topo = CreateTopology(origin + <0,0,40>, angles, 120, 80)
+    vector origin = GetMapFinishLineOrigin()
+    vector angles = GetMapFinishLineAngles()
+    array<float> coordinates = GetMapFinishLineDimensions()
+	var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
 }

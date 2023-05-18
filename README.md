@@ -30,9 +30,9 @@ A template repository for Northstar mods with a ~~mostly~~ pre-configured github
 - [x] Reset feature
 - [ ] Make checkpoints visible through walls
 - [ ] Display big message to all players on new highscore
-- [ ] Make mode implementable on all maps
-    - [ ] Server (ziplines missing)
-    - [ ] Client (start/finish lines, leaderboard)
+- [x] Make mode implementable on all maps
+    - [x] Server (ziplines missing)
+    - [x] Client (start/finish lines, leaderboard)
 - [ ] Add electric smoke volumes
 - [x] Prevent titans from being called
 - [x] Put all players in the same team

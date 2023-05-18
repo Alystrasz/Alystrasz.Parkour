@@ -17,6 +17,10 @@
             }
         },
         {
+            "Path": "utils/client/map.nut",
+            "RunOn": "CLIENT"
+        },
+        {
             "Path": "gamemodes/cl_gamemode_pk.nut",
             "RunOn": "CLIENT"
         },
