@@ -29,7 +29,7 @@ A template repository for Northstar mods with a ~~mostly~~ pre-configured github
     - [ ] Working example: https://github.com/ColombianGuy/r5_flowstate/blob/921391d6f0748e22644b559f65201cb634ff4f39/vscripts/ai/_ai_utility.gnut#L41-L64
 - [x] Reset feature
 - [ ] Make checkpoints visible through walls
-- [ ] Display big message to all players on new highscore
+- [x] Display big message to all players on new highscore
 - [x] Make mode implementable on all maps
     - [x] Server (ziplines missing)
     - [x] Client (start/finish lines, leaderboard)

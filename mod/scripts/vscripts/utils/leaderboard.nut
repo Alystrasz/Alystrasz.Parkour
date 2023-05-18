@@ -78,6 +78,13 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 	}
 
 	UpdatePlayersLeaderboard( insertionIndex )
+	if (insertionIndex == 0)
+	{
+		foreach(lPlayer in GetPlayerArray())
+		{
+			NSSendInfoMessageToPlayer(lPlayer, player.GetPlayerName() + " is the new race leader with " + duration + " seconds!")
+		}
+	}
 }
 
 /**
