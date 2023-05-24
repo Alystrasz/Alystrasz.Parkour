@@ -14,6 +14,15 @@ global struct ZiplineCoordinates {
 }
 
 
+/**
+ * Returns a list of coordinates for all map checkpoints.
+ *
+ * This list includes first map spawn point (needed to spawn players on match start),
+ * map finish trigger location, and all checkpoints between them.
+ *
+ * Coordinates are used to display a little flag icon on players' interface, showing
+ * them where to go.
+ **/
 array<vector> function GetMapCheckpointLocations()
 {
     array<vector> checkpoints = _GetMapCheckpointLocations()
@@ -87,6 +96,10 @@ vector function _GetMapEndLocation()
     unreachable
 }
 
+/**
+ * Returns the starting line volume.
+ * It is used to start players' runs.
+ **/
 TriggerVolume function GetMapStartVolume()
 {
     string mapName = GetMapName()
@@ -105,6 +118,10 @@ TriggerVolume function GetMapStartVolume()
     unreachable
 }
 
+/**
+ * Returns the finish line volume.
+ * It is used to end players' runs.
+ **/
 TriggerVolume function GetMapFinishVolume()
 {
     string mapName = GetMapName()
