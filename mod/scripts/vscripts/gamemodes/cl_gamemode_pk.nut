@@ -15,6 +15,7 @@ struct {
     var timerRUI
     var splashStartRUI
     var splashEndRUI
+    var newHighscoreRUI
 
     bool isRunning = false
     var nextCheckpointRui
@@ -101,6 +102,11 @@ void function DestroyRemainingRUIs()
         RuiDestroyIfAlive( file.nextCheckpointRui )
         file.nextCheckpointRui = null
     }
+    if ( file.newHighscoreRUI != null )
+    {
+        RuiDestroyIfAlive( file.newHighscoreRUI )
+        file.newHighscoreRUI = null
+    }
 }
 
 void function ServerCallback_StartRun()
@@ -165,6 +171,28 @@ void function ServerCallback_UpdateLeaderboard( int playerHandle, float time, in
 
     RuiSetString( file.leaderboard, nameArg, player.GetPlayerName() )
     RuiSetFloat( file.leaderboard, timeArg, time )
+
+    // Display a special message on new highscore
+    if (index == 0)
+    {
+        thread ShowNewHighscoreMessage( player.GetPlayerName(), time )
+    }
+}
+
+void function ShowNewHighscoreMessage( string playerName, float playerTime )
+{
+    if (file.newHighscoreRUI != null)
+            RuiDestroyIfAlive( file.newHighscoreRUI )
+
+    file.newHighscoreRUI = CreatePermanentCockpitRui( $"ui/death_hint_mp.rpak" )
+    RuiSetString( file.newHighscoreRUI, "hintText", Localize( "#NEW_HIGHSCORE", playerName, playerTime ) )
+    RuiSetGameTime( file.newHighscoreRUI, "startTime", Time() )
+    RuiSetFloat3( file.newHighscoreRUI, "bgColor", < 0, 0, 0 > )
+    RuiSetFloat( file.newHighscoreRUI, "bgAlpha", 0.5 )
+
+    wait 7
+
+    RuiDestroyIfAlive( file.newHighscoreRUI )
 }
 
 void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle )
