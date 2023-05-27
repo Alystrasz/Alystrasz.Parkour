@@ -1,8 +1,6 @@
 global function PKMode_Init
 
 global const GAMEMODE_PK = "pk"
-global const PK_NAME = "Parkour"
-global const PK_DESC = "The gauntlet mission, but on multiplayer maps."
 
 void function PKMode_Init() {
     AddCallback_OnCustomGamemodesInit( CreateGamemode )
@@ -11,24 +9,16 @@ void function PKMode_Init() {
 
 void function CreateGamemode() {
     GameMode_Create( GAMEMODE_PK )
-    GameMode_SetName( GAMEMODE_PK, PK_NAME )
-    GameMode_SetDesc( GAMEMODE_PK, PK_DESC )
+    GameMode_SetName( GAMEMODE_PK, "#GAMEMODE_PK" )
+    GameMode_SetDesc( GAMEMODE_PK, "#PK_DESC" )
 
     // Game statistics
-    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Started runs", PGS_PILOT_KILLS, 2)
-    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Finished runs", PGS_ASSAULT_SCORE, 2)
-    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Resets", PGS_DEFENSE_SCORE, 2)
-    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "Top 3 scores", PGS_TITAN_KILLS, 2 )
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "#SCOREBOARD_STARTED_RUNS", PGS_PILOT_KILLS, 2)
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "#SCOREBOARD_FINISHED_RUNS", PGS_ASSAULT_SCORE, 2)
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "#SCOREBOARD_RESETS", PGS_DEFENSE_SCORE, 2)
+    GameMode_AddScoreboardColumnData( GAMEMODE_PK, "#SCOREBOARD_TOP_THREE", PGS_TITAN_KILLS, 2 )
 
-    // Green because batteries are green.. idk
-	GameMode_SetColor( GAMEMODE_PK, [56, 181, 34, 255] )
-
-    // Clueless Surely this'll work
-	GameMode_SetDefaultTimeLimits( GAMEMODE_PK, 3, 0 )
-	GameMode_SetDefaultScoreLimits( GAMEMODE_PK, 5, 0 )
 	GameMode_SetEvacEnabled( GAMEMODE_PK, false )
-
-    // IDK what this is but it works
     GameMode_SetGameModeAnnouncement( GAMEMODE_PK, "gnrc_modeDesc" )
 
     AddPrivateMatchMode( GAMEMODE_PK )

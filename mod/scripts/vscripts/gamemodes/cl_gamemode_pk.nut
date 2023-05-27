@@ -146,7 +146,7 @@ void function ServerCallback_StartRun()
 void function ShowResetHint()
 {
     wait 5
-    AddPlayerHint( 5.0, 0.5, $"", "Tip: hold %use% to restart the run." )
+    AddPlayerHint( 5.0, 0.5, $"", "#RESET_RUN_HINT" )
 }
 
 void function ServerCallback_ResetRun()

@@ -36,5 +36,8 @@
             "Path": "gamemodes/_gamemode_pk.nut",
             "RunOn": "SERVER"
         }
+    ],
+    "Localisation": [
+        "resource/parkour_%language%.txt"
     ]
 }

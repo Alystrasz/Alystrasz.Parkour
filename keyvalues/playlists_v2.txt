@@ -7,10 +7,10 @@ playlists
 			inherit defaults
 			vars
 			{
-				name "Parkour"
-				lobbytitle "Lobby: Parkour"
-				description "The gauntlet, but on multiplayer maps."
-				hint "The gauntlet, but on multiplayer maps."
+				name "#GAMEMODE_PK"
+				lobbytitle "PK_NAME_LOBBY"
+				description "#PK_DESC"
+				hint "#PK_DESC"
 				abbreviation "PK"
 				
 				max_players 16
@@ -32,10 +32,10 @@ playlists
 			inherit defaults
 			vars
 			{
-				name "Parkour"
-				lobbytitle "Lobby: Parkour"
-				description "The gauntlet, but on multiplayer maps."
-				hint "The gauntlet, but on multiplayer maps."
+				name "#GAMEMODE_PK"
+				lobbytitle "#PK_NAME_LOBBY"
+				description "#PK_DESC"
+				hint "#PK_DESC"
 				abbreviation "PK"
 				image ffa
 				max_players 16
