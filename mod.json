@@ -17,16 +17,12 @@
             }
         },
         {
-            "Path": "utils/client/map.nut",
-            "RunOn": "CLIENT"
+            "Path": "utils/sh_map.nut",
+            "RunOn": "SERVER || CLIENT"
         },
         {
             "Path": "gamemodes/cl_gamemode_pk.nut",
             "RunOn": "CLIENT"
-        },
-        {
-            "Path": "utils/map.nut",
-            "RunOn": "SERVER"
         },
         {
             "Path": "utils/leaderboard.nut",
