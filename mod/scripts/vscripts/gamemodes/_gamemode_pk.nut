@@ -123,7 +123,7 @@ void function CheckPlayersForReset()
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
 					thread MovePlayerToMapStart(player)
-					ResetPlayerRun( player, true )
+					
 					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
 					player.AddToPlayerGameStat( PGS_DEFENSE_SCORE, 1 )
@@ -139,6 +139,8 @@ void function CheckPlayersForReset()
 
 void function MovePlayerToMapStart( entity player )
 {
+	player.FreezeControlsOnServer()
+
 	PhaseShift(player, 0, 1)
 	entity mover = CreateOwnedScriptMover (player)
 	player.SetParent(mover)
@@ -150,6 +152,7 @@ void function MovePlayerToMapStart( entity player )
 	player.ClearParent()
 	mover.Destroy()
 
-	player.SetOrigin( checkpoints[0] )
-	player.SetAngles( <0, 0, 0> )
+	ResetPlayerRun( player, true )
+	player.SetAngles(<0, 0, 0>)
+	player.UnfreezeControlsOnServer()
 }
