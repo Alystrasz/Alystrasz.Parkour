@@ -9,7 +9,6 @@ global struct PlayerStats
 	array<vector> checkpointAngles = [<0, 0, 0>]
 	float startTime
 	float bestTime = 65535
-	string playerIdentifier
 }
 
 global table< string, PlayerStats > localStats = {}
@@ -124,7 +123,6 @@ void function CheckPlayersForReset()
 					delete times[playerName]
 					thread MovePlayerToMapStart(player)
 					
-					NSDeleteStatusMessageOnPlayer( player, localStats[playerName].playerIdentifier )
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
 					player.AddToPlayerGameStat( PGS_DEFENSE_SCORE, 1 )
 				}

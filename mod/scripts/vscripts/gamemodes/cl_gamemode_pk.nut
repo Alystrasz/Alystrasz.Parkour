@@ -16,6 +16,7 @@ struct {
     var splashStartRUI
     var splashEndRUI
     var newHighscoreRUI
+	var checkpointsCountRUI
 
     bool isRunning = false
     var nextCheckpointRui
@@ -107,6 +108,11 @@ void function DestroyRemainingRUIs()
         RuiDestroyIfAlive( file.newHighscoreRUI )
         file.newHighscoreRUI = null
     }
+	if ( file.checkpointsCountRUI != null )
+	{
+		RuiDestroyIfAlive( file.checkpointsCountRUI )
+		file.checkpointsCountRUI = null
+	}
 }
 
 void function ServerCallback_StartRun()
@@ -195,17 +201,33 @@ void function ShowNewHighscoreMessage( string playerName, float playerTime )
     RuiDestroyIfAlive( file.newHighscoreRUI )
 }
 
-void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle )
+void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, int checkpointIndex, int totalCheckpointsCount )
 {
 	entity checkpoint = GetEntityFromEncodedEHandle( checkpointHandle )
 	if (!IsValid(checkpoint))
 		return
     RuiTrackFloat3( file.nextCheckpointRui, "pos", checkpoint, RUI_TRACK_OVERHEAD_FOLLOW )
+
+    // TODO start run if index == 0
+    if (checkpointIndex == 0)
+    {
+        file.checkpointsCountRUI = CreatePermanentCockpitRui( $"ui/at_wave_intro.rpak" )
+        RuiSetInt( file.checkpointsCountRUI, "listPos", 0 )
+		RuiSetGameTime( file.checkpointsCountRUI, "startFadeInTime", Time() )
+        RuiSetString( file.checkpointsCountRUI, "titleText", checkpointIndex + "/" + totalCheckpointsCount )
+        RuiSetString( file.checkpointsCountRUI, "itemText", "reached checkpoints" )
+        RuiSetFloat2( file.checkpointsCountRUI, "offset", < 0, -250, 0 > )
+    }
+    else
+    {
+		RuiSetString( file.checkpointsCountRUI, "titleText", checkpointIndex + "/" + totalCheckpointsCount )
+    }
 }
 
 void function ServerCallback_StopRun( float runDuration, bool isBestTime )
 {
     file.isRunning = false
+	thread DestroyCheckpointsCountRUI()
 
     if ( file.nextCheckpointRui != null )
     {
@@ -241,4 +263,11 @@ void function DestroyTimerRUI( float delay )
 		RuiDestroyIfAlive( file.timerRUI )
 
 	file.timerRUI = null
+}
+
+void function DestroyCheckpointsCountRUI()
+{
+	RuiSetGameTime( file.checkpointsCountRUI, "startFadeOutTime", Time() )
+	wait 0.6
+	RuiDestroyIfAlive( file.checkpointsCountRUI )
 }

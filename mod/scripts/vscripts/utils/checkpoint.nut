@@ -46,13 +46,10 @@ void function SpawnCheckpoints()
 					Remote_CallFunction_NonReplay( 							// Send player's client next checkpoint location, for it to be RUI displayed
 						player,
 						"ServerCallback_UpdateNextCheckpointMarker",
-						checkpointEntities[index].GetEncodedEHandle()
+						checkpointEntities[index].GetEncodedEHandle(),
+						index,
+						checkpointsCount
 					)
-
-					// Update checkpoint UI
-					string id = localStats[player.GetPlayerName()].playerIdentifier
-    				NSEditStatusMessageOnPlayer(player, "[" + pStats.currentCheckpoint + "/" + checkpointsCount + "]", "checkpoints reached", id)
-					EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
 				}
 			})
 			checkpointEntities.append( checkpoint )
@@ -113,13 +110,7 @@ void function SpawnStartTrigger()
 					localStats[playerName].startTime = Time()
 					localStats[playerName].isRunning = true
 					Remote_CallFunction_NonReplay( player, "ServerCallback_StartRun" )
-					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle() )
-
-					// Update checkpoint UI
-					string id = UniqueString(playerName)
-					localStats[playerName].playerIdentifier = id
-    				NSCreateStatusMessageOnPlayer(player, "[0/" + checkpointsCount + "]", "checkpoints reached", id)
-					player.AddToPlayerGameStat( PGS_PILOT_KILLS, 1 )
+					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
 				}
 			}
 		}
@@ -175,9 +166,6 @@ void function FinishTriggerThink()
                     }
 
                     Remote_CallFunction_NonReplay( player, "ServerCallback_StopRun", duration, isBestTime )
-
-					// Update checkpoint UI
-					NSDeleteStatusMessageOnPlayer( player, playerStats.playerIdentifier )
 
 					// Score update
 					StoreNewLeaderboardEntry( player, duration )
