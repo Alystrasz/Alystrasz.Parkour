@@ -159,12 +159,14 @@ void function ServerCallback_StartRun()
 void function ShowResetHint()
 {
     wait 5
-    AddPlayerHint( 5.0, 0.5, $"", "#RESET_RUN_HINT" )
+	if (file.isRunning)
+    	AddPlayerHint( 5.0, 0.5, $"", "#RESET_RUN_HINT" )
 }
 
 void function ServerCallback_ResetRun()
 {
     DestroyRemainingRUIs()
+	file.isRunning = false
 }
 
 void function ServerCallback_UpdateLeaderboard( int playerHandle, float time, int index )
