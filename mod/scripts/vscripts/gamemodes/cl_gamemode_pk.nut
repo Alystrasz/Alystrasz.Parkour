@@ -113,6 +113,7 @@ void function DestroyRemainingRUIs()
 		RuiDestroyIfAlive( file.checkpointsCountRUI )
 		file.checkpointsCountRUI = null
 	}
+	HidePlayerHint("#RESET_RUN_HINT")
 }
 
 void function ServerCallback_StartRun()
