@@ -1,5 +1,4 @@
 global function Cl_Parkour_Init
-global function ServerCallback_StartRun
 global function ServerCallback_UpdateLeaderboard
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
@@ -116,7 +115,7 @@ void function DestroyRemainingRUIs()
 	HidePlayerHint("#RESET_RUN_HINT")
 }
 
-void function ServerCallback_StartRun()
+void function StartRun( int checkpointsCount )
 {
     file.isRunning = true
 
@@ -151,6 +150,14 @@ void function ServerCallback_StartRun()
 	RuiSetImage( rui, "imageName", $"rui/hud/gametype_icons/ctf/ctf_flag_neutral" )
 	RuiSetBool( rui, "isVisible", true )
     file.nextCheckpointRui = rui
+
+    // Checkpoints count RUI
+    file.checkpointsCountRUI = CreatePermanentCockpitRui( $"ui/at_wave_intro.rpak" )
+    RuiSetInt( file.checkpointsCountRUI, "listPos", 0 )
+    RuiSetGameTime( file.checkpointsCountRUI, "startFadeInTime", Time() )
+    RuiSetString( file.checkpointsCountRUI, "titleText", "0/" + checkpointsCount )
+    RuiSetString( file.checkpointsCountRUI, "itemText", "#REACHED_CHECKPOINTS" )
+    RuiSetFloat2( file.checkpointsCountRUI, "offset", < 0, -250, 0 > )
 
     // Reset hint message
     thread ShowResetHint()
@@ -209,22 +216,20 @@ void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, 
 	entity checkpoint = GetEntityFromEncodedEHandle( checkpointHandle )
 	if (!IsValid(checkpoint))
 		return
-    RuiTrackFloat3( file.nextCheckpointRui, "pos", checkpoint, RUI_TRACK_OVERHEAD_FOLLOW )
 
-    // TODO start run if index == 0
     if (checkpointIndex == 0)
     {
-        file.checkpointsCountRUI = CreatePermanentCockpitRui( $"ui/at_wave_intro.rpak" )
-        RuiSetInt( file.checkpointsCountRUI, "listPos", 0 )
-		RuiSetGameTime( file.checkpointsCountRUI, "startFadeInTime", Time() )
-        RuiSetString( file.checkpointsCountRUI, "titleText", checkpointIndex + "/" + totalCheckpointsCount )
-        RuiSetString( file.checkpointsCountRUI, "itemText", "#REACHED_CHECKPOINTS" )
-        RuiSetFloat2( file.checkpointsCountRUI, "offset", < 0, -250, 0 > )
+        // Setup run RUIs
+        StartRun( totalCheckpointsCount );
     }
     else
     {
+        // Update checkpoints count RUI
 		RuiSetString( file.checkpointsCountRUI, "titleText", checkpointIndex + "/" + totalCheckpointsCount )
     }
+
+    // Update checkpoint overhead icon
+    RuiTrackFloat3( file.nextCheckpointRui, "pos", checkpoint, RUI_TRACK_OVERHEAD_FOLLOW )
 }
 
 void function ServerCallback_StopRun( float runDuration, bool isBestTime )
