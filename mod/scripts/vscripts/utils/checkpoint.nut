@@ -111,6 +111,7 @@ void function SpawnStartTrigger()
 					localStats[playerName].isRunning = true
 					Remote_CallFunction_NonReplay( player, "ServerCallback_StartRun" )
 					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
+					player.AddToPlayerGameStat( PGS_PILOT_KILLS, 1 )
 				}
 			}
 		}
