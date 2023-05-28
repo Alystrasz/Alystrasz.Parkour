@@ -42,7 +42,6 @@ void function SpawnCheckpoints()
 				{
 					pStats.checkpointAngles.append( player.GetAngles() )	// Saves player orientation when checkpoint was reached
 					pStats.currentCheckpoint = index						// Updates player's last reached checkpoint
-					player.SetPlayerNetInt( "currentCheckpoint", index )	// Update player's client
 					Remote_CallFunction_NonReplay( 							// Send player's client next checkpoint location, for it to be RUI displayed
 						player,
 						"ServerCallback_UpdateNextCheckpointMarker",
