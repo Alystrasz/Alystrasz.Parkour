@@ -218,7 +218,7 @@ void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, 
         RuiSetInt( file.checkpointsCountRUI, "listPos", 0 )
 		RuiSetGameTime( file.checkpointsCountRUI, "startFadeInTime", Time() )
         RuiSetString( file.checkpointsCountRUI, "titleText", checkpointIndex + "/" + totalCheckpointsCount )
-        RuiSetString( file.checkpointsCountRUI, "itemText", "reached checkpoints" )
+        RuiSetString( file.checkpointsCountRUI, "itemText", "#REACHED_CHECKPOINTS" )
         RuiSetFloat2( file.checkpointsCountRUI, "offset", < 0, -250, 0 > )
     }
     else
