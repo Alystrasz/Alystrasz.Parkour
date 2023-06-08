@@ -36,7 +36,6 @@ void function PKRegisterNetworkVars()
 	if ( GAMETYPE != GAMEMODE_PK )
 		return
 
-    Remote_RegisterFunction( "ServerCallback_UpdateLeaderboard" )
     Remote_RegisterFunction( "ServerCallback_UpdateNextCheckpointMarker" )
     Remote_RegisterFunction( "ServerCallback_StopRun" )
     Remote_RegisterFunction( "ServerCallback_ResetRun" )

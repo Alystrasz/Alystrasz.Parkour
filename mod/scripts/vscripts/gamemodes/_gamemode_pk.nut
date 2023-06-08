@@ -17,7 +17,6 @@ global table< string, PlayerStats > localStats = {}
 global struct LeaderboardEntry
 {
 	string playerName
-	int playerHandle
 	float time
 }
 

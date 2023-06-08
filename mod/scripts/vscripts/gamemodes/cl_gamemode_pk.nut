@@ -1,5 +1,4 @@
 global function Cl_Parkour_Init
-global function ServerCallback_UpdateLeaderboard
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 global function ServerCallback_ResetRun
@@ -47,7 +46,6 @@ void function UpdateTopology( var topo, vector org, vector ang, float width, flo
     RuiTopology_UpdatePos(topo, org, right, down)
 }
 
-
 void function Cl_Parkour_Init()
 {
     // leaderboard
@@ -57,6 +55,9 @@ void function Cl_Parkour_Init()
     var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
     file.leaderboard = rui
+
+    // register command to receive leaderboard updates from server
+    AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
 
     thread Cl_Parkour_Create_Start()
     Cl_Parkour_Create_End()
@@ -176,22 +177,22 @@ void function ServerCallback_ResetRun()
 	file.isRunning = false
 }
 
-void function ServerCallback_UpdateLeaderboard( int playerHandle, float time, int index )
+void function ServerCallback_UpdateLeaderboard( array<string> args )
 {
-    entity player = GetEntityFromEncodedEHandle( playerHandle )
-	if (!IsValid(player))
-		return
+    string playerName = args[0]
+    float time = args[1].tofloat()
+    int index = args[2].tointeger()
 
     string nameArg = "entry" + index + "Name"
     string timeArg = "entry" + index + "Time"
 
-    RuiSetString( file.leaderboard, nameArg, player.GetPlayerName() )
+    RuiSetString( file.leaderboard, nameArg, playerName )
     RuiSetFloat( file.leaderboard, timeArg, time )
 
     // Display a special message on new highscore
     if (index == 0)
     {
-        thread ShowNewHighscoreMessage( player.GetPlayerName(), time )
+        thread ShowNewHighscoreMessage( playerName, time )
     }
 }
 
