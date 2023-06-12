@@ -100,12 +100,8 @@ void function SpawnStartTrigger()
 
 			if (PointIsWithinBounds( player.GetOrigin(), coordinates.mins, coordinates.maxs ))
 			{
-				if (localStats[playerName].isRunning) {
-					// Chat_ServerBroadcast(playerName + " is in start trigger but is already running!")
-				}
-				else
+				if (!localStats[playerName].isRunning)
 				{
-					Chat_ServerBroadcast(playerName + " starts a new run!")
 					localStats[playerName].startTime = Time()
 					localStats[playerName].isRunning = true
 					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
