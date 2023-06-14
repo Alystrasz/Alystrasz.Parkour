@@ -73,7 +73,7 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
     DispatchSpawn( point )
 
     // Spawn trigger
-    entity trigger = CreateTriggerRadiusMultiple( origin, 140, [], TRIG_FLAG_NONE)
+    entity trigger = CreateTriggerRadiusMultiple( origin, 140, [], TRIG_FLAG_NONE, 80, -80)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player): (callback) {
         callback(player)
     })
