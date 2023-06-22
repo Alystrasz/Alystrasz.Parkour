@@ -36,7 +36,7 @@ jobs:
           # This should be modified if your github username is different than your team name on Thunderstore
           namespace: ${{ github.repository_owner }} # <------ DOUBLE CHECK THIS
           # Name of the package
-          name: ${{ env.name }} # This can be modified if the package name differs from the repo name
+          name: parkour # ${{ env.name }} # This can be modified if the package name differs from the repo name
           # Package version to publish
           version: ${{ github.ref_name }} # This is the tag that was created in the release
           # Description of the mod
