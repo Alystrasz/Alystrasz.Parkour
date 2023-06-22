@@ -40,7 +40,7 @@ jobs:
           # Package version to publish
           version: ${{ github.ref_name }} # This is the tag that was created in the release
           # Description of the mod
-          description: Example mod description # <----------- UPDATE THIS
+          description: Reach all checkpoints and end the race as fast as you can.
           # Thunderstore API token
           token: ${{ secrets.TS_KEY }} 
           # Directory to wrap the contents of the repo in
