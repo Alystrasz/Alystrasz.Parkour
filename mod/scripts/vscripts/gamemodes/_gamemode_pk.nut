@@ -60,7 +60,7 @@ void function ResetPlayerRun(entity player, bool preserveBestTime = false)
 		stats.bestTime = localStats[playerName].bestTime
 	}
 
-	localStats[playerName] <- stats	
+	localStats[playerName] <- stats
 	RespawnPlayerToConfirmedCheckpoint(player)
 }
 
@@ -74,7 +74,7 @@ void function OnPlayerConnected(entity player)
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
 	ResetPlayerRun(player)
-	UpdatePlayersLeaderboard( 0 )
+	UpdatePlayerLeaderboard( player, 0 )
 }
 
 /**
@@ -122,7 +122,7 @@ void function CheckPlayersForReset()
 					delete times[playerName]
 					localStats[playerName].isRunning = false
 					thread MovePlayerToMapStart(player)
-					
+
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
 					player.AddToPlayerGameStat( PGS_DEFENSE_SCORE, 1 )
 				}

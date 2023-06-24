@@ -1,5 +1,6 @@
 global function StoreNewLeaderboardEntry
 global function UpdatePlayersLeaderboard
+global function UpdatePlayerLeaderboard
 
 void function StoreNewLeaderboardEntry( entity player, float duration )
 {
@@ -87,10 +88,15 @@ void function UpdatePlayersLeaderboard( int startIndex )
 {
 	foreach(player in GetPlayerArray())
 	{
-		for (int i=startIndex; i<leaderboard.len(); i++)
-		{
-			LeaderboardEntry entry = leaderboard[i]
-			ServerToClientStringCommand( player, "ParkourUpdateLeaderboard " + entry.playerName + " " + entry.time + " " + i )
-		}
+		UpdatePlayerLeaderboard( player, startIndex )
+	}
+}
+
+void function UpdatePlayerLeaderboard( entity player, int startIndex)
+{
+	for (int i=startIndex; i<leaderboard.len(); i++)
+	{
+		LeaderboardEntry entry = leaderboard[i]
+		ServerToClientStringCommand( player, "ParkourUpdateLeaderboard " + entry.playerName + " " + entry.time + " " + i )
 	}
 }
