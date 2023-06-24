@@ -5,6 +5,7 @@ global bool IS_PK = false
 global struct PlayerStats
 {
 	bool isRunning = false
+	bool isResetting = false
 	int currentCheckpoint = 0
 	array<vector> checkpointAngles = [<0, 0, 0>]
 	float startTime
@@ -120,6 +121,7 @@ void function CheckPlayersForReset()
 				// Player held `use` button long enough, trigger run reset
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
+					localStats[playerName].isResetting = true
 					localStats[playerName].isRunning = false
 					thread MovePlayerToMapStart(player)
 
@@ -153,4 +155,6 @@ void function MovePlayerToMapStart( entity player )
 	ResetPlayerRun( player, true )
 	player.SetAngles(<0, 0, 0>)
 	player.UnfreezeControlsOnServer()
+
+	localStats[player.GetPlayerName()].isResetting = false
 }

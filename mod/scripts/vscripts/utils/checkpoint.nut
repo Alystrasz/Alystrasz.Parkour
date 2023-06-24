@@ -38,7 +38,7 @@ void function SpawnCheckpoints()
 				PlayerStats pStats = localStats[player.GetPlayerName()]
 
 				// Only update player info if their currentCheckpoint index is the previous one!
-				if (pStats.isRunning && pStats.currentCheckpoint == index-1)
+				if (pStats.isRunning && !pStats.isResetting && pStats.currentCheckpoint == index-1)
 				{
 					pStats.checkpointAngles.append( player.GetAngles() )	// Saves player orientation when checkpoint was reached
 					pStats.currentCheckpoint = index						// Updates player's last reached checkpoint
@@ -100,7 +100,7 @@ void function SpawnStartTrigger()
 
 			if (PointIsWithinBounds( player.GetOrigin(), coordinates.mins, coordinates.maxs ))
 			{
-				if (!localStats[playerName].isRunning)
+				if (!localStats[playerName].isRunning && !localStats[playerName].isResetting)
 				{
 					localStats[playerName].startTime = Time()
 					localStats[playerName].isRunning = true
