@@ -157,4 +157,5 @@ void function MovePlayerToMapStart( entity player )
 	player.UnfreezeControlsOnServer()
 
 	localStats[player.GetPlayerName()].isResetting = false
+	ResetPlayerCooldowns(player)
 }

@@ -161,6 +161,7 @@ void function FinishTriggerThink()
                     }
 
                     Remote_CallFunction_NonReplay( player, "ServerCallback_StopRun", duration, isBestTime )
+					ResetPlayerCooldowns(player)
 
 					// Score update
 					StoreNewLeaderboardEntry( player, duration )
