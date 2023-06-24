@@ -120,6 +120,7 @@ void function CheckPlayersForReset()
 				// Player held `use` button long enough, trigger run reset
 				if (currTime - times[playerName] >= resetDelay) {
 					delete times[playerName]
+					localStats[playerName].isRunning = false
 					thread MovePlayerToMapStart(player)
 					
 					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
