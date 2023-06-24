@@ -84,35 +84,22 @@ void function Cl_Parkour_Create_End()
 	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
 }
 
+void function SafeDestroyRUI( var rui )
+{
+    if ( rui != null ) {
+        RuiDestroyIfAlive( rui )
+        rui = null
+    }
+}
+
 void function DestroyRemainingRUIs()
 {
-    if ( file.timerRUI != null ) {
-        RuiDestroyIfAlive( file.timerRUI )
-        file.timerRUI = null
-    }
-    if ( file.splashStartRUI != null ) {
-        RuiDestroyIfAlive( file.splashStartRUI )
-        file.splashStartRUI = null
-    }
-    if ( file.splashEndRUI != null ) {
-        RuiDestroyIfAlive( file.splashEndRUI )
-        file.splashEndRUI = null
-    }
-    if ( file.nextCheckpointRui != null )
-    {
-        RuiDestroyIfAlive( file.nextCheckpointRui )
-        file.nextCheckpointRui = null
-    }
-    if ( file.newHighscoreRUI != null )
-    {
-        RuiDestroyIfAlive( file.newHighscoreRUI )
-        file.newHighscoreRUI = null
-    }
-	if ( file.checkpointsCountRUI != null )
-	{
-		RuiDestroyIfAlive( file.checkpointsCountRUI )
-		file.checkpointsCountRUI = null
-	}
+    SafeDestroyRUI( file.timerRUI )
+    SafeDestroyRUI( file.splashStartRUI )
+    SafeDestroyRUI( file.splashEndRUI )
+    SafeDestroyRUI( file.nextCheckpointRui )
+    SafeDestroyRUI( file.newHighscoreRUI )
+    SafeDestroyRUI( file.checkpointsCountRUI )
 	HidePlayerHint("#RESET_RUN_HINT")
 }
 
@@ -198,8 +185,7 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
 
 void function ShowNewHighscoreMessage( string playerName, float playerTime )
 {
-    if (file.newHighscoreRUI != null)
-            RuiDestroyIfAlive( file.newHighscoreRUI )
+    SafeDestroyRUI(  file.newHighscoreRUI )
 
     file.newHighscoreRUI = CreatePermanentCockpitRui( $"ui/death_hint_mp.rpak" )
     RuiSetString( file.newHighscoreRUI, "hintText", Localize( "#NEW_HIGHSCORE", playerName, playerTime ) )
@@ -209,7 +195,7 @@ void function ShowNewHighscoreMessage( string playerName, float playerTime )
 
     wait 7
 
-    RuiDestroyIfAlive( file.newHighscoreRUI )
+    SafeDestroyRUI( file.newHighscoreRUI )
 }
 
 void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, int checkpointIndex, int totalCheckpointsCount )
@@ -238,12 +224,7 @@ void function ServerCallback_StopRun( float runDuration, bool isBestTime )
     file.isRunning = false
 	thread DestroyCheckpointsCountRUI()
 
-    if ( file.nextCheckpointRui != null )
-    {
-        RuiDestroyIfAlive( file.nextCheckpointRui )
-        file.nextCheckpointRui = null
-    }
-
+    SafeDestroyRUI( file.nextCheckpointRui )
     float stopRunRUIsDuration = 5
 
     // Finish splash message
@@ -268,8 +249,7 @@ void function DestroyTimerRUI( float delay )
 
     if (file.isRunning)
         return
-	if ( file.timerRUI != null )
-		RuiDestroyIfAlive( file.timerRUI )
+    SafeDestroyRUI( file.timerRUI )
 
 	file.timerRUI = null
 }
@@ -278,5 +258,5 @@ void function DestroyCheckpointsCountRUI()
 {
 	RuiSetGameTime( file.checkpointsCountRUI, "startFadeOutTime", Time() )
 	wait 0.6
-	RuiDestroyIfAlive( file.checkpointsCountRUI )
+    SafeDestroyRUI( file.checkpointsCountRUI )
 }
