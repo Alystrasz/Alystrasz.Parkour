@@ -27,7 +27,7 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 			leaderboardNeedsUpdating = true
 
 		// Check if input time should appear in leaderboard
-		if (!leaderboardNeedsUpdating && leaderboard.len() == 10)
+		if (!leaderboardNeedsUpdating && leaderboard.len() >= 10)
 		{
 			float lastTime = leaderboard[9].time
 			if (duration < lastTime)
