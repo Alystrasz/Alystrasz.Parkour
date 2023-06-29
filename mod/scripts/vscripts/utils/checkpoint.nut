@@ -49,6 +49,7 @@ void function SpawnCheckpoints()
 						index,
 						checkpointsCount
 					)
+					EmitSoundOnEntityOnlyToPlayer( player, player, "Burn_Card_Map_Hack_Radar_Pulse_V1_1P" )
 				}
 			})
 			checkpointEntities.append( checkpoint )
@@ -105,6 +106,7 @@ void function SpawnStartTrigger()
 					localStats[playerName].startTime = Time()
 					localStats[playerName].isRunning = true
 					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
+					EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_start" )
 					player.AddToPlayerGameStat( PGS_PILOT_KILLS, 1 )
 				}
 			}
@@ -158,7 +160,10 @@ void function FinishTriggerThink()
                     if (isBestTime)
                     {
                         playerStats.bestTime = duration
-                    }
+						EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_high_score" )
+                    } else {
+						EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_end" )
+					}
 
                     Remote_CallFunction_NonReplay( player, "ServerCallback_StopRun", duration, isBestTime )
 					ResetPlayerCooldowns(player)
