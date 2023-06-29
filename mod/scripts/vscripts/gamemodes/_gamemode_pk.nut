@@ -43,7 +43,6 @@ void function _PK_Init() {
 	// Prepare map for parkour gamemode
 	checkpoints = GetMapCheckpointLocations()
 	SpawnEntities()
-	thread CheckPlayersForReset()
 }
 
 /**
@@ -76,6 +75,27 @@ void function OnPlayerConnected(entity player)
 	SetTeam( player, TEAM_IMC )
 	ResetPlayerRun(player)
 	UpdatePlayerLeaderboard( player, 0 )
+
+	// Listen for 
+	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
+}
+
+/**
+ * Callback invoked on player reset.
+ * If the player is currently doing a run, this will set their serverside stats
+ * as such, and teleport them to the map starting line.
+ **/
+void function OnPlayerReset(entity player) {
+	string playerName = player.GetPlayerName()
+	PlayerStats stats = localStats[playerName]
+	if (!stats.isRunning) return;
+
+	stats.isResetting = true
+	stats.isRunning = false
+	thread MovePlayerToMapStart(player)
+
+	Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
+	player.AddToPlayerGameStat( PGS_DEFENSE_SCORE, 1 )
 }
 
 /**
@@ -89,52 +109,6 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	vector checkpoint = checkpoints[checkpointIndex]
 	player.SetOrigin( checkpoint )
 	player.SetAngles(localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
-}
-
-/**
- * This method listens to players, checking if they're holding their `use` button.
- * If a player holds this button for a given amount of time, this method will kill
- * him, reset his current run statistics and respawn him to the starting point.
- *
- * TODO assert this is launched in a thread
- **/
-void function CheckPlayersForReset()
-{
-	// This table holds times players started pressing `use` button
-	table times = {}
-	// Duration of seconds needed for a reset
-	int resetDelay = 1
-
-	while (true)
-	{
-		float currTime = Time()
-
-		foreach(player in GetPlayerArray())
-		{
-			string playerName = player.GetPlayerName()
-			if(player.UseButtonPressed() && localStats[playerName].isRunning)
-			{
-				if (!(playerName in times)) {
-					times[playerName] <- currTime
-				}
-
-				// Player held `use` button long enough, trigger run reset
-				if (currTime - times[playerName] >= resetDelay) {
-					delete times[playerName]
-					localStats[playerName].isResetting = true
-					localStats[playerName].isRunning = false
-					thread MovePlayerToMapStart(player)
-
-					Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
-					player.AddToPlayerGameStat( PGS_DEFENSE_SCORE, 1 )
-				}
-			}
-			else {
-				times[playerName] <- currTime
-			}
-		}
-		WaitFrame()
-	}
 }
 
 void function MovePlayerToMapStart( entity player )
