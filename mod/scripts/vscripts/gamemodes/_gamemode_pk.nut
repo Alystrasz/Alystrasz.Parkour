@@ -45,7 +45,7 @@ void function OnPlayerConnected(entity player)
 	UpdatePlayerLeaderboard( player, 0 )
 
 	// Init server player state
-	ResetPlayerStats(player)
+	InitPlayerStats(player)
 	RespawnPlayerToConfirmedCheckpoint(player)
 
 	// Listen for 

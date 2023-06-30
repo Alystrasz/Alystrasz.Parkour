@@ -1,4 +1,5 @@
 global function AddPlayerParkourStat
+global function InitPlayerStats
 global function ResetPlayerStats
 global struct PlayerStats
 {
@@ -29,7 +30,7 @@ void function AddPlayerParkourStat( entity player, int type )
 {
     string playerName = player.GetPlayerName()
     PlayerStats stats = localStats[playerName]
-    
+
     switch( type )
     {
         case ePlayerParkourStatType.Starts:
@@ -52,6 +53,25 @@ void function AddPlayerParkourStat( entity player, int type )
 }
 
 /**
+ * This is invoked on player connection, and will check if newly connected
+ * player already have statistics in the current match.
+ * If yes, this will update the tab scoreboard with said stats. 
+ **/
+void function InitPlayerStats(entity player)
+{
+    string playerName = player.GetPlayerName()
+
+    if (playerName in localStats) {
+        PlayerStats stats = localStats[playerName]
+        player.SetPlayerGameStat( PGS_PILOT_KILLS, stats.starts )
+        player.SetPlayerGameStat( PGS_DEFENSE_SCORE, stats.resets )
+        player.SetPlayerGameStat( PGS_ASSAULT_SCORE, stats.finishes )
+        player.SetPlayerGameStat( PGS_TITAN_KILLS, stats.top3scores )
+    } 
+    ResetPlayerStats(player)
+}
+
+/**
  * Resets a player's run statistics (check the PlayerStats struct for default
  * values).
  **/
@@ -66,7 +86,7 @@ void function ResetPlayerStats(entity player, bool preserveBestTime = false)
 		stats.bestTime = localStats[playerName].bestTime
 	}
 
-    // Preserve match statistics
+    // Preserve match statistics if there are some
     if (playerName in localStats) {
         stats.starts = localStats[playerName].starts
         stats.resets = localStats[playerName].resets
