@@ -181,6 +181,12 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
     {
         thread ShowNewHighscoreMessage( playerName, time )
     }
+
+    // When reconnecting to a server where a score has previously been registered,
+    // restore it as best time.
+    entity localPlayer = GetLocalViewPlayer()
+    if (localPlayer.GetPlayerName() == playerName && file.bestTime == 0)
+        file.bestTime = time
 }
 
 void function ShowNewHighscoreMessage( string playerName, float playerTime )
