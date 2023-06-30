@@ -25,6 +25,10 @@
             "RunOn": "CLIENT"
         },
         {
+            "Path": "utils/player_stats.nut",
+            "RunOn": "SERVER"
+        },
+        {
             "Path": "utils/leaderboard.nut",
             "RunOn": "SERVER"
         },

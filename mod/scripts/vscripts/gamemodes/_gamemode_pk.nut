@@ -2,18 +2,6 @@ untyped
 global function _PK_Init
 global bool IS_PK = false
 
-global struct PlayerStats
-{
-	bool isRunning = false
-	bool isResetting = false
-	int currentCheckpoint = 0
-	array<vector> checkpointAngles = [<0, 0, 0>]
-	float startTime
-	float bestTime = 65535
-}
-
-global table< string, PlayerStats > localStats = {}
-
 // Leaderboard
 global struct LeaderboardEntry
 {
@@ -95,7 +83,7 @@ void function OnPlayerReset(entity player) {
 	thread MovePlayerToMapStart(player)
 
 	Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
-	player.AddToPlayerGameStat( PGS_DEFENSE_SCORE, 1 )
+	AddPlayerParkourStat(player, ePlayerParkourStatType.Resets)
 }
 
 /**

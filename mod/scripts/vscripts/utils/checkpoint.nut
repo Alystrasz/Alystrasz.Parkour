@@ -107,7 +107,7 @@ void function SpawnStartTrigger()
 					localStats[playerName].isRunning = true
 					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
 					EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_start" )
-					player.AddToPlayerGameStat( PGS_PILOT_KILLS, 1 )
+					AddPlayerParkourStat( player, ePlayerParkourStatType.Starts )
 				}
 			}
 		}
@@ -170,7 +170,7 @@ void function FinishTriggerThink()
 
 					// Score update
 					StoreNewLeaderboardEntry( player, duration )
-					player.AddToPlayerGameStat( PGS_ASSAULT_SCORE, 1 )
+					AddPlayerParkourStat(player, ePlayerParkourStatType.Finishes)
 				}
 			}
 		}

@@ -74,7 +74,7 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 
 		// Update player stats
 		if (insertionIndex <= 2)
-			player.AddToPlayerGameStat( PGS_TITAN_KILLS, 1 )
+			AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
 	}
 
 	UpdatePlayersLeaderboard( insertionIndex )
