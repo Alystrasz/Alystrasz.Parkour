@@ -1,4 +1,5 @@
 global function AddPlayerParkourStat
+global function ResetPlayerStats
 global struct PlayerStats
 {
 	bool isRunning = false
@@ -36,4 +37,22 @@ void function AddPlayerParkourStat( entity player, int type )
             player.AddToPlayerGameStat( PGS_TITAN_KILLS, 1 )
             break;
     }
+}
+
+/**
+ * Resets a player's run statistics (check the PlayerStats struct for default
+ * values).
+ **/
+void function ResetPlayerStats(entity player, bool preserveBestTime = false)
+{
+	string playerName = player.GetPlayerName()
+	PlayerStats stats = {
+		...
+	}
+
+	if (preserveBestTime) {
+		stats.bestTime = localStats[playerName].bestTime
+	}
+
+	localStats[playerName] <- stats
 }

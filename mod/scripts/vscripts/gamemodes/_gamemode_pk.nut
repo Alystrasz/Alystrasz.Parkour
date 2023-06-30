@@ -34,25 +34,6 @@ void function _PK_Init() {
 }
 
 /**
- * Resets a player's run statistics (check the PlayerStats struct for default
- * values), and respawns them to the last checkpoint they crossed.
- **/
-void function ResetPlayerRun(entity player, bool preserveBestTime = false)
-{
-	string playerName = player.GetPlayerName()
-	PlayerStats stats = {
-		...
-	}
-
-	if (preserveBestTime) {
-		stats.bestTime = localStats[playerName].bestTime
-	}
-
-	localStats[playerName] <- stats
-	RespawnPlayerToConfirmedCheckpoint(player)
-}
-
-/**
  * Callback invoked on player connection.
  * This initializes gamemode variables for player, and sends him the entire
  * leaderboard state.
@@ -61,8 +42,11 @@ void function OnPlayerConnected(entity player)
 {
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
-	ResetPlayerRun(player)
 	UpdatePlayerLeaderboard( player, 0 )
+
+	// Init server player state
+	ResetPlayerStats(player)
+	RespawnPlayerToConfirmedCheckpoint(player)
 
 	// Listen for 
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
@@ -116,10 +100,12 @@ void function MovePlayerToMapStart( entity player )
 		mover.Destroy()
 	}
 
-	ResetPlayerRun( player, true )
+	ResetPlayerStats( player, true )
+	RespawnPlayerToConfirmedCheckpoint(player)
+
 	player.SetAngles(<0, 0, 0>)
 	player.UnfreezeControlsOnServer()
 
-	localStats[player.GetPlayerName()].isResetting = false
+	// localStats[player.GetPlayerName()].isResetting = false
 	ResetPlayerCooldowns(player)
 }
