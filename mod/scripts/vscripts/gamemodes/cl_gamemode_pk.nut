@@ -9,6 +9,7 @@ struct {
 
     table< int, entity > cache
 
+    var worldLeaderboard
     var leaderboard
     var timerRUI
     var splashStartRUI
@@ -55,6 +56,14 @@ void function Cl_Parkour_Init()
     var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
     file.leaderboard = rui
+
+    // world leaderboard
+    origin = GetMapLeaderboardOrigin(true)
+    angles = GetMapLeaderboardAngles(true)
+    coordinates = GetMapLeaderboardDimensions(true)
+    topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
+    rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
+    file.worldLeaderboard = rui
 
     // register command to receive leaderboard updates from server
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
