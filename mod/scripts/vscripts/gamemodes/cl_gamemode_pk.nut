@@ -56,6 +56,7 @@ void function Cl_Parkour_Init()
     var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
     file.leaderboard = rui
+    Cl_ParkourCreateLeaderboardSource();
 
     // world leaderboard
     origin = GetMapLeaderboardOrigin(true)
@@ -64,12 +65,22 @@ void function Cl_Parkour_Init()
     topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
     file.worldLeaderboard = rui
+    Cl_ParkourCreateLeaderboardSource(true);
 
     // register command to receive leaderboard updates from server
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
 
     thread Cl_Parkour_Create_Start()
     Cl_Parkour_Create_End()
+}
+
+void function Cl_ParkourCreateLeaderboardSource(bool world = false) {
+    vector origin = GetMapLeaderboardSourceOrigin(world)
+    vector angles = GetMapLeaderboardSourceAngles(world)
+    array<float> dimensions = GetMapLeaderboardSourceDimensions(world)
+	var topo = CreateTopology(origin, angles, dimensions[0], dimensions[1])
+    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( startRui, "displayText", world ? "World" : "Local" )
 }
 
 // Start/end "barrier" world UI

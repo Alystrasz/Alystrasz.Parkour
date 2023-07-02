@@ -21,6 +21,10 @@ global function GetMapLeaderboardAngles
 global function GetMapLeaderboardDimensions
 global function GetMapLeaderboardOrigin
 
+global function GetMapLeaderboardSourceOrigin
+global function GetMapLeaderboardSourceAngles
+global function GetMapLeaderboardSourceDimensions
+
 #elseif SERVER
 global function GetMapCheckpointLocations
 global function GetMapStartVolume
@@ -189,6 +193,61 @@ array<float> function GetMapLeaderboardDimensions(bool world = false)
             return [80.0, 75.0]
         default:
             throw format( "Leaderboard dimensions were not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+
+/*
+██╗     ███████╗ █████╗ ██████╗ ███████╗██████╗ ██████╗  ██████╗  █████╗ ██████╗ ██████╗     ███████╗ ██████╗ ██╗   ██╗██████╗  ██████╗███████╗
+██║     ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗    ██╔════╝██╔═══██╗██║   ██║██╔══██╗██╔════╝██╔════╝
+██║     █████╗  ███████║██║  ██║█████╗  ██████╔╝██████╔╝██║   ██║███████║██████╔╝██║  ██║    ███████╗██║   ██║██║   ██║██████╔╝██║     █████╗
+██║     ██╔══╝  ██╔══██║██║  ██║██╔══╝  ██╔══██╗██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║    ╚════██║██║   ██║██║   ██║██╔══██╗██║     ██╔══╝
+███████╗███████╗██║  ██║██████╔╝███████╗██║  ██║██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝    ███████║╚██████╔╝╚██████╔╝██║  ██║╚██████╗███████╗
+╚══════╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝     ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚══════╝
+*/
+
+vector function GetMapLeaderboardSourceOrigin(bool world = false)
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            return world ? < -616, -2992.5, 17> : < -536, -2929.38, 17>
+        default:
+            throw format( "Leaderboard source coordinates were not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+vector function GetMapLeaderboardSourceAngles(bool world = false)
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            return world ? <0, 180, 0> : <0, 90, 0>
+        default:
+            throw format( "Leaderboard source angles were not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+array<float> function GetMapLeaderboardSourceDimensions(bool world = false)
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            return [50.0, 33.0]
+        default:
+            throw format( "Leaderboard source dimensions were not found for map \"%s\".", mapName )
     }
 
     unreachable
