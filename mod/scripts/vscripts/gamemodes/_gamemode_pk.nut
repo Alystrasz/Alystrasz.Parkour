@@ -31,6 +31,7 @@ void function _PK_Init() {
 	// Prepare map for parkour gamemode
 	checkpoints = GetMapCheckpointLocations()
 	SpawnEntities()
+	WorldLeaderboard_Init()
 }
 
 /**
@@ -48,7 +49,7 @@ void function OnPlayerConnected(entity player)
 	InitPlayerStats(player)
 	RespawnPlayerToConfirmedCheckpoint(player)
 
-	// Listen for 
+	// Listen for
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
 }
 
