@@ -45,6 +45,7 @@ void function OnPlayerConnected(entity player)
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
 	UpdatePlayerLeaderboard( player, 0 )
+	UpdatePlayerLeaderboard( player, 0, true )
 
 	// Init server player state
 	InitPlayerStats(player)
