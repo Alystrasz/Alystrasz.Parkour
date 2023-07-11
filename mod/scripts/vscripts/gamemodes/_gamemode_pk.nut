@@ -10,6 +10,7 @@ global struct LeaderboardEntry
 }
 
 global array<LeaderboardEntry> leaderboard = []
+global array<LeaderboardEntry> worldLeaderboard = []
 global array<vector> checkpoints = []
 global array<entity> checkpointEntities = []
 
