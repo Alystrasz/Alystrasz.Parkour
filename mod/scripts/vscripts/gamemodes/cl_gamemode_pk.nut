@@ -189,12 +189,16 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
     string playerName = args[0]
     float time = args[1].tofloat()
     int index = args[2].tointeger()
+    bool world = args[3].tointeger() == 1;
 
     string nameArg = "entry" + index + "Name"
     string timeArg = "entry" + index + "Time"
 
-    RuiSetString( file.leaderboard, nameArg, playerName )
-    RuiSetFloat( file.leaderboard, timeArg, time )
+    RuiSetString( world ? file.worldLeaderboard : file.leaderboard, nameArg, playerName )
+    RuiSetFloat( world ? file.worldLeaderboard : file.leaderboard, timeArg, time )
+
+    // Stop here for world scores
+    if (world) return;
 
     // Display a special message on new highscore
     if (index == 0)

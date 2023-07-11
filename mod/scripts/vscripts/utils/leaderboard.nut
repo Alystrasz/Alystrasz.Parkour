@@ -84,19 +84,21 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
  * If a new time enters the leaderboard, we don't need to send all 10 entries to all players
  * (if new entry has 7th position, we only need to send 7th, 8th, 9th and 10th entries for instance).
  **/
-void function UpdatePlayersLeaderboard( int startIndex )
+void function UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderboard = false )
 {
 	foreach(player in GetPlayerArray())
 	{
-		UpdatePlayerLeaderboard( player, startIndex )
+		UpdatePlayerLeaderboard( player, startIndex, updateWorldLeaderboard )
 	}
 }
 
-void function UpdatePlayerLeaderboard( entity player, int startIndex)
+void function UpdatePlayerLeaderboard( entity player, int startIndex, bool updateWorldLeaderboard = false )
 {
-	for (int i=startIndex; i<leaderboard.len(); i++)
+	array<LeaderboardEntry> board = updateWorldLeaderboard ? worldLeaderboard : leaderboard;
+
+	for (int i=startIndex; i<board.len(); i++)
 	{
-		LeaderboardEntry entry = leaderboard[i]
-		ServerToClientStringCommand( player, "ParkourUpdateLeaderboard " + entry.playerName + " " + entry.time + " " + i )
+		LeaderboardEntry entry = board[i]
+		ServerToClientStringCommand( player, "ParkourUpdateLeaderboard " + entry.playerName + " " + entry.time + " " + i + " " + (updateWorldLeaderboard ? 1 : 0).tostring())
 	}
 }

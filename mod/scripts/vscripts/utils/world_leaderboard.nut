@@ -69,6 +69,7 @@ void function WorldLeaderboard_FetchScores(string event_id)
             table data = DecodeJSON(inputStr)
             array scores = expect array(data["data"])
 
+            // TODO Each time we receive a scores list, we sent it entirely to clients, which should be improved.
             array<LeaderboardEntry> localWorldLeaderboard = []
             foreach (value in scores) {
                 table raw_score = expect table(value)
@@ -80,6 +81,7 @@ void function WorldLeaderboard_FetchScores(string event_id)
 
             worldLeaderboard = localWorldLeaderboard;
             print("Scores received.")
+            UpdatePlayersLeaderboard(0, true)
         }
 
         void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
