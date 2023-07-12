@@ -3,9 +3,11 @@ global function SendWorldLeaderboardEntryToAPI
 
 struct {
     var event_id
+    string secret
 } file;
 
 void function WorldLeaderboard_Init() {
+    file.secret = GetConVarString("parkour_api_secret")
     thread WorldLeaderboard_FetchEvents()
 }
 
@@ -15,7 +17,7 @@ void function WorldLeaderboard_FetchEvents() {
     request.method = HttpRequestMethod.GET
     request.url = "https://parkour.remyraes.com/v1/events"
     table<string, array<string> > headers
-    headers[ "authentication" ] <- ["my_little_secret"]
+    headers[ "authentication" ] <- [file.secret]
     request.headers = headers
 
     void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
@@ -62,7 +64,7 @@ void function WorldLeaderboard_FetchScores(string event_id)
     request.method = HttpRequestMethod.GET
     request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", event_id)
     table<string, array<string> > headers
-    headers[ "authentication" ] <- ["my_little_secret"]
+    headers[ "authentication" ] <- [file.secret]
     request.headers = headers
 
     while (true)
@@ -121,7 +123,7 @@ void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
     request.method = HttpRequestMethod.POST
     request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", file.event_id )
     table<string, array<string> > headers
-    headers[ "authentication" ] <- ["my_little_secret"]
+    headers[ "authentication" ] <- [file.secret]
     request.headers = headers
 
     // Encode leaderboard entry

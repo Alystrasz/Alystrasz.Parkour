@@ -4,6 +4,12 @@
     "LoadPriority": 2,
     "Version": "0.0.5",
     "RequiredOnClient": true,
+    "ConVars": [
+        {
+            "Name": "parkour_api_secret",
+            "DefaultValue": "my_little_secret"
+        }
+    ],
     "Scripts": [
         {
             "Path": "gamemodes/sh_gamemode_pk.nut",
