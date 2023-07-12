@@ -86,7 +86,7 @@ void function Cl_ParkourCreateLeaderboardSource(bool world = false) {
     array<float> dimensions = GetMapLeaderboardSourceDimensions(world)
 	var topo = CreateTopology(origin, angles, dimensions[0], dimensions[1])
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", world ? "World" : "Local" )
+	RuiSetString( startRui, "displayText", world ? "#LEADERBOARD_WORLD" : "#LEADERBOARD_LOCAL" )
 }
 
 // Start/end "barrier" world UI
