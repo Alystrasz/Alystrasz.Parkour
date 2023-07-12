@@ -9,6 +9,7 @@ struct {
 
     table< int, entity > cache
 
+    bool receivedWorldScores = false
     var worldLeaderboard
     var leaderboard
     var timerRUI
@@ -55,23 +56,28 @@ void function Cl_Parkour_Init()
     array<float> coordinates = GetMapLeaderboardDimensions()
     var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
-    file.leaderboard = rui
-    Cl_ParkourCreateLeaderboardSource();
-
-    // world leaderboard
-    origin = GetMapLeaderboardOrigin(true)
-    angles = GetMapLeaderboardAngles(true)
-    coordinates = GetMapLeaderboardDimensions(true)
-    topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
-    rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
-    file.worldLeaderboard = rui
-    Cl_ParkourCreateLeaderboardSource(true);
+    file.leaderboard = rui    
 
     // register command to receive leaderboard updates from server
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
 
     thread Cl_Parkour_Create_Start()
     Cl_Parkour_Create_End()
+}
+
+void function Cl_Parkour_InitWorldLeaderboard()
+{
+    // Local/World leaderboard signs
+    Cl_ParkourCreateLeaderboardSource();
+    Cl_ParkourCreateLeaderboardSource(true);
+
+    // world leaderboard
+    vector origin = GetMapLeaderboardOrigin(true)
+    vector angles = GetMapLeaderboardAngles(true)
+    array<float> coordinates = GetMapLeaderboardDimensions(true)
+    var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
+    var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
+    file.worldLeaderboard = rui
 }
 
 void function Cl_ParkourCreateLeaderboardSource(bool world = false) {
@@ -190,6 +196,14 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
     float time = args[1].tofloat()
     int index = args[2].tointeger()
     bool world = args[3].tointeger() == 1;
+
+
+    // World leaderboard is only displayed if server is connected to world parkour API
+    if (world && !file.receivedWorldScores) {
+        Cl_Parkour_InitWorldLeaderboard()
+        file.receivedWorldScores = true
+    }
+
 
     string nameArg = "entry" + index + "Name"
     string timeArg = "entry" + index + "Time"
