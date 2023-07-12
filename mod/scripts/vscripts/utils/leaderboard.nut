@@ -2,6 +2,12 @@ global function StoreNewLeaderboardEntry
 global function UpdatePlayersLeaderboard
 global function UpdatePlayerLeaderboard
 
+global struct LeaderboardEntry
+{
+	string playerName
+	float time
+}
+
 void function StoreNewLeaderboardEntry( entity player, float duration )
 {
 	print("New time for " + player.GetPlayerName() + ": " + duration)
@@ -75,6 +81,8 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 		// Update player stats
 		if (insertionIndex <= 2)
 			AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
+
+		SendWorldLeaderboardEntryToAPI( entry )
 	}
 
 	UpdatePlayersLeaderboard( insertionIndex )

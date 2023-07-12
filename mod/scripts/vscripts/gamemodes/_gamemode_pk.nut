@@ -2,13 +2,6 @@ untyped
 global function _PK_Init
 global bool IS_PK = false
 
-// Leaderboard
-global struct LeaderboardEntry
-{
-	string playerName
-	float time
-}
-
 global array<LeaderboardEntry> leaderboard = []
 global array<LeaderboardEntry> worldLeaderboard = []
 global array<vector> checkpoints = []

@@ -1,4 +1,5 @@
 global function WorldLeaderboard_Init
+global function SendWorldLeaderboardEntryToAPI
 
 void function WorldLeaderboard_Init() {
     thread WorldLeaderboard_FetchEvents()
@@ -94,4 +95,9 @@ void function WorldLeaderboard_FetchScores(string event_id)
         NSHttpRequest( request, onSuccess, onFailure )
         wait 10
     }
+}
+
+void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
+{
+    // TODO POST request
 }
