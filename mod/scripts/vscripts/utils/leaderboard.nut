@@ -82,7 +82,8 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 		if (insertionIndex <= 2)
 			AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
 
-		SendWorldLeaderboardEntryToAPI( entry )
+		if ( has_api_access )
+			SendWorldLeaderboardEntryToAPI( entry )
 	}
 
 	UpdatePlayersLeaderboard( insertionIndex )

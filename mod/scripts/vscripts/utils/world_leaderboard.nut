@@ -40,11 +40,13 @@ void function WorldLeaderboard_FetchEvents() {
             if ( event_name.find( mapName) != null ) {
                 file.event_id = expect string(event["id"])
                 thread WorldLeaderboard_FetchScores( expect string(event["id"]) )
+                has_api_access = true
                 return;
             }
         }
 
         print("No event matches the current map.")
+        has_api_access = false
     }
 
     void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
@@ -52,6 +54,7 @@ void function WorldLeaderboard_FetchEvents() {
         print("Something went wrong while fetching events from parkour API.")
         print("=> " + failure.errorCode)
         print("=> " + failure.errorMessage)
+        has_api_access = false
     }
 
     NSHttpRequest( request, onSuccess, onFailure )
@@ -89,6 +92,7 @@ void function WorldLeaderboard_FetchScores(string event_id)
 
             worldLeaderboard = localWorldLeaderboard;
             print("Scores received.")
+            has_api_access = true
             UpdatePlayersLeaderboard(0, true)
         }
 
@@ -97,6 +101,7 @@ void function WorldLeaderboard_FetchScores(string event_id)
             print("Something went wrong while fetching scores from parkour API.")
             print("=> " + failure.errorCode)
             print("=> " + failure.errorMessage)
+            has_api_access = false
         }
 
         NSHttpRequest( request, onSuccess, onFailure )
@@ -108,6 +113,7 @@ void function WorldLeaderboard_FetchScores(string event_id)
 void function onSubmissionSuccess ( HttpRequestResponse response )
 {
     print("Score successfully submitted.")
+    has_api_access = true
 }
 
 void function onSubmissionFailure ( HttpRequestFailure failure )
@@ -115,6 +121,7 @@ void function onSubmissionFailure ( HttpRequestFailure failure )
     print("Something went wrong while submitting scores to parkour API.")
     print("=> " + failure.errorCode)
     print("=> " + failure.errorMessage)
+    has_api_access = false
 }
 
 void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )

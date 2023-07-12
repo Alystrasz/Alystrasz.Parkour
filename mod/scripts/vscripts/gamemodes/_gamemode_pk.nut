@@ -7,6 +7,8 @@ global array<LeaderboardEntry> worldLeaderboard = []
 global array<vector> checkpoints = []
 global array<entity> checkpointEntities = []
 
+global bool has_api_access = false
+
 
 void function _PK_Init() {
 	IS_PK = true
