@@ -1,6 +1,10 @@
 global function WorldLeaderboard_Init
 global function SendWorldLeaderboardEntryToAPI
 
+struct {
+    var event_id
+} file;
+
 void function WorldLeaderboard_Init() {
     thread WorldLeaderboard_FetchEvents()
 }
@@ -32,6 +36,7 @@ void function WorldLeaderboard_FetchEvents() {
             table event = expect table(value)
             string event_name = expect string(event["name"])
             if ( event_name.find( mapName) != null ) {
+                file.event_id = expect string(event["id"])
                 thread WorldLeaderboard_FetchScores( expect string(event["id"]) )
                 return;
             }
@@ -97,7 +102,34 @@ void function WorldLeaderboard_FetchScores(string event_id)
     }
 }
 
+// Score submissions
+void function onSubmissionSuccess ( HttpRequestResponse response )
+{
+    print("Score successfully submitted.")
+}
+
+void function onSubmissionFailure ( HttpRequestFailure failure )
+{
+    print("Something went wrong while submitting scores to parkour API.")
+    print("=> " + failure.errorCode)
+    print("=> " + failure.errorMessage)
+}
+
 void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
 {
-    // TODO POST request
+    HttpRequest request
+    request.method = HttpRequestMethod.POST
+    request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", file.event_id )
+    table<string, array<string> > headers
+    headers[ "authentication" ] <- ["my_little_secret"]
+    request.headers = headers
+
+    // Encode leaderboard entry
+    table data = {}
+    data[ "name" ] <- entry.playerName
+    data[ "time" ] <- entry.time
+    string json = EncodeJSON( data )
+    request.body = json
+
+    NSHttpRequest( request, onSubmissionSuccess, onSubmissionFailure )
 }
