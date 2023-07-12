@@ -21,6 +21,10 @@ global function GetMapLeaderboardAngles
 global function GetMapLeaderboardDimensions
 global function GetMapLeaderboardOrigin
 
+global function GetMapLeaderboardSourceOrigin
+global function GetMapLeaderboardSourceAngles
+global function GetMapLeaderboardSourceDimensions
+
 #elseif SERVER
 global function GetMapCheckpointLocations
 global function GetMapStartVolume
@@ -141,22 +145,22 @@ array<float> function GetMapFinishLineDimensions()
 
 
 /*
-██╗     ███████╗ █████╗ ██████╗ ███████╗██████╗ ██████╗  ██████╗  █████╗ ██████╗ ██████╗ 
-██║     ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗
-██║     █████╗  ███████║██║  ██║█████╗  ██████╔╝██████╔╝██║   ██║███████║██████╔╝██║  ██║
-██║     ██╔══╝  ██╔══██║██║  ██║██╔══╝  ██╔══██╗██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║
-███████╗███████╗██║  ██║██████╔╝███████╗██║  ██║██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝
-╚══════╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ 
+██╗     ███████╗ █████╗ ██████╗ ███████╗██████╗ ██████╗  ██████╗  █████╗ ██████╗ ██████╗ ███████╗
+██║     ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝
+██║     █████╗  ███████║██║  ██║█████╗  ██████╔╝██████╔╝██║   ██║███████║██████╔╝██║  ██║███████╗
+██║     ██╔══╝  ██╔══██║██║  ██║██╔══╝  ██╔══██╗██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║╚════██║
+███████╗███████╗██║  ██║██████╔╝███████╗██║  ██║██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝███████║
+╚══════╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚══════╝
 */
 
-vector function GetMapLeaderboardOrigin()
+vector function GetMapLeaderboardOrigin(bool world = false)
 {
     string mapName = GetMapName()
 
     switch( mapName )
     {
         case "mp_thaw":
-            return < -536, -2929.38, -36>
+            return world ? < -616, -2992.5, -36> : < -536, -2929.38, -36>
         default:
             throw format( "Leaderboard coordinates were not found for map \"%s\".", mapName )
     }
@@ -164,14 +168,14 @@ vector function GetMapLeaderboardOrigin()
     unreachable
 }
 
-vector function GetMapLeaderboardAngles()
+vector function GetMapLeaderboardAngles(bool world = false)
 {
     string mapName = GetMapName()
 
     switch( mapName )
     {
         case "mp_thaw":
-            return <0, 90, 0>
+            return world ? <0, 180, 0> : <0, 90, 0>
         default:
             throw format( "Leaderboard angles were not found for map \"%s\".", mapName )
     }
@@ -179,7 +183,7 @@ vector function GetMapLeaderboardAngles()
     unreachable
 }
 
-array<float> function GetMapLeaderboardDimensions()
+array<float> function GetMapLeaderboardDimensions(bool world = false)
 {
     string mapName = GetMapName()
 
@@ -195,7 +199,71 @@ array<float> function GetMapLeaderboardDimensions()
 }
 
 
+/*
+██╗     ███████╗ █████╗ ██████╗ ███████╗██████╗ ██████╗  ██████╗  █████╗ ██████╗ ██████╗     ███████╗ ██████╗ ██╗   ██╗██████╗  ██████╗███████╗
+██║     ██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗    ██╔════╝██╔═══██╗██║   ██║██╔══██╗██╔════╝██╔════╝
+██║     █████╗  ███████║██║  ██║█████╗  ██████╔╝██████╔╝██║   ██║███████║██████╔╝██║  ██║    ███████╗██║   ██║██║   ██║██████╔╝██║     █████╗
+██║     ██╔══╝  ██╔══██║██║  ██║██╔══╝  ██╔══██╗██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║    ╚════██║██║   ██║██║   ██║██╔══██╗██║     ██╔══╝
+███████╗███████╗██║  ██║██████╔╝███████╗██║  ██║██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝    ███████║╚██████╔╝╚██████╔╝██║  ██║╚██████╗███████╗
+╚══════╝╚══════╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝     ╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚══════╝
+*/
+
+vector function GetMapLeaderboardSourceOrigin(bool world = false)
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            return world ? < -616, -2992.5, 17> : < -536, -2929.38, 17>
+        default:
+            throw format( "Leaderboard source coordinates were not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+vector function GetMapLeaderboardSourceAngles(bool world = false)
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            return world ? <0, 180, 0> : <0, 90, 0>
+        default:
+            throw format( "Leaderboard source angles were not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+array<float> function GetMapLeaderboardSourceDimensions(bool world = false)
+{
+    string mapName = GetMapName()
+
+    switch( mapName )
+    {
+        case "mp_thaw":
+            return [50.0, 33.0]
+        default:
+            throw format( "Leaderboard source dimensions were not found for map \"%s\".", mapName )
+    }
+
+    unreachable
+}
+
+
 #elseif SERVER
+
+/*
+███╗   ███╗██╗███████╗ ██████╗███████╗██╗     ██╗      █████╗ ███╗   ██╗███████╗ ██████╗ ██╗   ██╗███████╗
+████╗ ████║██║██╔════╝██╔════╝██╔════╝██║     ██║     ██╔══██╗████╗  ██║██╔════╝██╔═══██╗██║   ██║██╔════╝
+██╔████╔██║██║███████╗██║     █████╗  ██║     ██║     ███████║██╔██╗ ██║█████╗  ██║   ██║██║   ██║███████╗
+██║╚██╔╝██║██║╚════██║██║     ██╔══╝  ██║     ██║     ██╔══██║██║╚██╗██║██╔══╝  ██║   ██║██║   ██║╚════██║
+██║ ╚═╝ ██║██║███████║╚██████╗███████╗███████╗███████╗██║  ██║██║ ╚████║███████╗╚██████╔╝╚██████╔╝███████║
+╚═╝     ╚═╝╚═╝╚══════╝ ╚═════╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝  ╚═════╝ ╚══════╝
+*/
 
 /**
  * Returns a list of coordinates for all map checkpoints.

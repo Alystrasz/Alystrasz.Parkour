@@ -2,16 +2,12 @@ untyped
 global function _PK_Init
 global bool IS_PK = false
 
-// Leaderboard
-global struct LeaderboardEntry
-{
-	string playerName
-	float time
-}
-
 global array<LeaderboardEntry> leaderboard = []
+global array<LeaderboardEntry> worldLeaderboard = []
 global array<vector> checkpoints = []
 global array<entity> checkpointEntities = []
+
+global bool has_api_access = false
 
 
 void function _PK_Init() {
@@ -31,6 +27,7 @@ void function _PK_Init() {
 	// Prepare map for parkour gamemode
 	checkpoints = GetMapCheckpointLocations()
 	SpawnEntities()
+	WorldLeaderboard_Init()
 }
 
 /**
@@ -43,12 +40,13 @@ void function OnPlayerConnected(entity player)
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
 	UpdatePlayerLeaderboard( player, 0 )
+	UpdatePlayerLeaderboard( player, 0, true )
 
 	// Init server player state
 	InitPlayerStats(player)
 	RespawnPlayerToConfirmedCheckpoint(player)
 
-	// Listen for 
+	// Listen for
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
 }
 

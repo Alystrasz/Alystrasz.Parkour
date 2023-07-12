@@ -2,9 +2,14 @@
     "Name": "Parkour",
     "Description": "Reach all checkpoints and end the race as fast as you can.",
     "LoadPriority": 2,
-    "Version": "0.0.5",
+    "Version": "0.1.0",
     "RequiredOnClient": true,
-    "ConVars": [],
+    "ConVars": [
+        {
+            "Name": "parkour_api_secret",
+            "DefaultValue": "my_little_secret"
+        }
+    ],
     "Scripts": [
         {
             "Path": "gamemodes/sh_gamemode_pk.nut",
@@ -34,6 +39,10 @@
         },
         {
             "Path": "utils/checkpoint.nut",
+            "RunOn": "SERVER"
+        },
+        {
+            "Path": "utils/world_leaderboard.nut",
             "RunOn": "SERVER"
         },
         {
