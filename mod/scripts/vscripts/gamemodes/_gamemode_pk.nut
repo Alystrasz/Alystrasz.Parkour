@@ -66,6 +66,9 @@ void function OnPlayerReset(entity player) {
 
 	Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
 	AddPlayerParkourStat(player, ePlayerParkourStatType.Resets)
+
+	// Reset weapons as well
+	ForcePlayerLoadout(player)
 }
 
 /**
@@ -79,6 +82,9 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	vector checkpoint = checkpoints[checkpointIndex]
 	player.SetOrigin( checkpoint )
 	player.SetAngles(localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
+
+	// Give player predefined weapons
+	ForcePlayerLoadout(player)
 }
 
 void function MovePlayerToMapStart( entity player )

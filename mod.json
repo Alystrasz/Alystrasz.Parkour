@@ -30,6 +30,10 @@
             "RunOn": "CLIENT"
         },
         {
+            "Path": "utils/perks.nut",
+            "RunOn": "SERVER"
+        },
+        {
             "Path": "utils/player_stats.nut",
             "RunOn": "SERVER"
         },
