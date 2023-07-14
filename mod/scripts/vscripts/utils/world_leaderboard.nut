@@ -41,6 +41,12 @@ void function WorldLeaderboard_FetchEvents() {
                 file.event_id = expect string(event["id"])
                 thread WorldLeaderboard_FetchScores( expect string(event["id"]) )
                 has_api_access = true
+
+                // Simulate assigning weapons
+                perks.weapon = "mp_weapon_epg"
+                perks.ability = "mp_ability_grapple"
+                perks.grenade = "mp_weapon_grenade_gravity"
+
                 return;
             }
         }
