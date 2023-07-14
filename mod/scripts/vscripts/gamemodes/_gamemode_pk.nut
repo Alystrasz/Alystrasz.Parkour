@@ -13,8 +13,9 @@ global bool has_api_access = false
 void function _PK_Init() {
 	IS_PK = true
 
-	// AddCallback_OnPlayerKilled( OnPlayerKilled )
 	ClassicMP_SetCustomIntro( ClassicMP_DefaultNoIntro_Setup, 10 )
+	ClassicMP_ForceDisableEpilogue( true )
+	SetLoadoutGracePeriodEnabled( false )
 
 	// teleport connected players to map start
 	AddCallback_OnClientConnected( OnPlayerConnected )
