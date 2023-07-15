@@ -10,10 +10,14 @@ global Perks perks
 array<string> abilities = [ "mp_ability_cloak", "mp_weapon_grenade_sonar", "mp_ability_grapple", "mp_ability_heal", "mp_weapon_deployable_cover", "mp_ability_shifter", "mp_ability_holopilot" ]
 array<string> grenades = [ "mp_weapon_frag_grenade", "mp_weapon_grenade_emp", "mp_weapon_thermite_grenade", "mp_weapon_grenade_gravity", "mp_weapon_grenade_electric_smoke", "mp_weapon_satchel" ]
 
+
+/**
+ * This gives player predefined weapon, grenade and ability.
+ **/
 void function ForcePlayerLoadout(entity player) {
 	if (IsAlive(player) && player != null)
 	{
-		// Weapon switch
+		// Weapon switch (removes all weapons and give one perk weapon)
 		if (perks.weapon != "") {
 			foreach ( int index, entity weapon in player.GetMainWeapons() ) {
 				player.TakeWeaponNow( weapon.GetWeaponClassName() )
