@@ -8,6 +8,17 @@ global struct LeaderboardEntry
 	float time
 }
 
+/**
+ * This method creates a new entry in the local match leaderboard, and if the
+ * This methods checks if the input entry fits local match leaderboard (= if it's
+ * among the 10 best times, as leaderboard RUI doesn't have much entries); if it
+ * does, this inserts new entry at the correct leaderboard location, and sends
+ * leaderboard state to all connected players.
+ *
+ * Leaderboard state sending is done starting from the insertion index, to avoid
+ * sending whole leaderboard on new score registration that's not the best time
+ * of the match.
+ **/
 void function StoreNewLeaderboardEntry( entity player, float duration )
 {
 	print("New time for " + player.GetPlayerName() + ": " + duration)
