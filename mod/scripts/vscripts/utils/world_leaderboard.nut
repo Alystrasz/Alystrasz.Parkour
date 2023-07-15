@@ -1,3 +1,9 @@
+/**
+ * This package contains all code related to the "world" leaderboard, which scores are stored
+ * on a distant API.
+ * (source code for the API is available here: https://github.com/Alystrasz/parkour-api)
+ **/
+
 global function WorldLeaderboard_Init
 global function SendWorldLeaderboardEntryToAPI
 
@@ -6,12 +12,31 @@ struct {
     string secret
 } file;
 
+/**
+ * Entrypoint of the package, this method will load the API authentication token
+ * from the dedicated configuration variable; it will be used in all future HTTP
+ * requests to Parkour API.
+ *
+ * Once the token has been saved, this starts fetching events.
+ **/
 void function WorldLeaderboard_Init() {
     file.secret = GetConVarString("parkour_api_secret")
     thread WorldLeaderboard_FetchEvents()
 }
 
 
+/**
+ * This method fetches the `events` resource of the Parkour API to find information
+ * about the current match: where to save new scores, which settings (weapons/ability
+ * set) to apply to all players...
+ *
+ * Once corresponding event has been found, this will register said event identifier
+ * locally, for it to be used in future HTTP requests, apply required changes to
+ * current match, and start fetching scores from distant API every few seconds.
+ *
+ * If no corresponding event is found, no further HTTP request will occur during the
+ * current match.
+ **/
 void function WorldLeaderboard_FetchEvents() {
     HttpRequest request
     request.method = HttpRequestMethod.GET
@@ -33,6 +58,8 @@ void function WorldLeaderboard_FetchEvents() {
         table data = DecodeJSON(inputStr)
         array events = expect array(data["data"])
 
+        // Currently, corresponding event is found by checking if its name contains the
+        // name of the current map, which might be improved.
         string mapName = GetMapName()
         foreach (value in events) {
             table event = expect table(value)
@@ -66,9 +93,18 @@ void function WorldLeaderboard_FetchEvents() {
     NSHttpRequest( request, onSuccess, onFailure )
 }
 
+
+/**
+ * This fetches scores for the event linked to the current match, using the previously
+ * stored event id.
+ * Scores fetching happens every few seconds.
+ *
+ * On scores reception, those are sent to connected game clients, to update the in-game
+ * "world" leaderboard.
+ **/
 void function WorldLeaderboard_FetchScores(string event_id)
 {
-    print("Starting fetching scores for event n°" + event_id)
+    print("Fetching scores for event n°" + event_id)
     HttpRequest request
     request.method = HttpRequestMethod.GET
     request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", event_id)
