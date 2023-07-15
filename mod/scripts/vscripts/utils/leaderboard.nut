@@ -107,6 +107,9 @@ void function UpdatePlayerLeaderboard( entity player, int startIndex, bool updat
 
 	for (int i=startIndex; i<board.len(); i++)
 	{
+		// Leaderboard RUI has 10 entries only
+		if (i >= 10) return;
+
 		LeaderboardEntry entry = board[i]
 		ServerToClientStringCommand( player, "ParkourUpdateLeaderboard " + entry.playerName + " " + entry.time + " " + i + " " + (updateWorldLeaderboard ? 1 : 0).tostring())
 	}
