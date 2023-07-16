@@ -16,6 +16,7 @@ void function _PK_Init() {
 	ClassicMP_SetCustomIntro( ClassicMP_DefaultNoIntro_Setup, 10 )
 	ClassicMP_ForceDisableEpilogue( true )
 	SetLoadoutGracePeriodEnabled( false )
+	SetTimeoutWinnerDecisionFunc( ParkourDecideWinner )
 
 	// teleport connected players to map start
 	AddCallback_OnClientConnected( OnPlayerConnected )
@@ -113,4 +114,24 @@ void function MovePlayerToMapStart( entity player )
 
 	// localStats[player.GetPlayerName()].isResetting = false
 	ResetPlayerCooldowns(player)
+}
+
+int function ParkourDecideWinner()
+{
+	if (leaderboard.len() == 0)
+		return TEAM_UNASSIGNED
+
+	bool found = false
+	string winnerName = leaderboard[0].playerName
+	float time = leaderboard[0].time
+	foreach( player in GetPlayerArray() ) {
+		if ( player.GetPlayerName() == winnerName ) {
+			SetTeam( player, TEAM_MILITIA )
+			found = true
+			break
+		}
+	}
+
+	Chat_ServerBroadcast( format("%s is the winner of the match with a run of %.2f seconds!", winnerName, time), false )
+	return found ? TEAM_MILITIA : TEAM_UNASSIGNED
 }
