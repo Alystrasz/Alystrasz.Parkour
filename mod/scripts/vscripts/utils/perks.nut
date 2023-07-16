@@ -1,3 +1,4 @@
+global function ApplyPerks
 global function ForcePlayerLoadout
 
 global struct Perks {
@@ -10,6 +11,26 @@ global Perks perks
 array<string> abilities = [ "mp_ability_cloak", "mp_weapon_grenade_sonar", "mp_ability_grapple", "mp_ability_heal", "mp_weapon_deployable_cover", "mp_ability_shifter", "mp_ability_holopilot" ]
 array<string> grenades = [ "mp_weapon_frag_grenade", "mp_weapon_grenade_emp", "mp_weapon_thermite_grenade", "mp_weapon_grenade_gravity", "mp_weapon_grenade_electric_smoke", "mp_weapon_satchel" ]
 
+
+void function ApplyPerks( table tPerks ) {
+	if ("weapon" in tPerks) {
+		string weapon = expect string(tPerks["weapon"])
+		print(format("Applying weapon perk (%s)", weapon))
+		perks.weapon = weapon
+	}
+
+	if ("ability" in tPerks) {
+		string ability = expect string(tPerks["ability"])
+		print(format("Applying ability perk (%s)", ability))
+		perks.ability = ability
+	}
+
+	if ("grenade" in tPerks) {
+		string grenade = expect string(tPerks["grenade"])
+		print(format("Applying grenade perk (%s)", grenade))
+		perks.grenade = grenade
+	}
+}
 
 /**
  * This gives player predefined weapon, grenade and ability.
