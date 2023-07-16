@@ -12,15 +12,15 @@ playlists
 				description "#PK_DESC"
 				hint "#PK_DESC"
 				abbreviation "PK"
-				
+
 				max_players 16
-				max_teams 2
+				max_teams 1
 				classic_mp 1
 				scorelimit 100
 				timelimit 10
 				roundtimelimit 3
 				roundscorelimit 5
-				
+
 				gamemode_score_hint #GAMEMODE_SCORE_HINT_TDM
 			}
 		}
@@ -39,14 +39,14 @@ playlists
 				abbreviation "PK"
 				image ffa
 				max_players 16
-				max_teams 2
+				max_teams 1
 				classic_mp 1
 				scorelimit 5
 				roundtimelimit 2
 				roundscorelimit 5
-				
+
 				gamemode_score_hint #GAMEMODE_SCORE_HINT_TDM
-			}	
+			}
 			gamemodes
 			{
 				pk
