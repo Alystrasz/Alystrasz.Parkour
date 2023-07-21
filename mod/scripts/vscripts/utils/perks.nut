@@ -5,6 +5,7 @@ global struct Perks {
 	string ability = ""
 	string weapon = ""
 	string grenade = ""
+	int kit = -1 // numerical value of the passive ability
 }
 global Perks perks
 
@@ -29,6 +30,12 @@ void function ApplyPerks( table tPerks ) {
 		string grenade = expect string(tPerks["grenade"])
 		print(format("Applying grenade perk (%s)", grenade))
 		perks.grenade = grenade
+	}
+
+	if ("kit" in tPerks) {
+		string kit = expect string(tPerks["kit"])
+		print(format("Applying kit perk (%s)", kit))
+		perks.kit = kit.tointeger()
 	}
 }
 
@@ -63,6 +70,11 @@ void function ForcePlayerLoadout(entity player) {
 				player.GiveOffhandWeapon( perks.grenade, index )
 				grenadeGiven = true
 			}
+		}
+
+		// Kit
+		if (perks.kit != -1) {
+			GivePassive (player, perks.kit)
 		}
 	}
 }
