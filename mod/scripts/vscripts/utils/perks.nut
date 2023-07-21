@@ -50,7 +50,7 @@ void function ForcePlayerLoadout(entity player) {
 			foreach ( int index, entity weapon in player.GetMainWeapons() ) {
 				player.TakeWeaponNow( weapon.GetWeaponClassName() )
 				if (weapon.GetWeaponClassName().find("mp_weapon_") != null && index == 0)
-					player.GiveWeapon( "mp_weapon_epg", [] )
+					player.GiveWeapon( perks.weapon, [] )
 			}
 		}
 
