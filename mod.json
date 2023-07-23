@@ -22,6 +22,10 @@
             }
         },
         {
+            "Path": "utils/parsing.nut",
+            "RunOn": "SERVER || CLIENT"
+        },
+        {
             "Path": "utils/network_map_configuration.nut",
             "RunOn": "SERVER"
         },

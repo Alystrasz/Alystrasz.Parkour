@@ -1,13 +1,5 @@
 global function InitializeMapConfigurationFromAPI
 
-struct {
-    vector origin
-    vector angles
-    array dimensions
-    vector triggerMins
-    vector triggerMaxs
-} startLine;
-
 void function InitializeMapConfigurationFromAPI()
 {
     thread FetchMapConfigurationFromAPI()
@@ -23,15 +15,10 @@ void function FetchMapConfigurationFromAPI()
 
     // Start line
     table startLineData = expect table(data["startLine"])
-    startLine.origin = ArrayToFloatVector( expect array(startLineData["origin"]) )
-    startLine.angles = ArrayToIntVector( expect array(startLineData["angles"]) )
-    startLine.dimensions = expect array(startLineData["dimensions"])
-    array triggerDimensions = expect array(startLineData["trigger"])
-    startLine.triggerMins = ArrayToFloatVector( expect array(triggerDimensions[0]) )
-    startLine.triggerMaxs = ArrayToFloatVector( expect array(triggerDimensions[1]) )
-    // TODO save this somewhere to send to new connected players without reparsing everything
-    string startLineStr = EncodeJSON(startLineData)
 
+    // TODO save this somewhere to send to new connected players without reparsing everything
+    ParkourLine startLine = BuildStartLine( startLineData )
+    string startLineStr = EncodeJSON(startLineData)
     foreach (player in GetPlayerArray())
     {
         ServerToClientStringCommand( player, "ParkourInitStartLine " + startLineStr)
@@ -52,20 +39,4 @@ void function SpawnZiplines( array coordinates )
         array endCoordinates = expect array(zipline[1])
 		CreateZipline( ArrayToFloatVector(startCoordinates), ArrayToFloatVector(endCoordinates) )
 	}
-}
-
-vector function ArrayToFloatVector(array a)
-{
-    float v1 = expect float(a[0]);
-    float v2 = expect float(a[1]);
-    float v3 = expect float(a[2]);
-    return < v1, v2, v3 >
-}
-
-vector function ArrayToIntVector(array a)
-{
-    int v1 = expect int(a[0]);
-    int v2 = expect int(a[1]);
-    int v3 = expect int(a[2]);
-    return < v1, v2, v3 >
 }
