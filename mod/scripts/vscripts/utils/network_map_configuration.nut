@@ -3,6 +3,19 @@ global function InitializeMapConfigurationFromAPI
 void function InitializeMapConfigurationFromAPI()
 {
     thread FetchMapConfigurationFromAPI()
+
+    while(checkpoints.len() == 0) {
+		WaitFrame()
+	}
+
+	SpawnCheckpoints()
+	WorldLeaderboard_Init()
+
+    // Init players
+    foreach(player in GetPlayerArray())
+    {
+        OnPlayerConnected(player)
+    }
 }
 
 void function FetchMapConfigurationFromAPI()
@@ -12,6 +25,18 @@ void function FetchMapConfigurationFromAPI()
 
     // simulate network delay
     wait 1
+
+    // Checkpoints
+    array fCheckpoints = expect array(data["checkpoints"])
+    foreach( checkpoint in fCheckpoints ) {
+        checkpoints.push( ArrayToFloatVector(expect array(checkpoint)) )
+    }
+    table startData = expect table(data["start"])
+    vector start = ArrayToFloatVector( expect array(startData["origin"]) )
+    checkpoints.insert( 0, start )
+    table endData = expect table(data["end"])
+    vector end = ArrayToFloatVector( expect array(endData["origin"]) )
+    checkpoints.append( end )
 
     // Start/finish lines
     table startLineData = expect table(data["startLine"])

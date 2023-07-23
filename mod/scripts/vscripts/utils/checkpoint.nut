@@ -1,14 +1,4 @@
-global function SpawnEntities
-
-
-/**
- * Called on server initialization, this will spawn all entities related to this very
- * gamemode.
- **/
-void function SpawnEntities()
-{
-    SpawnCheckpoints()
-}
+global function SpawnCheckpoints
 
 
 /**
@@ -123,6 +113,8 @@ entity function SpawnEndTrigger( vector origin )
 {
 	entity point = CreateEntity( "prop_dynamic" )
     point.SetOrigin( origin )
+	point.SetValueForModelKey($"models/fx/xo_emp_field.mdl")
+	point.kv.modelscale = 0.3
     point.Hide()
     DispatchSpawn( point )
     thread FinishTriggerThink()

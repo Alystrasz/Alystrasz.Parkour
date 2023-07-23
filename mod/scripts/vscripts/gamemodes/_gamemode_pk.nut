@@ -8,6 +8,7 @@ global array<vector> checkpoints = []
 global array<entity> checkpointEntities = []
 
 global bool has_api_access = false
+global function OnPlayerConnected
 
 
 void function _PK_Init() {
@@ -18,21 +19,21 @@ void function _PK_Init() {
 	SetLoadoutGracePeriodEnabled( false )
 	SetTimeoutWinnerDecisionFunc( ParkourDecideWinner )
 
-	// teleport connected players to map start
-	AddCallback_OnClientConnected( OnPlayerConnected )
-	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
+	// Precache checkpoint model
+	PrecacheModel($"models/fx/xo_emp_field.mdl")
 
 	// Disable titans and boosts
 	Riff_ForceTitanAvailability( eTitanAvailability.Never )
 	Riff_ForceBoostAvailability( eBoostAvailability.Disabled )
 
-	InitializeMapConfigurationFromAPI()
+	// teleport connected players to map start
+	AddCallback_OnClientConnected( OnPlayerConnected )
+	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
 
 	// Prepare map for parkour gamemode
-	checkpoints = GetMapCheckpointLocations()
-	SpawnEntities()
-	WorldLeaderboard_Init()
+	thread InitializeMapConfigurationFromAPI()
 }
+
 
 /**
  * Callback invoked on player connection.
@@ -82,6 +83,9 @@ void function OnPlayerReset(entity player) {
  **/
 void function RespawnPlayerToConfirmedCheckpoint(entity player)
 {
+	// Do nothing if called during server initialization
+	if (checkpoints.len() == 0) return
+	
 	int checkpointIndex = localStats[player.GetPlayerName()].currentCheckpoint
 	vector checkpoint = checkpoints[checkpointIndex]
 	player.SetOrigin( checkpoint )

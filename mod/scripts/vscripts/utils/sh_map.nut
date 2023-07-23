@@ -3,92 +3,9 @@ global struct TriggerVolume {
     vector maxs
 }
 
-global function GetMapCheckpointLocations
 global function GetMapStartVolume
 global function GetMapFinishVolume
 
-
-/**
- * Returns a list of coordinates for all map checkpoints.
- *
- * This list includes first map spawn point (needed to spawn players on match start),
- * map finish trigger location, and all checkpoints between them.
- *
- * Coordinates are used to display a little flag icon on players' interface, showing
- * them where to go.
- **/
-array<vector> function GetMapCheckpointLocations()
-{
-    array<vector> checkpoints = _GetMapCheckpointLocations()
-    checkpoints.insert( 0, _GetMapStartLocation() )
-    checkpoints.append( _GetMapEndLocation() )
-    return checkpoints
-}
-
-// Return checkpoints player must go through during run.
-array<vector> function _GetMapCheckpointLocations()
-{
-    string mapName = GetMapName()
-
-    switch( mapName )
-    {
-        case "mp_thaw":
-            return [
-                <471.636, -3438.36, 112.031>,
-                <1078.87, -4349.23, 30.0313>,
-                <1286.21, -5821.39, -174.185>,
-                <1478.94, -4339.42, 30.0313>,
-                <2337.49, -2532.42, 63.8572>,
-                <1767.95, -554.624, -16.3175>,
-                < -488.85, -956.027, -191.969>,
-                < -1806.92, -1307.96, -319.969>,
-                < -1206.72, -766.02, 328.031>,
-                < -1844.4, -1307.25, 949.407>
-            ]
-        default:
-            throw format( "Checkpoints were not found for map \"%s\".", mapName )
-    }
-
-    unreachable
-}
-
-/**
- * Returns location of the spawning point.
- * This is used to spawn new players.
- **/
-vector function _GetMapStartLocation()
-{
-    string mapName = GetMapName()
-
-    switch( mapName )
-    {
-        case "mp_thaw":
-            return < -492.656, -3036, -107.969>
-        default:
-            throw format( "End location was not found for map \"%s\".", mapName )
-    }
-
-    unreachable
-}
-
-/**
- * Returns location of the finish line.
- * This is used to display the icon on players UI.
- **/
-vector function _GetMapEndLocation()
-{
-    string mapName = GetMapName()
-
-    switch( mapName )
-    {
-        case "mp_thaw":
-            return < -399.065, -2906.22, -83.9688>
-        default:
-            throw format( "End location was not found for map \"%s\".", mapName )
-    }
-
-    unreachable
-}
 
 /**
  * Returns the starting line volume.
