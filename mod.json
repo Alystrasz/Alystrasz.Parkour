@@ -30,10 +30,6 @@
             "RunOn": "SERVER"
         },
         {
-            "Path": "utils/sh_map.nut",
-            "RunOn": "SERVER"
-        },
-        {
             "Path": "gamemodes/cl_gamemode_pk.nut",
             "RunOn": "CLIENT"
         },

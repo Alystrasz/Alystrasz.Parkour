@@ -1,5 +1,13 @@
 global function InitializeMapConfigurationFromAPI
 
+struct {
+    bool finishedFetchingData = false
+    vector startMins
+    vector startMaxs
+    vector endMins
+    vector endMaxs
+} file;
+
 void function InitializeMapConfigurationFromAPI()
 {
     thread FetchMapConfigurationFromAPI()
@@ -8,7 +16,7 @@ void function InitializeMapConfigurationFromAPI()
 		WaitFrame()
 	}
 
-	SpawnCheckpoints()
+	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
 	WorldLeaderboard_Init()
 
     // Init players
@@ -39,8 +47,17 @@ void function FetchMapConfigurationFromAPI()
     checkpoints.append( end )
 
     // Start/finish lines
+    // Start
     table startLineData = expect table(data["startLine"])
+    ParkourLine startLine = BuildParkourLine(startLineData)
+    file.startMins = startLine.triggerMins
+    file.startMaxs = startLine.triggerMaxs
+    // End
     table finishLineData = expect table(data["finishLine"])
+    ParkourLine endLine = BuildParkourLine(finishLineData)
+    file.endMins = endLine.triggerMins
+    file.endMaxs = endLine.triggerMaxs
+    // Leaderboards
     table leaderboardsData = expect table(data["leaderboards"])
     table localLeaderboardData = expect table(leaderboardsData["local"])
     table worldLeaderboardData = expect table(leaderboardsData["world"])
@@ -57,9 +74,6 @@ void function FetchMapConfigurationFromAPI()
         ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + localLeaderboardStr)
         ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + worldLeaderboardStr)
     }
-
-    // TODO typing issues
-    // checkpoints = expect array(data["checkpoints"])
 
     SpawnZiplines( expect array(data["ziplines"]) )
 }
