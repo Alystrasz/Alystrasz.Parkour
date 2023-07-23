@@ -31,7 +31,7 @@
         },
         {
             "Path": "utils/sh_map.nut",
-            "RunOn": "SERVER || CLIENT"
+            "RunOn": "SERVER"
         },
         {
             "Path": "gamemodes/cl_gamemode_pk.nut",
