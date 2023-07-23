@@ -1,5 +1,6 @@
 global function ArrayToFloatVector
 global function ArrayToIntVector
+global function BuildParkourLeaderboard
 global function BuildParkourLine
 
 global struct ParkourLine {
@@ -9,6 +10,16 @@ global struct ParkourLine {
     vector triggerMins
     vector triggerMaxs
 }
+
+global struct ParkourLeaderboard {
+    vector origin
+    vector angles
+    array<int> dimensions
+    vector sourceOrigin
+    vector sourceAngles
+    array<int> sourceDimensions
+}
+
 
 vector function ArrayToFloatVector(array a)
 {
@@ -37,4 +48,23 @@ ParkourLine function BuildParkourLine(table parkourLineData)
     startLine.triggerMins = ArrayToFloatVector( expect array(triggerDimensions[0]) )
     startLine.triggerMaxs = ArrayToFloatVector( expect array(triggerDimensions[1]) )
     return startLine
+}
+
+ParkourLeaderboard function BuildParkourLeaderboard(table parkourLeaderboardData)
+{
+    ParkourLeaderboard leaderboard = { ... }
+
+    // Leaderboard coordinates
+    leaderboard.origin = ArrayToFloatVector( expect array(parkourLeaderboardData["origin"]) )
+    leaderboard.angles = ArrayToIntVector( expect array(parkourLeaderboardData["angles"]) )
+    array dimensions = expect array(parkourLeaderboardData["dimensions"])
+    leaderboard.dimensions = [ expect int(dimensions[0]), expect int(dimensions[1]) ]
+    // Source coordinates
+    table sourceCoordinates = expect table(parkourLeaderboardData["source"])
+    leaderboard.sourceOrigin = ArrayToFloatVector( expect array(sourceCoordinates["origin"]) )
+    leaderboard.sourceAngles = ArrayToIntVector( expect array(sourceCoordinates["angles"]) )
+    dimensions = expect array(sourceCoordinates["dimensions"])
+    leaderboard.sourceDimensions = [ expect int(dimensions[0]), expect int(dimensions[1]) ]
+
+    return leaderboard
 }

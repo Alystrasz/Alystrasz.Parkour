@@ -16,14 +16,21 @@ void function FetchMapConfigurationFromAPI()
     // Start/finish lines
     table startLineData = expect table(data["startLine"])
     table finishLineData = expect table(data["finishLine"])
+    table leaderboardsData = expect table(data["leaderboards"])
+    table localLeaderboardData = expect table(leaderboardsData["local"])
+    table worldLeaderboardData = expect table(leaderboardsData["world"])
     // Serialized (TODO save those somewhere to send to new connected players without reparsing everything)
     string startLineStr = EncodeJSON(startLineData)
     string finishLineStr = EncodeJSON(finishLineData)
-    
+    string localLeaderboardStr = EncodeJSON(localLeaderboardData)
+    string worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
+
     foreach (player in GetPlayerArray())
     {
         ServerToClientStringCommand( player, "ParkourInitLine start " + startLineStr)
         ServerToClientStringCommand( player, "ParkourInitLine end " + finishLineStr)
+        ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + localLeaderboardStr)
+        ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + worldLeaderboardStr)
     }
 
     // TODO typing issues
