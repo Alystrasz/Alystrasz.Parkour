@@ -1,6 +1,6 @@
 global function ArrayToFloatVector
 global function ArrayToIntVector
-global function BuildStartLine
+global function BuildParkourLine
 
 global struct ParkourLine {
     vector origin
@@ -26,14 +26,14 @@ vector function ArrayToIntVector(array a)
     return < v1, v2, v3 >
 }
 
-ParkourLine function BuildStartLine(table startLineData)
+ParkourLine function BuildParkourLine(table parkourLineData)
 {
     ParkourLine startLine = { ... }
-    startLine.origin = ArrayToFloatVector( expect array(startLineData["origin"]) )
-    startLine.angles = ArrayToIntVector( expect array(startLineData["angles"]) )
-    array dimensions = expect array(startLineData["dimensions"])
+    startLine.origin = ArrayToFloatVector( expect array(parkourLineData["origin"]) )
+    startLine.angles = ArrayToIntVector( expect array(parkourLineData["angles"]) )
+    array dimensions = expect array(parkourLineData["dimensions"])
     startLine.dimensions = [ expect int(dimensions[0]), expect int(dimensions[1]) ]
-    array triggerDimensions = expect array(startLineData["trigger"])
+    array triggerDimensions = expect array(parkourLineData["trigger"])
     startLine.triggerMins = ArrayToFloatVector( expect array(triggerDimensions[0]) )
     startLine.triggerMaxs = ArrayToFloatVector( expect array(triggerDimensions[1]) )
     return startLine

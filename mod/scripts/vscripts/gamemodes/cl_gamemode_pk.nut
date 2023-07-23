@@ -60,9 +60,7 @@ void function Cl_Parkour_Init()
 
     // register command to receive leaderboard updates from server
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
-    AddServerToClientStringCommandCallback( "ParkourInitStartLine", ServerCallback_CreateStartLine )
-
-    Cl_Parkour_Create_End()
+    AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
 }
 
 void function Cl_Parkour_InitWorldLeaderboard()
@@ -87,17 +85,6 @@ void function Cl_ParkourCreateLeaderboardSource(bool world = false) {
 	var topo = CreateTopology(origin, angles, dimensions[0], dimensions[1])
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( startRui, "displayText", world ? "#LEADERBOARD_WORLD" : "#LEADERBOARD_LOCAL" )
-}
-
-
-void function Cl_Parkour_Create_End()
-{
-    vector origin = GetMapFinishLineOrigin()
-    vector angles = GetMapFinishLineAngles()
-    array<float> coordinates = GetMapFinishLineDimensions()
-	var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
-    var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
 }
 
 void function SafeDestroyRUI( var rui )
@@ -305,11 +292,12 @@ void function DestroyCheckpointsCountRUI()
 ╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝ 
 */
 
-void function ServerCallback_CreateStartLine( array<string> args ) 
+void function ServerCallback_CreateLine( array<string> args ) 
 {
-    table data = DecodeJSON(args[0]);
-    ParkourLine startLine = BuildStartLine( data )
-	var topo = CreateTopology(startLine.origin, startLine.angles, startLine.dimensions[0].tofloat(), startLine.dimensions[1].tofloat())
+    bool isStartLine = args[0] == "start"
+    table data = DecodeJSON(args[1]);
+    ParkourLine line = BuildParkourLine( data )
+	var topo = CreateTopology(line.origin, line.angles, line.dimensions[0].tofloat(), line.dimensions[1].tofloat())
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
+	RuiSetString( startRui, "displayText", isStartLine ? "#GAUNTLET_START_TEXT" : "#GAUNTLET_FINISH_TEXT" )
 }

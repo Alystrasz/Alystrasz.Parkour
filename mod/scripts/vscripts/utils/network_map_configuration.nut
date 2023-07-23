@@ -13,15 +13,17 @@ void function FetchMapConfigurationFromAPI()
     // simulate network delay
     wait 1
 
-    // Start line
+    // Start/finish lines
     table startLineData = expect table(data["startLine"])
-
-    // TODO save this somewhere to send to new connected players without reparsing everything
-    ParkourLine startLine = BuildStartLine( startLineData )
+    table finishLineData = expect table(data["finishLine"])
+    // Serialized (TODO save those somewhere to send to new connected players without reparsing everything)
     string startLineStr = EncodeJSON(startLineData)
+    string finishLineStr = EncodeJSON(finishLineData)
+    
     foreach (player in GetPlayerArray())
     {
-        ServerToClientStringCommand( player, "ParkourInitStartLine " + startLineStr)
+        ServerToClientStringCommand( player, "ParkourInitLine start " + startLineStr)
+        ServerToClientStringCommand( player, "ParkourInitLine end " + finishLineStr)
     }
 
     // TODO typing issues
