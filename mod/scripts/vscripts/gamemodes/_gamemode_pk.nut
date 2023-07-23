@@ -26,6 +26,8 @@ void function _PK_Init() {
 	Riff_ForceTitanAvailability( eTitanAvailability.Never )
 	Riff_ForceBoostAvailability( eBoostAvailability.Disabled )
 
+	InitializeMapConfigurationFromAPI()
+
 	// Prepare map for parkour gamemode
 	checkpoints = GetMapCheckpointLocations()
 	SpawnEntities()

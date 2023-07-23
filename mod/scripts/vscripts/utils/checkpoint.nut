@@ -8,7 +8,6 @@ global function SpawnEntities
 void function SpawnEntities()
 {
     SpawnCheckpoints()
-    SpawnZiplines()
 }
 
 
@@ -175,17 +174,5 @@ void function FinishTriggerThink()
 			}
 		}
 		WaitFrame()
-	}
-}
-
-
-/**
- * Retrieves ziplines coordinates for the current map, and spawns them accordingly.
- **/
-void function SpawnZiplines()
-{
-	foreach (coordinates in GetMapZiplinesCoordinates())
-	{
-		CreateZipline( coordinates.start, coordinates.end )
 	}
 }
