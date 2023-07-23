@@ -60,8 +60,8 @@ void function Cl_Parkour_Init()
 
     // register command to receive leaderboard updates from server
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
+    AddServerToClientStringCommandCallback( "ParkourInitStartLine", ServerCallback_CreateStartLine )
 
-    thread Cl_Parkour_Create_Start()
     Cl_Parkour_Create_End()
 }
 
@@ -89,16 +89,6 @@ void function Cl_ParkourCreateLeaderboardSource(bool world = false) {
 	RuiSetString( startRui, "displayText", world ? "#LEADERBOARD_WORLD" : "#LEADERBOARD_LOCAL" )
 }
 
-// Start/end "barrier" world UI
-void function Cl_Parkour_Create_Start()
-{
-	vector origin = GetMapStartLineOrigin()
-    vector angles = GetMapStartLineAngles()
-    array<float> coordinates = GetMapStartLineDimensions()
-	var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
-    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
-}
 
 void function Cl_Parkour_Create_End()
 {
@@ -303,4 +293,46 @@ void function DestroyCheckpointsCountRUI()
 	RuiSetGameTime( file.checkpointsCountRUI, "startFadeOutTime", Time() )
 	wait 0.6
     SafeDestroyRUI( file.checkpointsCountRUI )
+}
+
+
+/*
+███╗   ██╗███████╗████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗    ██╗███╗   ██╗██╗████████╗
+████╗  ██║██╔════╝╚══██╔══╝██║    ██║██╔═══██╗██╔══██╗██║ ██╔╝    ██║████╗  ██║██║╚══██╔══╝
+██╔██╗ ██║█████╗     ██║   ██║ █╗ ██║██║   ██║██████╔╝█████╔╝     ██║██╔██╗ ██║██║   ██║   
+██║╚██╗██║██╔══╝     ██║   ██║███╗██║██║   ██║██╔══██╗██╔═██╗     ██║██║╚██╗██║██║   ██║   
+██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗    ██║██║ ╚████║██║   ██║   
+╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝ 
+*/
+
+vector function ArrayToFloatVector(array a)
+{
+    float v1 = expect float(a[0]);
+    float v2 = expect float(a[1]);
+    float v3 = expect float(a[2]);
+    return < v1, v2, v3 >
+}
+
+vector function ArrayToIntVector(array a)
+{
+    int v1 = expect int(a[0]);
+    int v2 = expect int(a[1]);
+    int v3 = expect int(a[2]);
+    return < v1, v2, v3 >
+}
+
+
+void function ServerCallback_CreateStartLine( array<string> args ) 
+{
+    table data = DecodeJSON(args[0]);
+
+    vector origin = ArrayToFloatVector( expect array(data["origin"]) )
+    vector angles = ArrayToIntVector( expect array(data["angles"]) )
+    array dimensions = expect array(data["dimensions"])
+
+    float width = expect int(dimensions[0]).tofloat()
+    float height = expect int(dimensions[1]).tofloat()
+	var topo = CreateTopology(origin, angles, width, height)
+    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
 }
