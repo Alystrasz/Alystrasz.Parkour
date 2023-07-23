@@ -5,7 +5,7 @@ global function BuildStartLine
 global struct ParkourLine {
     vector origin
     vector angles
-    array dimensions
+    array<int> dimensions
     vector triggerMins
     vector triggerMaxs
 }
@@ -31,7 +31,8 @@ ParkourLine function BuildStartLine(table startLineData)
     ParkourLine startLine = { ... }
     startLine.origin = ArrayToFloatVector( expect array(startLineData["origin"]) )
     startLine.angles = ArrayToIntVector( expect array(startLineData["angles"]) )
-    startLine.dimensions = expect array(startLineData["dimensions"])
+    array dimensions = expect array(startLineData["dimensions"])
+    startLine.dimensions = [ expect int(dimensions[0]), expect int(dimensions[1]) ]
     array triggerDimensions = expect array(startLineData["trigger"])
     startLine.triggerMins = ArrayToFloatVector( expect array(triggerDimensions[0]) )
     startLine.triggerMaxs = ArrayToFloatVector( expect array(triggerDimensions[1]) )

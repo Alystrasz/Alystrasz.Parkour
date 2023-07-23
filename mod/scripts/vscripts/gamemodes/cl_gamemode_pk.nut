@@ -309,8 +309,7 @@ void function ServerCallback_CreateStartLine( array<string> args )
 {
     table data = DecodeJSON(args[0]);
     ParkourLine startLine = BuildStartLine( data )
-    print("cl => yo?")
-	var topo = CreateTopology(startLine.origin, startLine.angles, expect int(startLine.dimensions[0]).tofloat(), expect int(startLine.dimensions[1]).tofloat())
+	var topo = CreateTopology(startLine.origin, startLine.angles, startLine.dimensions[0].tofloat(), startLine.dimensions[1].tofloat())
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
 }
