@@ -9,6 +9,7 @@ global function SendWorldLeaderboardEntryToAPI
 
 struct {
     var event_id
+    string endpoint
     string secret
 } file;
 
@@ -21,6 +22,7 @@ struct {
  **/
 void function WorldLeaderboard_Init() {
     file.secret = GetConVarString("parkour_api_secret")
+    file.endpoint = GetConVarString("parkour_api_endpoint")
     thread WorldLeaderboard_FetchEvents()
 }
 
@@ -40,7 +42,7 @@ void function WorldLeaderboard_Init() {
 void function WorldLeaderboard_FetchEvents() {
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = "https://parkour.remyraes.com/v1/events"
+    request.url = format("%s/v1/events", file.endpoint)
     table<string, array<string> > headers
     headers[ "authentication" ] <- [file.secret]
     request.headers = headers
@@ -105,7 +107,7 @@ void function WorldLeaderboard_FetchScores(string event_id)
     print("Fetching scores for event n°" + event_id)
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", event_id)
+    request.url = format("%s/v1/events/%s/scores", file.endpoint, event_id)
     table<string, array<string> > headers
     headers[ "authentication" ] <- [file.secret]
     request.headers = headers
@@ -168,7 +170,7 @@ void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
 {
     HttpRequest request
     request.method = HttpRequestMethod.POST
-    request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", file.event_id )
+    request.url = format("%s/v1/events/%s/scores", file.endpoint, file.event_id )
     table<string, array<string> > headers
     headers[ "authentication" ] <- [file.secret]
     request.headers = headers

@@ -6,6 +6,10 @@
     "RequiredOnClient": true,
     "ConVars": [
         {
+            "Name": "parkour_api_endpoint",
+            "DefaultValue": "https://parkour.remyraes.com"
+        },
+        {
             "Name": "parkour_api_secret",
             "DefaultValue": "my_little_secret"
         }
