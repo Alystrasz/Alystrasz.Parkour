@@ -1,22 +1,34 @@
 global function InitializeMapConfigurationFromAPI
 
-struct {
+global struct MapConfiguration {
     bool finishedFetchingData = false
+    string startLineStr
+    string finishLineStr
+    string localLeaderboardStr
+    string worldLeaderboardStr
+}
+
+global MapConfiguration mapConfiguration
+
+struct {
     vector startMins
     vector startMaxs
     vector endMins
     vector endMaxs
+    array ziplines
 } file;
 
 void function InitializeMapConfigurationFromAPI()
 {
     thread FetchMapConfigurationFromAPI()
 
-    while(checkpoints.len() == 0) {
+    while(mapConfiguration.finishedFetchingData == false) {
 		WaitFrame()
 	}
 
+    // Set up world
 	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
+    SpawnZiplines( file.ziplines )
 	WorldLeaderboard_Init()
 
     // Init players
@@ -61,21 +73,15 @@ void function FetchMapConfigurationFromAPI()
     table leaderboardsData = expect table(data["leaderboards"])
     table localLeaderboardData = expect table(leaderboardsData["local"])
     table worldLeaderboardData = expect table(leaderboardsData["world"])
-    // Serialized (TODO save those somewhere to send to new connected players without reparsing everything)
-    string startLineStr = EncodeJSON(startLineData)
-    string finishLineStr = EncodeJSON(finishLineData)
-    string localLeaderboardStr = EncodeJSON(localLeaderboardData)
-    string worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
 
-    foreach (player in GetPlayerArray())
-    {
-        ServerToClientStringCommand( player, "ParkourInitLine start " + startLineStr)
-        ServerToClientStringCommand( player, "ParkourInitLine end " + finishLineStr)
-        ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + localLeaderboardStr)
-        ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + worldLeaderboardStr)
-    }
+    // Serialized
+    mapConfiguration.startLineStr = EncodeJSON(startLineData)
+    mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
+    mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
+    mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
 
-    SpawnZiplines( expect array(data["ziplines"]) )
+    file.ziplines = expect array(data["ziplines"])
+    mapConfiguration.finishedFetchingData = true
 }
 
 void function SpawnZiplines( array coordinates )

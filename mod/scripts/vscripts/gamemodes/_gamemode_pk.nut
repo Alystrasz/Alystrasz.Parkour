@@ -42,8 +42,18 @@ void function _PK_Init() {
  **/
 void function OnPlayerConnected(entity player)
 {
+	// Do nothing if called during server initialization
+	if (mapConfiguration.finishedFetchingData == false) return
+	
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
+
+	// Init client-side elements
+	ServerToClientStringCommand( player, "ParkourInitLine start " + mapConfiguration.startLineStr)
+	ServerToClientStringCommand( player, "ParkourInitLine end " + mapConfiguration.finishLineStr)
+	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
+	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
+
 	UpdatePlayerLeaderboard( player, 0 )
 	UpdatePlayerLeaderboard( player, 0, true )
 
@@ -51,7 +61,7 @@ void function OnPlayerConnected(entity player)
 	InitPlayerStats(player)
 	RespawnPlayerToConfirmedCheckpoint(player)
 
-	// Listen for
+	// Listen for reset
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
 }
 
@@ -84,7 +94,7 @@ void function OnPlayerReset(entity player) {
 void function RespawnPlayerToConfirmedCheckpoint(entity player)
 {
 	// Do nothing if called during server initialization
-	if (checkpoints.len() == 0) return
+	if (mapConfiguration.finishedFetchingData == false) return
 	
 	int checkpointIndex = localStats[player.GetPlayerName()].currentCheckpoint
 	vector checkpoint = checkpoints[checkpointIndex]
