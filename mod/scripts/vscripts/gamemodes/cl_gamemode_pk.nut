@@ -211,6 +211,12 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
     RuiSetString( world ? file.worldLeaderboard : file.leaderboard, nameArg, playerName )
     RuiSetFloat( world ? file.worldLeaderboard : file.leaderboard, timeArg, time )
 
+    // Highlight personal entries
+    entity localPlayer = GetLocalViewPlayer()
+    if (playerName == localPlayer.GetPlayerName()) {
+        RuiSetInt( world ? file.worldLeaderboard : file.leaderboard, "activeEntryIdx", index )
+    }
+
     // Stop here for world scores
     if (world) return;
 
@@ -222,7 +228,6 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
 
     // When reconnecting to a server where a score has previously been registered,
     // restore it as best time.
-    entity localPlayer = GetLocalViewPlayer()
     if (localPlayer.GetPlayerName() == playerName && file.bestTime == 0)
         file.bestTime = time
 }
