@@ -142,7 +142,7 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 
                     playerStats.isRunning = false
                     playerStats.currentCheckpoint = 0
-                    playerStats.checkpointAngles = [<0, 0, 0>]
+                    playerStats.checkpointAngles = [startAngles]
 
                     bool isBestTime = duration < playerStats.bestTime
                     if (isBestTime)

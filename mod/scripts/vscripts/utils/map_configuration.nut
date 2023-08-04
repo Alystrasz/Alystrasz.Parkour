@@ -212,6 +212,8 @@ void function LoadParkourMapConfiguration(table data)
         table startData = expect table(data["start"])
         vector start = ArrayToFloatVector( expect array(startData["origin"]) )
         checkpoints.insert( 0, start )
+        vector angles = ArrayToIntVector( expect array(startData["angles"]) )
+        startAngles = angles
         table endData = expect table(data["end"])
         vector end = ArrayToFloatVector( expect array(endData["origin"]) )
         checkpoints.append( end )
