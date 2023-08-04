@@ -19,7 +19,7 @@
         },
         {
             "Name": "parkour_use_local_config",
-            "DefaultValue": "1"
+            "DefaultValue": "0"
         }
     ],
     "Scripts": [
