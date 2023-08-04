@@ -38,9 +38,9 @@ void function InitializeMapConfiguration()
     } else {
         print("Loading map configuration from API.")
         thread InitializeMapConfigurationFromAPI()
-        while(mapConfiguration.finishedFetchingData == false) {
-            WaitFrame()
-        }
+    }
+    while(mapConfiguration.finishedFetchingData == false) {
+        WaitFrame()
     }
 
     // Set up world
@@ -61,6 +61,13 @@ void function InitializeMapConfigurationFromFile()
         NSSaveFile(fileName, "")
         throw format("No configuration file found for map \"%s\", please fill the configuration file (%s).", GetMapName(), fileName)
     }
+
+    void functionref( string ) onFileLoad = void function ( string result )
+    {
+        LoadParkourMapConfiguration( DecodeJSON(result) )
+        mapConfiguration.finishedFetchingData = true;
+    }
+    NSLoadFile(fileName, onFileLoad)
 }
 
 void function InitializeMapConfigurationFromAPI()
@@ -189,42 +196,49 @@ void function SpawnZiplines( array coordinates )
 	}
 }
 
+/**
+ * This method loads all needed information from input table into memory.
+ **/
 void function LoadParkourMapConfiguration(table data)
 {
-    // Checkpoints
-    array fCheckpoints = expect array(data["checkpoints"])
-    foreach( checkpoint in fCheckpoints ) {
-        checkpoints.push( ArrayToFloatVector(expect array(checkpoint)) )
+    try {
+        // Checkpoints
+        array fCheckpoints = expect array(data["checkpoints"])
+        foreach( checkpoint in fCheckpoints ) {
+            checkpoints.push( ArrayToFloatVector(expect array(checkpoint)) )
+        }
+        table startData = expect table(data["start"])
+        vector start = ArrayToFloatVector( expect array(startData["origin"]) )
+        checkpoints.insert( 0, start )
+        table endData = expect table(data["end"])
+        vector end = ArrayToFloatVector( expect array(endData["origin"]) )
+        checkpoints.append( end )
+
+        // Start/finish lines
+        // Start
+        table startLineData = expect table(data["startLine"])
+        ParkourLine startLine = BuildParkourLine(startLineData)
+        file.startMins = startLine.triggerMins
+        file.startMaxs = startLine.triggerMaxs
+        // End
+        table finishLineData = expect table(data["finishLine"])
+        ParkourLine endLine = BuildParkourLine(finishLineData)
+        file.endMins = endLine.triggerMins
+        file.endMaxs = endLine.triggerMaxs
+        // Leaderboards
+        table leaderboardsData = expect table(data["leaderboards"])
+        table localLeaderboardData = expect table(leaderboardsData["local"])
+        table worldLeaderboardData = expect table(leaderboardsData["world"])
+
+        // Serialized
+        mapConfiguration.startLineStr = EncodeJSON(startLineData)
+        mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
+        mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
+        mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
+
+        file.ziplines = expect array(data["ziplines"])
+        mapConfiguration.finishedFetchingData = true
+    } catch (err) {
+        print("Error while loading map configuration: " + err)
     }
-    table startData = expect table(data["start"])
-    vector start = ArrayToFloatVector( expect array(startData["origin"]) )
-    checkpoints.insert( 0, start )
-    table endData = expect table(data["end"])
-    vector end = ArrayToFloatVector( expect array(endData["origin"]) )
-    checkpoints.append( end )
-
-    // Start/finish lines
-    // Start
-    table startLineData = expect table(data["startLine"])
-    ParkourLine startLine = BuildParkourLine(startLineData)
-    file.startMins = startLine.triggerMins
-    file.startMaxs = startLine.triggerMaxs
-    // End
-    table finishLineData = expect table(data["finishLine"])
-    ParkourLine endLine = BuildParkourLine(finishLineData)
-    file.endMins = endLine.triggerMins
-    file.endMaxs = endLine.triggerMaxs
-    // Leaderboards
-    table leaderboardsData = expect table(data["leaderboards"])
-    table localLeaderboardData = expect table(leaderboardsData["local"])
-    table worldLeaderboardData = expect table(leaderboardsData["world"])
-
-    // Serialized
-    mapConfiguration.startLineStr = EncodeJSON(startLineData)
-    mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
-    mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
-    mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
-
-    file.ziplines = expect array(data["ziplines"])
-    mapConfiguration.finishedFetchingData = true
 }
