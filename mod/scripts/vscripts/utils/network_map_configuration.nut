@@ -1,5 +1,13 @@
 global function InitializeMapConfigurationFromAPI
 
+global struct Credentials {
+    string eventId
+    string mapId = ""
+    string endpoint
+    string secret
+}
+global Credentials credentials
+
 global struct MapConfiguration {
     bool finishedFetchingData = false
     string startLineStr
@@ -20,8 +28,16 @@ struct {
 
 void function InitializeMapConfigurationFromAPI()
 {
-    thread FetchMapConfigurationFromAPI()
+    // Initialize credentials
+    credentials.eventId = GetConVarString("parkour_api_event_id")
+    credentials.secret = GetConVarString("parkour_api_secret")
+    credentials.endpoint = GetConVarString("parkour_api_endpoint")
+    thread FindMapIdentifier()
+    while (credentials.mapId == "") {
+        WaitFrame()
+    }
 
+    thread FetchMapConfigurationFromAPI()
     while(mapConfiguration.finishedFetchingData == false) {
 		WaitFrame()
 	}
@@ -29,13 +45,81 @@ void function InitializeMapConfigurationFromAPI()
     // Set up world
 	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
     SpawnZiplines( file.ziplines )
-	WorldLeaderboard_Init()
+	// WorldLeaderboard_Init()
 
     // Init players
     foreach(player in GetPlayerArray())
     {
         OnPlayerConnected(player)
     }
+}
+
+
+/**
+ * This method fetches the `maps` resource of the Parkour API to find information
+ * about the current match: where to save new scores, which settings (weapons/ability
+ * set) to apply to all players...
+ *
+ * Once corresponding map has been found, this will register said map identifier
+ * locally, for it to be used in future HTTP requests, apply required changes to
+ * current match, and start fetching scores from distant API every few seconds.
+ *
+ * If no corresponding map is found, no further HTTP request will occur during the
+ * current match.
+ **/
+void function FindMapIdentifier()
+{
+    HttpRequest request
+    request.method = HttpRequestMethod.GET
+    request.url = format("%s/v1/events/%s/maps", credentials.endpoint, credentials.eventId)
+    table<string, array<string> > headers
+    headers[ "authentication" ] <- [credentials.secret]
+    request.headers = headers
+
+    void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
+    {
+        print("███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗")
+        print("██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝")
+        print("█████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗")
+        print("██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║")
+        print("███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║")
+        print("╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝")
+
+        string inputStr = "{\"data\":" + response.body + "}"
+        table data = DecodeJSON(inputStr)
+        array maps = expect array(data["data"])
+
+        // Currently, corresponding event is found by checking if its name contains the
+        // name of the current map, which might be improved.
+        string mapName = GetMapName()
+        foreach (value in maps) {
+            table map = expect table(value)
+            string map_name = expect string(map["map_name"])
+            if ( map_name.find( mapName) != null ) {
+                credentials.mapId = expect string(map["id"])
+                thread WorldLeaderboard_FetchScores()
+                has_api_access = true
+
+                table perks = expect table(map["perks"]);
+                ApplyPerks( perks )
+
+                return;
+            }
+        }
+
+        print("No map matches the event id and current map.")
+        has_api_access = false
+    }
+
+    void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
+    {
+        print("Something went wrong while fetching maps from parkour API.")
+        print("=> " + failure.errorCode)
+        print("=> " + failure.errorMessage)
+        has_api_access = false
+    }
+
+    NSHttpRequest( request, onSuccess, onFailure )
 }
 
 void function FetchMapConfigurationFromAPI()
