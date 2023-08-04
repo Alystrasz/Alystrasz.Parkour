@@ -16,6 +16,10 @@
         {
             "Name": "parkour_api_event_id",
             "DefaultValue": "f20a4c02-501a-405d-98bc-2544143455fe"
+        },
+        {
+            "Name": "parkour_use_local_config",
+            "DefaultValue": "false"
         }
     ],
     "Scripts": [
@@ -34,7 +38,7 @@
             "RunOn": "SERVER || CLIENT"
         },
         {
-            "Path": "utils/network_map_configuration.nut",
+            "Path": "utils/map_configuration.nut",
             "RunOn": "SERVER"
         },
         {

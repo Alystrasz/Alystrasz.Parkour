@@ -1,4 +1,4 @@
-global function InitializeMapConfigurationFromAPI
+global function InitializeMapConfiguration
 
 global struct Credentials {
     string eventId
@@ -26,6 +26,36 @@ struct {
     array ziplines
 } file;
 
+
+void function InitializeMapConfiguration()
+{
+    // Load map configuration either from local file or distant API
+    bool useLocal = GetConVarBool("parkour_use_local_config")
+    if (useLocal) {
+        InitializeMapConfigurationFromFile()
+    } else {
+        thread InitializeMapConfigurationFromAPI()
+        while(mapConfiguration.finishedFetchingData == false) {
+            WaitFrame()
+        }
+    }
+
+    // Set up world
+	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
+    SpawnZiplines( file.ziplines )
+
+    // Init players
+    foreach(player in GetPlayerArray())
+    {
+        OnPlayerConnected(player)
+    }
+}
+
+void function InitializeMapConfigurationFromFile()
+{
+
+}
+
 void function InitializeMapConfigurationFromAPI()
 {
     // Initialize credentials
@@ -38,19 +68,6 @@ void function InitializeMapConfigurationFromAPI()
     }
 
     thread FetchMapConfigurationFromAPI()
-    while(mapConfiguration.finishedFetchingData == false) {
-		WaitFrame()
-	}
-
-    // Set up world
-	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
-    SpawnZiplines( file.ziplines )
-
-    // Init players
-    foreach(player in GetPlayerArray())
-    {
-        OnPlayerConnected(player)
-    }
 }
 
 

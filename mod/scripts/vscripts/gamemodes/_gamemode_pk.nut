@@ -31,7 +31,7 @@ void function _PK_Init() {
 	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
 
 	// Prepare map for parkour gamemode
-	thread InitializeMapConfigurationFromAPI()
+	thread InitializeMapConfiguration()
 }
 
 
@@ -44,7 +44,7 @@ void function OnPlayerConnected(entity player)
 {
 	// Do nothing if called during server initialization
 	if (mapConfiguration.finishedFetchingData == false) return
-	
+
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
 
@@ -95,7 +95,7 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 {
 	// Do nothing if called during server initialization
 	if (mapConfiguration.finishedFetchingData == false) return
-	
+
 	int checkpointIndex = localStats[player.GetPlayerName()].currentCheckpoint
 	vector checkpoint = checkpoints[checkpointIndex]
 	player.SetOrigin( checkpoint )
