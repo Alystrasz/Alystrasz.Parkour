@@ -8,39 +8,43 @@ global function WorldLeaderboard_Init
 global function SendWorldLeaderboardEntryToAPI
 
 struct {
-    var event_id
+    var mapId
+    string endpoint
     string secret
 } file;
 
 /**
- * Entrypoint of the package, this method will load the API authentication token
- * from the dedicated configuration variable; it will be used in all future HTTP
- * requests to Parkour API.
+ * Entrypoint of the package, this method will load the API endpoint and 
+ * authentication token from dedicated configuration variables; they will
+ * be used in all future HTTP requests to Parkour API.
  *
- * Once the token has been saved, this starts fetching events.
+ * Once information have been saved, this starts fetching maps.
  **/
 void function WorldLeaderboard_Init() {
     file.secret = GetConVarString("parkour_api_secret")
-    thread WorldLeaderboard_FetchEvents()
+    file.endpoint = GetConVarString("parkour_api_endpoint")
+    thread WorldLeaderboard_FetchMaps()
 }
 
 
 /**
- * This method fetches the `events` resource of the Parkour API to find information
+ * This method fetches the `maps` resource of the Parkour API to find information
  * about the current match: where to save new scores, which settings (weapons/ability
  * set) to apply to all players...
  *
- * Once corresponding event has been found, this will register said event identifier
+ * Once corresponding map has been found, this will register said map identifier
  * locally, for it to be used in future HTTP requests, apply required changes to
  * current match, and start fetching scores from distant API every few seconds.
  *
- * If no corresponding event is found, no further HTTP request will occur during the
+ * If no corresponding map is found, no further HTTP request will occur during the
  * current match.
  **/
-void function WorldLeaderboard_FetchEvents() {
+void function WorldLeaderboard_FetchMaps() {
+    string eventId = GetConVarString("parkour_api_event_id")
+
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = "https://parkour.remyraes.com/v1/events"
+    request.url = format("%s/v1/events/%s/maps", file.endpoint, eventId)
     table<string, array<string> > headers
     headers[ "authentication" ] <- [file.secret]
     request.headers = headers
@@ -56,33 +60,33 @@ void function WorldLeaderboard_FetchEvents() {
 
         string inputStr = "{\"data\":" + response.body + "}"
         table data = DecodeJSON(inputStr)
-        array events = expect array(data["data"])
+        array maps = expect array(data["data"])
 
         // Currently, corresponding event is found by checking if its name contains the
         // name of the current map, which might be improved.
         string mapName = GetMapName()
-        foreach (value in events) {
-            table event = expect table(value)
-            string event_name = expect string(event["name"])
-            if ( event_name.find( mapName) != null ) {
-                file.event_id = expect string(event["id"])
-                thread WorldLeaderboard_FetchScores( expect string(event["id"]) )
+        foreach (value in maps) {
+            table map = expect table(value)
+            string map_name = expect string(map["map_name"])
+            if ( map_name.find( mapName) != null ) {
+                file.mapId = expect string(map["id"])
+                thread WorldLeaderboard_FetchScores()
                 has_api_access = true
 
-                table perks = expect table(event["perks"]);
+                table perks = expect table(map["perks"]);
                 ApplyPerks( perks )
 
                 return;
             }
         }
 
-        print("No event matches the current map.")
+        print("No map matches the event id and current map.")
         has_api_access = false
     }
 
     void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
     {
-        print("Something went wrong while fetching events from parkour API.")
+        print("Something went wrong while fetching maps from parkour API.")
         print("=> " + failure.errorCode)
         print("=> " + failure.errorMessage)
         has_api_access = false
@@ -93,19 +97,19 @@ void function WorldLeaderboard_FetchEvents() {
 
 
 /**
- * This fetches scores for the event linked to the current match, using the previously
- * stored event id.
+ * This fetches scores for the map linked to the current match, using the previously
+ * stored map id.
  * Scores fetching happens every few seconds.
  *
  * On scores reception, those are sent to connected game clients, to update the in-game
  * "world" leaderboard.
  **/
-void function WorldLeaderboard_FetchScores(string event_id)
+void function WorldLeaderboard_FetchScores()
 {
-    print("Fetching scores for event n°" + event_id)
+    print("Fetching scores for map n°" + file.mapId)
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", event_id)
+    request.url = format("%s/v1/maps/%s/scores", file.endpoint, file.mapId)
     table<string, array<string> > headers
     headers[ "authentication" ] <- [file.secret]
     request.headers = headers
@@ -168,7 +172,7 @@ void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
 {
     HttpRequest request
     request.method = HttpRequestMethod.POST
-    request.url = format("https://parkour.remyraes.com/v1/events/%s/scores", file.event_id )
+    request.url = format("%s/v1/maps/%s/scores", file.endpoint, file.mapId )
     table<string, array<string> > headers
     headers[ "authentication" ] <- [file.secret]
     request.headers = headers

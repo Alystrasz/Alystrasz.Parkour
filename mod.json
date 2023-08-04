@@ -2,12 +2,20 @@
     "Name": "Parkour",
     "Description": "Reach all checkpoints and end the race as fast as you can.",
     "LoadPriority": 2,
-    "Version": "0.1.1",
+    "Version": "0.1.2",
     "RequiredOnClient": true,
     "ConVars": [
         {
+            "Name": "parkour_api_endpoint",
+            "DefaultValue": "https://parkour.remyraes.com"
+        },
+        {
             "Name": "parkour_api_secret",
             "DefaultValue": "my_little_secret"
+        },
+        {
+            "Name": "parkour_api_event_id",
+            "DefaultValue": "f20a4c02-501a-405d-98bc-2544143455fe"
         }
     ],
     "Scripts": [
