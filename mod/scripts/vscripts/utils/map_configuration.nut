@@ -30,10 +30,13 @@ struct {
 void function InitializeMapConfiguration()
 {
     // Load map configuration either from local file or distant API
-    bool useLocal = GetConVarBool("parkour_use_local_config")
+    bool useLocal = GetConVarInt("parkour_use_local_config") == 1
+
     if (useLocal) {
+        print("Loading map configuration from local file.")
         InitializeMapConfigurationFromFile()
     } else {
+        print("Loading map configuration from API.")
         thread InitializeMapConfigurationFromAPI()
         while(mapConfiguration.finishedFetchingData == false) {
             WaitFrame()
@@ -53,7 +56,11 @@ void function InitializeMapConfiguration()
 
 void function InitializeMapConfigurationFromFile()
 {
-
+    string fileName = format("%s_configuration.json", GetMapName())
+    if (!NSDoesFileExist(fileName)) {
+        NSSaveFile(fileName, "")
+        throw format("No configuration file found for map \"%s\", please fill the configuration file (%s).", GetMapName(), fileName)
+    }
 }
 
 void function InitializeMapConfigurationFromAPI()
