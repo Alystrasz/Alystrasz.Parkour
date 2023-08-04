@@ -75,15 +75,69 @@ void function InitializeMapConfigurationFromFile()
 void function InitializeMapConfigurationFromAPI()
 {
     // Initialize credentials
-    credentials.eventId = GetConVarString("parkour_api_event_id")
-    credentials.secret = GetConVarString("parkour_api_secret")
     credentials.endpoint = GetConVarString("parkour_api_endpoint")
+    credentials.secret = GetConVarString("parkour_api_secret")
+    thread FindEventIdentifier()
+    while (credentials.eventId == "") {
+        WaitFrame()
+    }
     thread FindMapIdentifier()
     while (credentials.mapId == "") {
         WaitFrame()
     }
 
     thread FetchMapConfigurationFromAPI()
+}
+
+
+void function FindEventIdentifier()
+{
+    HttpRequest request
+    request.method = HttpRequestMethod.GET
+    request.url = format("%s/v1/events", credentials.endpoint)
+    table<string, array<string> > headers
+    headers[ "authentication" ] <- [credentials.secret]
+    request.headers = headers
+
+    void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
+    {
+        print("███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗")
+        print("██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝")
+        print("█████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗")
+        print("██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║")
+        print("███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║")
+        print("╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝")
+
+        string inputStr = "{\"data\":" + response.body + "}"
+        table data = DecodeJSON(inputStr)
+        array events = expect array(data["data"])
+
+        // Looking for an event whose dates match server current time.
+        foreach (eValue in events) {
+            table event = expect table(eValue)
+            int start = expect int(event["start"])
+            int end = expect int(event["end"])
+            int currentTime = GetUnixTimestamp();
+
+            if (currentTime >= start && currentTime <= end) {
+                credentials.eventId = expect string(event["id"])
+                return;
+            }
+        }
+
+        print("No parkour event is available at the moment.")
+        has_api_access = false
+    }
+
+    void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
+    {
+        print("Something went wrong while fetching events from parkour API.")
+        print("=> " + failure.errorCode)
+        print("=> " + failure.errorMessage)
+        has_api_access = false
+    }
+
+    NSHttpRequest( request, onSuccess, onFailure )
 }
 
 
@@ -110,19 +164,18 @@ void function FindMapIdentifier()
 
     void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
     {
-        print("███████╗██╗   ██╗███████╗███╗   ██╗████████╗███████╗")
-        print("██╔════╝██║   ██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝")
-        print("█████╗  ██║   ██║█████╗  ██╔██╗ ██║   ██║   ███████╗")
-        print("██╔══╝  ╚██╗ ██╔╝██╔══╝  ██║╚██╗██║   ██║   ╚════██║")
-        print("███████╗ ╚████╔╝ ███████╗██║ ╚████║   ██║   ███████║")
-        print("╚══════╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝")
+        print("███╗   ███╗ █████╗ ██████╗ ███████╗")
+        print("████╗ ████║██╔══██╗██╔══██╗██╔════╝")
+        print("██╔████╔██║███████║██████╔╝███████╗")
+        print("██║╚██╔╝██║██╔══██║██╔═══╝ ╚════██║")
+        print("██║ ╚═╝ ██║██║  ██║██║     ███████║")
+        print("╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚══════╝")
 
         string inputStr = "{\"data\":" + response.body + "}"
         table data = DecodeJSON(inputStr)
         array maps = expect array(data["data"])
 
-        // Currently, corresponding event is found by checking if its name contains the
-        // name of the current map, which might be improved.
+        // Looking for a map whose name matches current map's name.
         string mapName = GetMapName()
         foreach (value in maps) {
             table map = expect table(value)
