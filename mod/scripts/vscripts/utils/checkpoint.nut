@@ -81,7 +81,7 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 {
 	int checkpointsCount = checkpoints.len()-1
 
-	while (true)
+	while (GetGameState() <= eGameState.SuddenDeath)
 	{
 		foreach(player in GetPlayerArray())
 		{
@@ -128,7 +128,7 @@ entity function SpawnEndTrigger( vector origin, vector volumeMins, vector volume
  **/
 void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 {
-    while (true)
+    while (GetGameState() <= eGameState.SuddenDeath)
 	{
 		foreach(player in GetPlayerArray())
 		{

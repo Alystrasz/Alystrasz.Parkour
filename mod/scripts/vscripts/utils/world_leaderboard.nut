@@ -26,7 +26,7 @@ void function WorldLeaderboard_FetchScores()
     headers[ "authentication" ] <- [credentials.secret]
     request.headers = headers
 
-    while (true)
+    while (GetGameState() <= eGameState.SuddenDeath)
     {
         void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
         {
