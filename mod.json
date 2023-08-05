@@ -14,8 +14,8 @@
             "DefaultValue": "my_little_secret"
         },
         {
-            "Name": "parkour_api_event_id",
-            "DefaultValue": "f20a4c02-501a-405d-98bc-2544143455fe"
+            "Name": "parkour_use_local_config",
+            "DefaultValue": "0"
         }
     ],
     "Scripts": [
@@ -30,8 +30,12 @@
             }
         },
         {
-            "Path": "utils/sh_map.nut",
+            "Path": "utils/parsing.nut",
             "RunOn": "SERVER || CLIENT"
+        },
+        {
+            "Path": "utils/map_configuration.nut",
+            "RunOn": "SERVER"
         },
         {
             "Path": "gamemodes/cl_gamemode_pk.nut",

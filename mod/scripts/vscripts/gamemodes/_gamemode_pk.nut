@@ -6,8 +6,10 @@ global array<LeaderboardEntry> leaderboard = []
 global array<LeaderboardEntry> worldLeaderboard = []
 global array<vector> checkpoints = []
 global array<entity> checkpointEntities = []
+global vector startAngles
 
 global bool has_api_access = false
+global function OnPlayerConnected
 
 
 void function _PK_Init() {
@@ -18,19 +20,21 @@ void function _PK_Init() {
 	SetLoadoutGracePeriodEnabled( false )
 	SetTimeoutWinnerDecisionFunc( ParkourDecideWinner )
 
-	// teleport connected players to map start
-	AddCallback_OnClientConnected( OnPlayerConnected )
-	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
+	// Precache checkpoint model
+	PrecacheModel($"models/fx/xo_emp_field.mdl")
 
 	// Disable titans and boosts
 	Riff_ForceTitanAvailability( eTitanAvailability.Never )
 	Riff_ForceBoostAvailability( eBoostAvailability.Disabled )
 
+	// teleport connected players to map start
+	AddCallback_OnClientConnected( OnPlayerConnected )
+	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
+
 	// Prepare map for parkour gamemode
-	checkpoints = GetMapCheckpointLocations()
-	SpawnEntities()
-	WorldLeaderboard_Init()
+	thread InitializeMapConfiguration()
 }
+
 
 /**
  * Callback invoked on player connection.
@@ -39,8 +43,18 @@ void function _PK_Init() {
  **/
 void function OnPlayerConnected(entity player)
 {
+	// Do nothing if called during server initialization
+	if (mapConfiguration.finishedFetchingData == false) return
+
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
+
+	// Init client-side elements
+	ServerToClientStringCommand( player, "ParkourInitLine start " + mapConfiguration.startLineStr)
+	ServerToClientStringCommand( player, "ParkourInitLine end " + mapConfiguration.finishLineStr)
+	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
+	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
+
 	UpdatePlayerLeaderboard( player, 0 )
 	UpdatePlayerLeaderboard( player, 0, true )
 
@@ -48,7 +62,7 @@ void function OnPlayerConnected(entity player)
 	InitPlayerStats(player)
 	RespawnPlayerToConfirmedCheckpoint(player)
 
-	// Listen for
+	// Listen for reset
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
 }
 
@@ -80,6 +94,9 @@ void function OnPlayerReset(entity player) {
  **/
 void function RespawnPlayerToConfirmedCheckpoint(entity player)
 {
+	// Do nothing if called during server initialization
+	if (mapConfiguration.finishedFetchingData == false) return
+
 	int checkpointIndex = localStats[player.GetPlayerName()].currentCheckpoint
 	vector checkpoint = checkpoints[checkpointIndex]
 	player.SetOrigin( checkpoint )
@@ -98,7 +115,7 @@ void function MovePlayerToMapStart( entity player )
 		entity mover = CreateOwnedScriptMover (player)
 		player.SetParent(mover)
 		mover.NonPhysicsMoveTo (checkpoints[0], 1, 0, 0)
-		mover.NonPhysicsRotateTo (<0,0,0>, 1, 0, 0)
+		mover.NonPhysicsRotateTo (startAngles, 1, 0, 0)
 		wait 1
 
 		player.SetVelocity(<0,0,0>)
@@ -109,7 +126,7 @@ void function MovePlayerToMapStart( entity player )
 	ResetPlayerStats( player, true )
 	RespawnPlayerToConfirmedCheckpoint(player)
 
-	player.SetAngles(<0, 0, 0>)
+	player.SetAngles(startAngles)
 	player.UnfreezeControlsOnServer()
 
 	// localStats[player.GetPlayerName()].isResetting = false

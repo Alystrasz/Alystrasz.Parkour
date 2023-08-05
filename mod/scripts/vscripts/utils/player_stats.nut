@@ -6,7 +6,7 @@ global struct PlayerStats
 	bool isRunning = false
 	bool isResetting = false
 	int currentCheckpoint = 0
-	array<vector> checkpointAngles = [<0, 0, 0>]
+	array<vector> checkpointAngles
 	float startTime
 	float bestTime = 65535
 
@@ -55,7 +55,7 @@ void function AddPlayerParkourStat( entity player, int type )
 /**
  * This is invoked on player connection, and will check if newly connected
  * player already have statistics in the current match.
- * If yes, this will update the tab scoreboard with said stats. 
+ * If yes, this will update the tab scoreboard with said stats.
  **/
 void function InitPlayerStats(entity player)
 {
@@ -67,7 +67,7 @@ void function InitPlayerStats(entity player)
         player.SetPlayerGameStat( PGS_DEFENSE_SCORE, stats.resets )
         player.SetPlayerGameStat( PGS_ASSAULT_SCORE, stats.finishes )
         player.SetPlayerGameStat( PGS_TITAN_KILLS, stats.top3scores )
-    } 
+    }
     ResetPlayerStats(player)
 }
 
@@ -81,6 +81,8 @@ void function ResetPlayerStats(entity player, bool preserveBestTime = false)
 	PlayerStats stats = {
 		...
 	}
+
+    stats.checkpointAngles = [startAngles]
 
 	if (preserveBestTime) {
 		stats.bestTime = localStats[playerName].bestTime

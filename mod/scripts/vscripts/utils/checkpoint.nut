@@ -1,15 +1,4 @@
-global function SpawnEntities
-
-
-/**
- * Called on server initialization, this will spawn all entities related to this very
- * gamemode.
- **/
-void function SpawnEntities()
-{
-    SpawnCheckpoints()
-    SpawnZiplines()
-}
+global function SpawnCheckpoints
 
 
 /**
@@ -18,7 +7,7 @@ void function SpawnEntities()
  * one being a start trigger (does not need the checkpoint visual); last entry will
  * also not be spawned as a checkpoint, but as a finish trigger.
  **/
-void function SpawnCheckpoints()
+void function SpawnCheckpoints( vector startMins, vector startMaxs, vector endMins, vector endMaxs )
 {
 	int checkpointsCount = checkpoints.len()-1
 
@@ -26,11 +15,11 @@ void function SpawnCheckpoints()
 	{
 		if (index == 0)
 		{
-			thread SpawnStartTrigger()
+			thread SpawnStartTrigger( startMins, startMaxs )
 		}
 		else if (index == checkpoints.len()-1)
 		{
-			checkpointEntities.append( SpawnEndTrigger( checkpoint ) )
+			checkpointEntities.append( SpawnEndTrigger( checkpoint, endMins, endMaxs ) )
 		}
 		else
 		{
@@ -88,10 +77,9 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
  * This trigger checks if colliding players are currently doing a parkour run, and starts
  * one if it's not the case.
  **/
-void function SpawnStartTrigger()
+void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 {
 	int checkpointsCount = checkpoints.len()-1
-	TriggerVolume coordinates = GetMapStartVolume()
 
 	while (true)
 	{
@@ -99,7 +87,7 @@ void function SpawnStartTrigger()
 		{
 			string playerName = player.GetPlayerName()
 
-			if (PointIsWithinBounds( player.GetOrigin(), coordinates.mins, coordinates.maxs ))
+			if (PointIsWithinBounds( player.GetOrigin(), volumeMins, volumeMaxs ))
 			{
 				if (!localStats[playerName].isRunning && !localStats[playerName].isResetting)
 				{
@@ -120,13 +108,15 @@ void function SpawnStartTrigger()
  * The `origin` argument vector is used to create an invisible entity, which is actually
  * used client-side to mark the last place players must go to.
  **/
-entity function SpawnEndTrigger( vector origin )
+entity function SpawnEndTrigger( vector origin, vector volumeMins, vector volumeMaxs )
 {
 	entity point = CreateEntity( "prop_dynamic" )
     point.SetOrigin( origin )
+	point.SetValueForModelKey($"models/fx/xo_emp_field.mdl")
+	point.kv.modelscale = 0.3
     point.Hide()
     DispatchSpawn( point )
-    thread FinishTriggerThink()
+    thread FinishTriggerThink(volumeMins, volumeMaxs)
     return point
 }
 
@@ -136,17 +126,15 @@ entity function SpawnEndTrigger( vector origin )
  * and last verified checkpoint was the last one), and save their run time if need be.
  * It also resets player stats, for them to be able to start a new parkour run.
  **/
-void function FinishTriggerThink()
+void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 {
-	TriggerVolume coordinates = GetMapFinishVolume()
-
     while (true)
 	{
 		foreach(player in GetPlayerArray())
 		{
 			string playerName = player.GetPlayerName()
 
-			if (PointIsWithinBounds( player.GetOrigin(), coordinates.mins, coordinates.maxs ))
+			if (PointIsWithinBounds( player.GetOrigin(), volumeMins, volumeMaxs ))
 			{
                 PlayerStats playerStats = localStats[playerName]
 				if (playerStats.isRunning && playerStats.currentCheckpoint == checkpoints.len()-2) {
@@ -154,7 +142,7 @@ void function FinishTriggerThink()
 
                     playerStats.isRunning = false
                     playerStats.currentCheckpoint = 0
-                    playerStats.checkpointAngles = [<0, 0, 0>]
+                    playerStats.checkpointAngles = [startAngles]
 
                     bool isBestTime = duration < playerStats.bestTime
                     if (isBestTime)
@@ -175,17 +163,5 @@ void function FinishTriggerThink()
 			}
 		}
 		WaitFrame()
-	}
-}
-
-
-/**
- * Retrieves ziplines coordinates for the current map, and spawns them accordingly.
- **/
-void function SpawnZiplines()
-{
-	foreach (coordinates in GetMapZiplinesCoordinates())
-	{
-		CreateZipline( coordinates.start, coordinates.end )
 	}
 }

@@ -9,7 +9,6 @@ struct {
 
     table< int, entity > cache
 
-    bool receivedWorldScores = false
     var worldLeaderboard
     var leaderboard
     var timerRUI
@@ -50,64 +49,10 @@ void function UpdateTopology( var topo, vector org, vector ang, float width, flo
 
 void function Cl_Parkour_Init()
 {
-    // leaderboard
-    vector origin = GetMapLeaderboardOrigin()
-    vector angles = GetMapLeaderboardAngles()
-    array<float> coordinates = GetMapLeaderboardDimensions()
-    var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
-    var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
-    file.leaderboard = rui    
-
     // register command to receive leaderboard updates from server
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
-
-    thread Cl_Parkour_Create_Start()
-    Cl_Parkour_Create_End()
-}
-
-void function Cl_Parkour_InitWorldLeaderboard()
-{
-    // Local/World leaderboard signs
-    Cl_ParkourCreateLeaderboardSource();
-    Cl_ParkourCreateLeaderboardSource(true);
-
-    // world leaderboard
-    vector origin = GetMapLeaderboardOrigin(true)
-    vector angles = GetMapLeaderboardAngles(true)
-    array<float> coordinates = GetMapLeaderboardDimensions(true)
-    var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
-    var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
-    file.worldLeaderboard = rui
-}
-
-void function Cl_ParkourCreateLeaderboardSource(bool world = false) {
-    vector origin = GetMapLeaderboardSourceOrigin(world)
-    vector angles = GetMapLeaderboardSourceAngles(world)
-    array<float> dimensions = GetMapLeaderboardSourceDimensions(world)
-	var topo = CreateTopology(origin, angles, dimensions[0], dimensions[1])
-    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", world ? "#LEADERBOARD_WORLD" : "#LEADERBOARD_LOCAL" )
-}
-
-// Start/end "barrier" world UI
-void function Cl_Parkour_Create_Start()
-{
-	vector origin = GetMapStartLineOrigin()
-    vector angles = GetMapStartLineAngles()
-    array<float> coordinates = GetMapStartLineDimensions()
-	var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
-    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
-}
-
-void function Cl_Parkour_Create_End()
-{
-    vector origin = GetMapFinishLineOrigin()
-    vector angles = GetMapFinishLineAngles()
-    array<float> coordinates = GetMapFinishLineDimensions()
-	var topo = CreateTopology(origin, angles, coordinates[0], coordinates[1])
-    var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
+    AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
+    AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
 }
 
 void function SafeDestroyRUI( var rui )
@@ -196,14 +141,6 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
     float time = args[1].tofloat()
     int index = args[2].tointeger()
     bool world = args[3].tointeger() == 1;
-
-
-    // World leaderboard is only displayed if server is connected to world parkour API
-    if (world && !file.receivedWorldScores) {
-        Cl_Parkour_InitWorldLeaderboard()
-        file.receivedWorldScores = true
-    }
-
 
     string nameArg = "entry" + index + "Name"
     string timeArg = "entry" + index + "Time"
@@ -308,4 +245,45 @@ void function DestroyCheckpointsCountRUI()
 	RuiSetGameTime( file.checkpointsCountRUI, "startFadeOutTime", Time() )
 	wait 0.6
     SafeDestroyRUI( file.checkpointsCountRUI )
+}
+
+
+/*
+███╗   ██╗███████╗████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗    ██╗███╗   ██╗██╗████████╗
+████╗  ██║██╔════╝╚══██╔══╝██║    ██║██╔═══██╗██╔══██╗██║ ██╔╝    ██║████╗  ██║██║╚══██╔══╝
+██╔██╗ ██║█████╗     ██║   ██║ █╗ ██║██║   ██║██████╔╝█████╔╝     ██║██╔██╗ ██║██║   ██║
+██║╚██╗██║██╔══╝     ██║   ██║███╗██║██║   ██║██╔══██╗██╔═██╗     ██║██║╚██╗██║██║   ██║
+██║ ╚████║███████╗   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗    ██║██║ ╚████║██║   ██║
+╚═╝  ╚═══╝╚══════╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝
+*/
+
+void function ServerCallback_CreateLine( array<string> args )
+{
+    bool isStartLine = args[0] == "start"
+    table data = DecodeJSON(args[1]);
+    ParkourLine line = BuildParkourLine( data )
+	var topo = CreateTopology(line.origin, line.angles, line.dimensions[0].tofloat(), line.dimensions[1].tofloat())
+    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( startRui, "displayText", isStartLine ? "#GAUNTLET_START_TEXT" : "#GAUNTLET_FINISH_TEXT" )
+}
+
+void function ServerCallback_CreateLeaderboard( array<string> args )
+{
+    bool isLocalLeaderboard = args[0] == "local"
+    table data = DecodeJSON(args[1]);
+    ParkourLeaderboard pl = BuildParkourLeaderboard( data )
+
+    // Build leaderboard
+    var topo = CreateTopology(pl.origin, pl.angles, pl.dimensions[0].tofloat(), pl.dimensions[1].tofloat())
+    var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
+    if (isLocalLeaderboard) {
+        file.leaderboard = rui
+    } else {
+        file.worldLeaderboard = rui
+    }
+
+    // Build "LOCAL"/"WORLD" sign
+	topo = CreateTopology(pl.sourceOrigin, pl.sourceAngles, pl.sourceDimensions[0].tofloat(), pl.sourceDimensions[1].tofloat())
+    rui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
 }
