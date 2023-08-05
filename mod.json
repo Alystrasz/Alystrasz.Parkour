@@ -30,6 +30,10 @@
             }
         },
         {
+            "Path": "utils/npc.nut",
+            "RunOn": "SERVER"
+        },
+        {
             "Path": "utils/parsing.nut",
             "RunOn": "SERVER || CLIENT"
         },
