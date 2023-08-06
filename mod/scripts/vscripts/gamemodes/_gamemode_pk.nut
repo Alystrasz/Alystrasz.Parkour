@@ -55,6 +55,11 @@ void function OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
 
+	// Apply clientside perks
+	if (perks.floorIsLava) {
+		Remote_CallFunction_NonReplay( player, "ServerCallback_ApplyClientsidePerks" )
+	}
+
 	UpdatePlayerLeaderboard( player, 0 )
 	UpdatePlayerLeaderboard( player, 0, true )
 

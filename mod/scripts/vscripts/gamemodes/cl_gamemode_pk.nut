@@ -2,6 +2,7 @@ global function Cl_Parkour_Init
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 global function ServerCallback_ResetRun
+global function ServerCallback_ApplyClientsidePerks
 
 struct {
     entity mover
@@ -53,7 +54,17 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
+
+    // register callbacks to prepare eventual perks
+    AddCreateCallback( "player", FloorIsLavaPlayerCreated )
 }
+
+void function FloorIsLavaPlayerCreated( entity player )
+{
+    table s = expect table(player.s)
+    s.inLavaFog <- false
+}
+
 
 void function SafeDestroyRUI( var rui )
 {
@@ -182,6 +193,12 @@ void function ShowNewHighscoreMessage( string playerName, float playerTime )
     wait 7
 
     SafeDestroyRUI( file.newHighscoreRUI )
+}
+
+// No arguments for now, until we need some.
+void function ServerCallback_ApplyClientsidePerks()
+{
+    ClRiffFloorIsLava_Init()
 }
 
 void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, int checkpointIndex, int totalCheckpointsCount )
