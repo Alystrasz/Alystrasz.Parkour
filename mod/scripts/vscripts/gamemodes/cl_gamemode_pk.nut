@@ -277,8 +277,10 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
     var topo = CreateTopology(pl.origin, pl.angles, pl.dimensions[0].tofloat(), pl.dimensions[1].tofloat())
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
     if (isLocalLeaderboard) {
+        SafeDestroyRUI( file.leaderboard )
         file.leaderboard = rui
     } else {
+        SafeDestroyRUI( file.worldLeaderboard )
         file.worldLeaderboard = rui
     }
 
