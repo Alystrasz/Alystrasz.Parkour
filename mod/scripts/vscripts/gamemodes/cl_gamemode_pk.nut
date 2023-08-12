@@ -3,6 +3,7 @@ global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 global function ServerCallback_ResetRun
 global function ServerCallback_CreateStartIndicator
+global function ServerCallback_ToggleStartIndicatorDisplay
 
 struct {
     entity mover
@@ -17,6 +18,7 @@ struct {
     var splashEndRUI
     var newHighscoreRUI
 	var checkpointsCountRUI
+    var startIndicatorRUI
 
     bool isRunning = false
     var nextCheckpointRui
@@ -248,6 +250,11 @@ void function DestroyCheckpointsCountRUI()
     SafeDestroyRUI( file.checkpointsCountRUI )
 }
 
+void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
+{
+    RuiSetBool( file.startIndicatorRUI, "isVisible", show )
+}
+
 
 /*
 ███╗   ██╗███████╗████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗    ██╗███╗   ██╗██╗████████╗
@@ -297,9 +304,9 @@ void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
     if (!IsValid(indicator))
 		return
 
-    var iconRui = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
-    RuiSetBool( iconRui, "isVisible", true )
-    RuiSetImage( iconRui, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
-    RuiSetString( iconRui, "statusText", "Parkour start" )
-    RuiTrackFloat3( iconRui, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
+    file.startIndicatorRUI = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
+    RuiSetBool( file.startIndicatorRUI, "isVisible", false )
+    RuiSetImage( file.startIndicatorRUI, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
+    RuiSetString( file.startIndicatorRUI, "statusText", "Parkour start" )
+    RuiTrackFloat3( file.startIndicatorRUI, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
 }

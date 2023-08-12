@@ -130,19 +130,37 @@ void function LoadParkourMapConfiguration(table data)
         mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
 
         // Start indicator (TODO import coordinates from configuration)
-        entity point = CreateEntity( "prop_dynamic" )
-        point.SetOrigin( < -331.044, -3128.37, 68.0313 + 50> )
-        point.SetValueForModelKey($"models/fx/xo_emp_field.mdl")
-        point.kv.modelscale = 1
-        point.Hide()
-        DispatchSpawn( point )
-        mapConfiguration.startIndicator = point
+        SetUpStartIndicator()
 
         file.ziplines = expect array(data["ziplines"])
         mapConfiguration.finishedFetchingData = true
     } catch (err) {
         print("Error while loading map configuration: " + err)
     }
+}
+
+
+void function SetUpStartIndicator()
+{
+    vector origin = < -331.044, -3128.37, 68.0313 + 50>
+
+    // Entity used to show indicator's location
+    entity point = CreateEntity( "prop_dynamic" )
+    point.SetOrigin( origin )
+    point.SetValueForModelKey($"models/fx/xo_emp_field.mdl")
+    point.kv.modelscale = 1
+    point.Hide()
+    DispatchSpawn( point )
+    mapConfiguration.startIndicator = point
+
+    // Only showing indicator when player is far from its origin
+    entity trigger = CreateTriggerRadiusMultiple( origin, 400, [], TRIG_FLAG_PLAYERONLY)
+    AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
+        Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", false )
+    })
+    AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
+        Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", true )
+    })
 }
 
 
