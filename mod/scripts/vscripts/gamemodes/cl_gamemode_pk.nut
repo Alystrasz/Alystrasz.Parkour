@@ -2,6 +2,7 @@ global function Cl_Parkour_Init
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 global function ServerCallback_ResetRun
+global function ServerCallback_CreateStartIndicator
 
 struct {
     entity mover
@@ -53,7 +54,6 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
-    AddServerToClientStringCommandCallback( "ParkourInitStartIndicator", ServerCallback_CreateStartIndicator )
 }
 
 void function SafeDestroyRUI( var rui )
@@ -291,10 +291,15 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
 }
 
-void function ServerCallback_CreateStartIndicator( array<string> args )
+void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
 {
+    entity indicator = GetEntityFromEncodedEHandle( indicatorEntityHandle )
+    if (!IsValid(indicator))
+		return
+
     var iconRui = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
     RuiSetBool( iconRui, "isVisible", true )
     RuiSetImage( iconRui, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
     RuiSetString( iconRui, "statusText", "Parkour start" )
+    RuiTrackFloat3( iconRui, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
 }

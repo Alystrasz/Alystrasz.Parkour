@@ -54,7 +54,7 @@ void function OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitLine end " + mapConfiguration.finishLineStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
-	ServerToClientStringCommand( player, "ParkourInitStartIndicator")
+	Remote_CallFunction_NonReplay( player, "ServerCallback_CreateStartIndicator", mapConfiguration.startIndicator.GetEncodedEHandle() )
 
 	UpdatePlayerLeaderboard( player, 0 )
 	UpdatePlayerLeaderboard( player, 0, true )

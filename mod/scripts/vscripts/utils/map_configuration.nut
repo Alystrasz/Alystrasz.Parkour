@@ -24,6 +24,7 @@ global Credentials credentials
  **/
 global struct MapConfiguration {
     bool finishedFetchingData = false
+    entity startIndicator
     string startLineStr
     string finishLineStr
     string localLeaderboardStr
@@ -127,6 +128,15 @@ void function LoadParkourMapConfiguration(table data)
         mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
         mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
         mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
+
+        // Start indicator (TODO import coordinates from configuration)
+        entity point = CreateEntity( "prop_dynamic" )
+        point.SetOrigin( < -331.044, -3128.37, 68.0313 + 50> )
+        point.SetValueForModelKey($"models/fx/xo_emp_field.mdl")
+        point.kv.modelscale = 1
+        point.Hide()
+        DispatchSpawn( point )
+        mapConfiguration.startIndicator = point
 
         file.ziplines = expect array(data["ziplines"])
         mapConfiguration.finishedFetchingData = true
