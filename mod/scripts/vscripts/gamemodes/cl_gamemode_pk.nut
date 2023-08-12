@@ -53,6 +53,7 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
+    AddServerToClientStringCommandCallback( "ParkourInitStartIndicator", ServerCallback_CreateStartIndicator )
 }
 
 void function SafeDestroyRUI( var rui )
@@ -288,4 +289,12 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 	topo = CreateTopology(pl.sourceOrigin, pl.sourceAngles, pl.sourceDimensions[0].tofloat(), pl.sourceDimensions[1].tofloat())
     rui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
+}
+
+void function ServerCallback_CreateStartIndicator( array<string> args )
+{
+    var iconRui = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
+    RuiSetBool( iconRui, "isVisible", true )
+    RuiSetImage( iconRui, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
+    RuiSetString( iconRui, "statusText", "Parkour start" )
 }
