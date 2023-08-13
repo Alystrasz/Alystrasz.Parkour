@@ -253,6 +253,9 @@ void function DestroyCheckpointsCountRUI()
 void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
 {
     RuiSetBool( file.startIndicatorRUI, "isVisible", show )
+    if ( show ) {
+        Chat_GameWriteLine("\x1b[93mRMY:\x1b[0m Getting lost, " + GetLocalClientPlayer().GetPlayerName() + "?\nI added coordinates of the parkour start to your HUD.")
+    }
 }
 
 
