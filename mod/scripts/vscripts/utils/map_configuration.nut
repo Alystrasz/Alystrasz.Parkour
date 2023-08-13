@@ -71,7 +71,7 @@ void function InitializeMapConfiguration()
     // Set up world
 	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
     SpawnZiplines( file.ziplines )
-    SpawnAmbientMarvin(< -581.59, -3285.56, -105.969>, <0, 45, 0>)
+    SpawnAmbientMarvin(< -590.0, -3234.85, -105.969>, <0, 180, 0>)
 
     // Init players
     foreach(player in GetPlayerArray())
