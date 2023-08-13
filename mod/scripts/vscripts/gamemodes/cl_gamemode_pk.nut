@@ -19,6 +19,7 @@ struct {
     var newHighscoreRUI
 	var checkpointsCountRUI
     var startIndicatorRUI
+    int startIndicatorTime = 0
 
     bool isRunning = false
     var nextCheckpointRui
@@ -253,8 +254,12 @@ void function DestroyCheckpointsCountRUI()
 void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
 {
     RuiSetBool( file.startIndicatorRUI, "isVisible", show )
-    if ( show ) {
+    int now = GetUnixTimestamp()
+
+    // Only display warning message once every two minutes
+    if ( show && now - file.startIndicatorTime > 120) {
         Chat_GameWriteLine("\x1b[93mRMY:\x1b[0m Getting lost, " + GetLocalClientPlayer().GetPlayerName() + "?\nI added coordinates of the parkour start to your HUD.")
+        file.startIndicatorTime = GetUnixTimestamp()
     }
 }
 
