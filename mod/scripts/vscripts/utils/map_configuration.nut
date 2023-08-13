@@ -156,10 +156,16 @@ void function SetUpStartIndicator()
     // Only showing indicator when player is far from its origin
     entity trigger = CreateTriggerRadiusMultiple( origin, 400, [], TRIG_FLAG_PLAYERONLY)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
-        Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", false )
+        string playerName = player.GetPlayerName()
+        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
+            Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", false )
+        }
     })
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
-        Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", true )
+        string playerName = player.GetPlayerName()
+        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
+            Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", true )
+        }
     })
 }
 
