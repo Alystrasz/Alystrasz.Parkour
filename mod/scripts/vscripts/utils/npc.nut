@@ -26,9 +26,9 @@ void function SpawnAmbientMarvin( vector origin, vector angles )
 
     entity trigger = CreateTriggerRadiusMultiple( origin, 60, [], TRIG_FLAG_PLAYERONLY, 80, -80)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
-        Chat_ServerBroadcast("HELLO")
+		Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", true)
     })
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
-        Chat_ServerBroadcast("GOODBYE")
+        Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", false)
     })
 }
