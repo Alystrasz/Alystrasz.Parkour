@@ -3,6 +3,7 @@ global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 global function ServerCallback_ResetRun
 global function ServerCallback_SetRobotTalkState
+global function ServerCallback_TalkToRobot
 
 struct {
     entity mover
@@ -56,8 +57,6 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
-
-    RegisterButtonPressedCallback( IN_USE, TalkToRobot )
 }
 
 void function SafeDestroyRUI( var rui )
@@ -304,13 +303,12 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 
 void function ServerCallback_SetRobotTalkState( bool canTalk )
 {
-    print(canTalk)
     file.canTalktoRobot = canTalk
 }
 
-void function TalkToRobot( entity player )
+void function ServerCallback_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
 
-    print("hello there")
+    Chat_GameWriteLine("hello there from client")
 }
