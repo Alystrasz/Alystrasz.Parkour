@@ -30,6 +30,10 @@
             }
         },
         {
+            "Path": "ui/robot_dialog.nut",
+            "RunOn": "UI"
+        },
+        {
             "Path": "utils/npc.nut",
             "RunOn": "SERVER"
         },

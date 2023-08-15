@@ -309,6 +309,5 @@ void function ServerCallback_SetRobotTalkState( bool canTalk )
 void function ServerCallback_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
-
-    Chat_GameWriteLine("hello there from client")
+    RunUIScript("Parkour_OpenRobotDialog")
 }
