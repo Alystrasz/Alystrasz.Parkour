@@ -21,11 +21,19 @@ void function ParkourShowMoreDetails()
 {
     DialogData dialogData
     dialogData.menu = GetMenu( "AnnouncementDialog" )
-    dialogData.header = "More about Parkour"
-    dialogData.ruiMessage.message = "Don't try to switch weapons, all pilots have a predefined set of weapons and abilities, so that everyone is on an equal footing.\n\n"
-    + "If your run is not going well, you can press %offhand4% to reappear here, and restart a new one!"
     dialogData.image = $"rui/hud/gametype_icons/fd/onboard_frontier_defense"
 
+    dialogData.header = "More about Parkour"
+    dialogData.ruiMessage.message = "Don't try to switch weapons, all pilots have a predefined set of weapons and abilities, so that everyone is on an equal footing.\n\n"
+    + "If your run is not going well, you can press %offhand4% to reappear here, and restart a new one!\n\n"
+    + "And if your time does not appear on the leaderboards, don't worry!\n"
+    + "I register scores of all pilots on this map; even scores not appearing here are saved, so pilots can compare to other pilots."
+
+
+    AddDialogButton(dialogData, "Show me the world scoreboard!", void function() {
+        string endpoint = GetConVarString("parkour_api_endpoint")
+        LaunchExternalWebBrowser(endpoint, WEBBROWSER_FLAG_FORCEEXTERNAL)
+    })
     AddDialogButton( dialogData, "Thanks!" )
 
     OpenDialog( dialogData )
