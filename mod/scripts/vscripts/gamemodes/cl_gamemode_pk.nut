@@ -4,6 +4,8 @@ global function ServerCallback_StopRun
 global function ServerCallback_ResetRun
 global function ServerCallback_SetRobotTalkState
 global function ServerCallback_TalkToRobot
+global function ServerCallback_CreateStartIndicator
+global function ServerCallback_ToggleStartIndicatorDisplay
 
 struct {
     entity mover
@@ -18,6 +20,8 @@ struct {
     var splashEndRUI
     var newHighscoreRUI
 	var checkpointsCountRUI
+    var startIndicatorRUI
+    int startIndicatorTime = 0
 
     bool isRunning = false
     var nextCheckpointRui
@@ -251,6 +255,41 @@ void function DestroyCheckpointsCountRUI()
     SafeDestroyRUI( file.checkpointsCountRUI )
 }
 
+void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
+{
+    RuiSetBool( file.startIndicatorRUI, "isVisible", show )
+    if (show) {
+        entity player = GetLocalClientPlayer()
+        EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
+
+        // Only display warning message once every two minutes
+        int now = GetUnixTimestamp()
+        if ( show && now - file.startIndicatorTime > 120) {
+            Chat_GameWriteLine("\x1b[93mRMY:\x1b[0m Getting lost, " + GetLocalClientPlayer().GetPlayerName() + "?\nI added coordinates of the parkour start to your HUD.")
+            file.startIndicatorTime = GetUnixTimestamp()
+        }
+    }
+}
+
+
+// ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
+// ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
+// ██████╔╝██║   ██║██████╔╝██║   ██║   ██║
+// ██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║
+// ██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║
+// ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝
+
+void function ServerCallback_SetRobotTalkState( bool canTalk )
+{
+    file.canTalktoRobot = canTalk
+}
+
+void function ServerCallback_TalkToRobot()
+{
+    if (!file.canTalktoRobot) return
+    RunUIScript("Parkour_OpenRobotDialog")
+}
+
 
 /*
 ███╗   ██╗███████╗████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗    ██╗███╗   ██╗██╗████████╗
@@ -281,8 +320,10 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
     var topo = CreateTopology(pl.origin, pl.angles, pl.dimensions[0].tofloat(), pl.dimensions[1].tofloat())
     var rui = RuiCreate( $"ui/gauntlet_leaderboard.rpak", topo, RUI_DRAW_WORLD, 0 )
     if (isLocalLeaderboard) {
+        SafeDestroyRUI( file.leaderboard )
         file.leaderboard = rui
     } else {
+        SafeDestroyRUI( file.worldLeaderboard )
         file.worldLeaderboard = rui
     }
 
@@ -292,22 +333,15 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
 }
 
-
-
-// ██████╗  ██████╗ ██████╗  ██████╗ ████████╗
-// ██╔══██╗██╔═══██╗██╔══██╗██╔═══██╗╚══██╔══╝
-// ██████╔╝██║   ██║██████╔╝██║   ██║   ██║
-// ██╔══██╗██║   ██║██╔══██╗██║   ██║   ██║
-// ██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║
-// ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝
-
-void function ServerCallback_SetRobotTalkState( bool canTalk )
+void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
 {
-    file.canTalktoRobot = canTalk
-}
+    entity indicator = GetEntityFromEncodedEHandle( indicatorEntityHandle )
+    if (!IsValid(indicator))
+		return
 
-void function ServerCallback_TalkToRobot()
-{
-    if (!file.canTalktoRobot) return
-    RunUIScript("Parkour_OpenRobotDialog")
+    file.startIndicatorRUI = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
+    RuiSetBool( file.startIndicatorRUI, "isVisible", false )
+    RuiSetImage( file.startIndicatorRUI, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
+    RuiSetString( file.startIndicatorRUI, "statusText", "Parkour start" )
+    RuiTrackFloat3( file.startIndicatorRUI, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
 }
