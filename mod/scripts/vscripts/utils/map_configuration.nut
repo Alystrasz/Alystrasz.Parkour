@@ -24,6 +24,7 @@ global Credentials credentials
  **/
 global struct MapConfiguration {
     bool finishedFetchingData = false
+    entity startIndicator
     string startLineStr
     string finishLineStr
     string localLeaderboardStr
@@ -128,11 +129,45 @@ void function LoadParkourMapConfiguration(table data)
         mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
         mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
 
+        // Start indicator
+        table startIndicator = expect table(data["indicator"])
+        vector startIndicatorOrigin = ArrayToFloatVector( expect array(startIndicator["coordinates"]) )
+        int startIndicatorRadius = expect int(startIndicator["trigger_radius"])
+        SetUpStartIndicator( startIndicatorOrigin, startIndicatorRadius )
+
         file.ziplines = expect array(data["ziplines"])
         mapConfiguration.finishedFetchingData = true
     } catch (err) {
         print("Error while loading map configuration: " + err)
     }
+}
+
+
+void function SetUpStartIndicator( vector origin, int triggerRadius )
+{
+    // Entity used to show indicator's location
+    entity point = CreateEntity( "prop_dynamic" )
+    point.SetOrigin( origin )
+    point.SetValueForModelKey($"models/fx/xo_emp_field.mdl")
+    point.kv.modelscale = 1
+    point.Hide()
+    DispatchSpawn( point )
+    mapConfiguration.startIndicator = point
+
+    // Only showing indicator when player is far from its origin
+    entity trigger = CreateTriggerRadiusMultiple( origin, triggerRadius.tofloat(), [], TRIG_FLAG_PLAYERONLY)
+    AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
+        string playerName = player.GetPlayerName()
+        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
+            Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", false )
+        }
+    })
+    AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
+        string playerName = player.GetPlayerName()
+        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
+            Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", true )
+        }
+    })
 }
 
 

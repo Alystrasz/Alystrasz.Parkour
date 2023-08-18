@@ -2,6 +2,8 @@ global function Cl_Parkour_Init
 global function ServerCallback_UpdateNextCheckpointMarker
 global function ServerCallback_StopRun
 global function ServerCallback_ResetRun
+global function ServerCallback_CreateStartIndicator
+global function ServerCallback_ToggleStartIndicatorDisplay
 
 struct {
     entity mover
@@ -16,6 +18,8 @@ struct {
     var splashEndRUI
     var newHighscoreRUI
 	var checkpointsCountRUI
+    var startIndicatorRUI
+    int startIndicatorTime = 0
 
     bool isRunning = false
     var nextCheckpointRui
@@ -247,6 +251,22 @@ void function DestroyCheckpointsCountRUI()
     SafeDestroyRUI( file.checkpointsCountRUI )
 }
 
+void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
+{
+    RuiSetBool( file.startIndicatorRUI, "isVisible", show )
+    if (show) {
+        entity player = GetLocalClientPlayer()
+        EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
+
+        // Only display warning message once every two minutes
+        int now = GetUnixTimestamp()
+        if ( show && now - file.startIndicatorTime > 120) {
+            Chat_GameWriteLine("\x1b[93mRMY:\x1b[0m Getting lost, " + GetLocalClientPlayer().GetPlayerName() + "?\nI added coordinates of the parkour start to your HUD.")
+            file.startIndicatorTime = GetUnixTimestamp()
+        }
+    }
+}
+
 
 /*
 ███╗   ██╗███████╗████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗    ██╗███╗   ██╗██╗████████╗
@@ -288,4 +308,17 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 	topo = CreateTopology(pl.sourceOrigin, pl.sourceAngles, pl.sourceDimensions[0].tofloat(), pl.sourceDimensions[1].tofloat())
     rui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
+}
+
+void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
+{
+    entity indicator = GetEntityFromEncodedEHandle( indicatorEntityHandle )
+    if (!IsValid(indicator))
+		return
+
+    file.startIndicatorRUI = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
+    RuiSetBool( file.startIndicatorRUI, "isVisible", false )
+    RuiSetImage( file.startIndicatorRUI, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
+    RuiSetString( file.startIndicatorRUI, "statusText", "Parkour start" )
+    RuiTrackFloat3( file.startIndicatorRUI, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
 }

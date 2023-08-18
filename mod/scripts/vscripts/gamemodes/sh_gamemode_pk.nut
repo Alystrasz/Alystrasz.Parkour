@@ -39,4 +39,6 @@ void function PKRegisterNetworkVars()
     Remote_RegisterFunction( "ServerCallback_UpdateNextCheckpointMarker" )
     Remote_RegisterFunction( "ServerCallback_StopRun" )
     Remote_RegisterFunction( "ServerCallback_ResetRun" )
+    Remote_RegisterFunction( "ServerCallback_CreateStartIndicator" )
+    Remote_RegisterFunction( "ServerCallback_ToggleStartIndicatorDisplay" )
 }
