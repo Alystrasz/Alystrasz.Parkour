@@ -129,8 +129,11 @@ void function LoadParkourMapConfiguration(table data)
         mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
         mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
 
-        // Start indicator (TODO import coordinates from configuration)
-        SetUpStartIndicator()
+        // Start indicator
+        table startIndicator = expect table(data["indicator"])
+        vector startIndicatorOrigin = ArrayToFloatVector( expect array(startIndicator["coordinates"]) )
+        int startIndicatorRadius = expect int(startIndicator["trigger_radius"])
+        SetUpStartIndicator( startIndicatorOrigin, startIndicatorRadius )
 
         file.ziplines = expect array(data["ziplines"])
         mapConfiguration.finishedFetchingData = true
@@ -140,10 +143,8 @@ void function LoadParkourMapConfiguration(table data)
 }
 
 
-void function SetUpStartIndicator()
+void function SetUpStartIndicator( vector origin, int triggerRadius )
 {
-    vector origin = < -331.044, -3128.37, 68.0313 + 50>
-
     // Entity used to show indicator's location
     entity point = CreateEntity( "prop_dynamic" )
     point.SetOrigin( origin )
@@ -154,7 +155,7 @@ void function SetUpStartIndicator()
     mapConfiguration.startIndicator = point
 
     // Only showing indicator when player is far from its origin
-    entity trigger = CreateTriggerRadiusMultiple( origin, 400, [], TRIG_FLAG_PLAYERONLY)
+    entity trigger = CreateTriggerRadiusMultiple( origin, triggerRadius.tofloat(), [], TRIG_FLAG_PLAYERONLY)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
         string playerName = player.GetPlayerName()
         if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
