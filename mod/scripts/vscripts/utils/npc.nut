@@ -25,7 +25,7 @@ void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadi
     thread PlayAnim( npc_marvin, animation, info_target, null, 0.6 )
 
 	// Check if player is close to robot
-    entity trigger = CreateTriggerRadiusMultiple( origin, talkableRadius.tofloat(), [], TRIG_FLAG_PLAYERONLY, 80, -80)
+    entity trigger = CreateTriggerRadiusMultiple( origin, talkableRadius.tofloat() + 6, [], TRIG_FLAG_PLAYERONLY, 80, -80)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
 		Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", true)
     })
