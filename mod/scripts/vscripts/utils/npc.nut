@@ -6,7 +6,7 @@ void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadi
 	npc_marvin.SetOrigin( origin )
 	npc_marvin.SetAngles( angles )
     SetTeam( npc_marvin, TEAM_IMC )
-    npc_marvin.SetTitle( "R-MY" )
+    npc_marvin.SetTitle( ROBOT_NAME )
 	npc_marvin.kv.rendercolor = "255 255 255"
 	npc_marvin.kv.health = -1
 	npc_marvin.kv.max_health = -1
@@ -37,5 +37,6 @@ void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadi
 	npc_marvin.SetUsable()
 	npc_marvin.SetUsableRadius( talkableRadius )
 	npc_marvin.AddUsableValue( USABLE_BY_PILOTS | USABLE_HINT_ONLY )
-	npc_marvin.SetUsePrompts( "Press %use% to talk to R-MY." , "Press %use% to talk to R-MY." )
+	string prompt = "Press %use% to talk to " + ROBOT_NAME
+	npc_marvin.SetUsePrompts( prompt, prompt )
 }

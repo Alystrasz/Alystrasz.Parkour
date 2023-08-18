@@ -265,7 +265,9 @@ void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
         // Only display warning message once every two minutes
         int now = GetUnixTimestamp()
         if ( show && now - file.startIndicatorTime > 120) {
-            Chat_GameWriteLine("\x1b[93mRMY:\x1b[0m Getting lost, " + GetLocalClientPlayer().GetPlayerName() + "?\nI added coordinates of the parkour start to your HUD.")
+            string template = "\x1b[93m%s:\x1b[0m Getting lost, %s?\nI added coordinates of the parkour start to your HUD."
+            string message = format(template, ROBOT_NAME, GetLocalClientPlayer().GetPlayerName())
+            Chat_GameWriteLine(message)
             file.startIndicatorTime = GetUnixTimestamp()
         }
     }
