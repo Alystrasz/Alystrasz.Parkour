@@ -1,6 +1,6 @@
 global function SpawnAmbientMarvin
 
-void function SpawnAmbientMarvin( vector origin, vector angles )
+void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadius, string animation )
 {
 	entity npc_marvin = CreateEntity( "npc_marvin" )
 	npc_marvin.SetOrigin( origin )
@@ -22,10 +22,10 @@ void function SpawnAmbientMarvin( vector origin, vector angles )
     info_target.SetOrigin( origin )
 	info_target.SetAngles( angles )
 
-    thread PlayAnim( npc_marvin, "mv_idle_weld", info_target, null, 0.6 )
+    thread PlayAnim( npc_marvin, animation, info_target, null, 0.6 )
 
 	// Check if player is close to robot
-    entity trigger = CreateTriggerRadiusMultiple( origin, 60, [], TRIG_FLAG_PLAYERONLY, 80, -80)
+    entity trigger = CreateTriggerRadiusMultiple( origin, talkableRadius.tofloat(), [], TRIG_FLAG_PLAYERONLY, 80, -80)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
 		Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", true)
     })
@@ -35,7 +35,7 @@ void function SpawnAmbientMarvin( vector origin, vector angles )
 
 	// Set robot as talkable to
 	npc_marvin.SetUsable()
-	npc_marvin.SetUsableRadius( 60 )
+	npc_marvin.SetUsableRadius( talkableRadius )
 	npc_marvin.AddUsableValue( USABLE_BY_PILOTS | USABLE_HINT_ONLY )
 	npc_marvin.SetUsePrompts( "Press %use% to talk to R-MY." , "Press %use% to talk to R-MY." )
 }

@@ -45,6 +45,16 @@ struct {
     array ziplines
 } file;
 
+/**
+ * This object stores information needed to spawn a helping robot on the map.
+ **/
+struct {
+    vector origin
+    vector angles
+    int talkableRadius
+    string animation
+} robot;
+
 
 
 /**
@@ -72,7 +82,7 @@ void function InitializeMapConfiguration()
     // Set up world
 	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
     SpawnZiplines( file.ziplines )
-    SpawnAmbientMarvin(< -590.0, -3234.85, -105.969>, <0, 180, 0>)
+    SpawnAmbientMarvin( robot.origin, robot.angles, robot.talkableRadius, robot.animation )
 
     // Init players
     foreach(player in GetPlayerArray())
@@ -129,6 +139,13 @@ void function LoadParkourMapConfiguration(table data)
         mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
         mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
         mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
+
+        // Robot
+        table robotData = expect table(data["robot"])
+        robot.origin = ArrayToFloatVector( expect array(robotData["origin"]) )
+        robot.angles = ArrayToIntVector( expect array(robotData["angles"]) )
+        robot.talkableRadius = expect int(robotData["talkable_radius"])
+        robot.animation = expect string(robotData["animation"])
 
         // Start indicator
         table startIndicator = expect table(data["indicator"])
