@@ -1,7 +1,11 @@
 global function Parkour_OpenRobotDialog
+struct {
+    string mapName = ""
+} file;
 
-void function Parkour_OpenRobotDialog()
+void function Parkour_OpenRobotDialog( string mapName )
 {
+    file.mapName = mapName
     EmitUISound( "diag_spectre_gs_LeechStart_01_1" )
 
     DialogData dialogData
@@ -56,6 +60,6 @@ void function ParkourOpenWebScoreboard()
     ParkourExitDialog()
 
     wait 0.2
-    string endpoint = GetConVarString("parkour_api_endpoint")
+    string endpoint = GetConVarString("parkour_api_endpoint") + "?map=" + file.mapName
     LaunchExternalWebBrowser(endpoint, WEBBROWSER_FLAG_FORCEEXTERNAL)
 }

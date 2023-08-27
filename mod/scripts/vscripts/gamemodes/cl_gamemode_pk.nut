@@ -289,7 +289,7 @@ void function ServerCallback_SetRobotTalkState( bool canTalk )
 void function ServerCallback_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
-    RunUIScript("Parkour_OpenRobotDialog")
+    RunUIScript( "Parkour_OpenRobotDialog", GetMapName() )
 }
 
 
