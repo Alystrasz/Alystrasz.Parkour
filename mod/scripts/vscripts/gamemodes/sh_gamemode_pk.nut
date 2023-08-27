@@ -2,6 +2,8 @@ global function PKMode_Init
 
 global const GAMEMODE_PK = "pk"
 
+global const ROBOT_NAME = "R-MY"
+
 void function PKMode_Init() {
     AddCallback_OnCustomGamemodesInit( CreateGamemode )
 	AddCallback_OnRegisteringCustomNetworkVars( PKRegisterNetworkVars )
@@ -40,4 +42,8 @@ void function PKRegisterNetworkVars()
     Remote_RegisterFunction( "ServerCallback_StopRun" )
     Remote_RegisterFunction( "ServerCallback_ResetRun" )
     Remote_RegisterFunction( "ServerCallback_ApplyClientsidePerks" )
+    Remote_RegisterFunction( "ServerCallback_SetRobotTalkState" )
+    Remote_RegisterFunction( "ServerCallback_TalkToRobot" )
+    Remote_RegisterFunction( "ServerCallback_CreateStartIndicator" )
+    Remote_RegisterFunction( "ServerCallback_ToggleStartIndicatorDisplay" )
 }

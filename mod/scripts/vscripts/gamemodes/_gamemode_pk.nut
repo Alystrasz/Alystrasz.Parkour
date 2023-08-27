@@ -54,6 +54,7 @@ void function OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitLine end " + mapConfiguration.finishLineStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
+	Remote_CallFunction_NonReplay( player, "ServerCallback_CreateStartIndicator", mapConfiguration.startIndicator.GetEncodedEHandle() )
 
 	// Apply clientside perks
 	if (perks.floorIsLava) {
@@ -69,6 +70,10 @@ void function OnPlayerConnected(entity player)
 
 	// Listen for reset
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
+	// Listen for players who wanna talk to robot
+	AddButtonPressedPlayerInputCallback( player, IN_USE, void function( entity player ) {
+		Remote_CallFunction_NonReplay( player, "ServerCallback_TalkToRobot" )
+	} )
 }
 
 /**
