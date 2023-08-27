@@ -14,7 +14,8 @@ void function Parkour_OpenRobotDialog()
     + "Wanna know more?"
 
     AddDialogButton( dialogData, "Tell me more!", ParkourShowMoreDetails )
-    AddDialogButton( dialogData, "Nope, thank you!" )
+    AddDialogButton( dialogData, "Nope, thank you!", ParkourExitDialog )
+    dialogData.forceChoice = true
 
     OpenDialog( dialogData )
 }
@@ -35,8 +36,15 @@ void function ParkourShowMoreDetails()
     AddDialogButton(dialogData, "Show me the world scoreboard!", void function() {
         string endpoint = GetConVarString("parkour_api_endpoint")
         LaunchExternalWebBrowser(endpoint, WEBBROWSER_FLAG_FORCEEXTERNAL)
+        ParkourExitDialog()
     })
-    AddDialogButton( dialogData, "Thanks!" )
+    AddDialogButton( dialogData, "Thanks!", ParkourExitDialog )
+    dialogData.forceChoice = true
 
     OpenDialog( dialogData )
+}
+
+void function ParkourExitDialog()
+{
+    EmitUISound( "diag_spectre_gs_LeechEnd_01_1" )
 }
