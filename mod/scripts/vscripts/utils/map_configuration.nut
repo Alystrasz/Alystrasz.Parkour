@@ -182,7 +182,7 @@ void function SetUpStartIndicator( vector origin, int triggerRadius )
     })
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
         string playerName = player.GetPlayerName()
-        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
+        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting && IsAlive(player) ) {
             Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", true )
         }
     })
