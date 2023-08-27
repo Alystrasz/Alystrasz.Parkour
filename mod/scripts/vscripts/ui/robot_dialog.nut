@@ -34,9 +34,7 @@ void function ParkourShowMoreDetails()
     + "I register scores of all pilots on this map; even scores not appearing here are saved, so pilots can compare to other pilots."
 
     AddDialogButton(dialogData, "Show me the world scoreboard!", void function() {
-        string endpoint = GetConVarString("parkour_api_endpoint")
-        LaunchExternalWebBrowser(endpoint, WEBBROWSER_FLAG_FORCEEXTERNAL)
-        ParkourExitDialog()
+        thread ParkourOpenWebScoreboard()
     })
     AddDialogButton( dialogData, "Thanks!", ParkourExitDialog )
     dialogData.forceChoice = true
@@ -47,4 +45,17 @@ void function ParkourShowMoreDetails()
 void function ParkourExitDialog()
 {
     EmitUISound( "diag_spectre_gs_LeechEnd_01_1" )
+}
+
+/**
+ * Since clicking the button directly closes current dialog and transmits click action
+ * to the game, thus firing at the robot, we wait a bit before opening web scoreboard.
+ **/
+void function ParkourOpenWebScoreboard()
+{
+    ParkourExitDialog()
+
+    wait 0.2
+    string endpoint = GetConVarString("parkour_api_endpoint")
+    LaunchExternalWebBrowser(endpoint, WEBBROWSER_FLAG_FORCEEXTERNAL)
 }
