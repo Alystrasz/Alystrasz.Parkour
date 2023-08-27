@@ -62,6 +62,7 @@ void function OnPlayerConnected(entity player)
 	// Init server player state
 	InitPlayerStats(player)
 	RespawnPlayerToConfirmedCheckpoint(player)
+	player.SetPlayerNetFloat( "gunGameLevelPercentage", 0 )
 
 	// Listen for reset
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
@@ -109,6 +110,17 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 
 	// Give player predefined weapons
 	ForcePlayerLoadout(player)
+
+	// Disable boost meter
+	thread OnPlayerRespawned_Threaded( player )
+}
+void function OnPlayerRespawned_Threaded( entity player )
+{
+	// bit of a hack, need to rework earnmeter code to have better support for completely disabling it
+	// rn though this just waits for earnmeter code to set the mode before we set it back
+	WaitFrame()
+	if ( IsValid( player ) )
+		PlayerEarnMeter_SetMode( player, eEarnMeterMode.DISABLED )
 }
 
 void function MovePlayerToMapStart( entity player )

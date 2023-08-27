@@ -61,6 +61,19 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
+
+    // hide boost progress
+    Cl_GGEarnMeter_Init(ClGamemodePK_GetWeaponIcon, ClGamemodePK_ShouldChangeWeaponIcon)
+}
+
+asset function ClGamemodePK_GetWeaponIcon()
+{
+	return $"rui/faction/faction_logo_mrvn";
+}
+
+bool function ClGamemodePK_ShouldChangeWeaponIcon()
+{
+	return true
 }
 
 void function SafeDestroyRUI( var rui )

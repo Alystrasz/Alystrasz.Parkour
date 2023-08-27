@@ -45,4 +45,6 @@ void function PKRegisterNetworkVars()
     Remote_RegisterFunction( "ServerCallback_TalkToRobot" )
     Remote_RegisterFunction( "ServerCallback_CreateStartIndicator" )
     Remote_RegisterFunction( "ServerCallback_ToggleStartIndicatorDisplay" )
+
+    RegisterNetworkedVariable( "gunGameLevelPercentage", SNDC_PLAYER_EXCLUSIVE, SNVT_FLOAT_RANGE, 0.0, 0.0, 1.0 )
 }
