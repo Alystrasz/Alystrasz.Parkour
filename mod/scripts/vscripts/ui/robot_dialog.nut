@@ -2,6 +2,8 @@ global function Parkour_OpenRobotDialog
 
 void function Parkour_OpenRobotDialog()
 {
+    EmitUISound( "diag_spectre_gs_LeechStart_01_1" )
+
     DialogData dialogData
     dialogData.image = $"rui/faction/faction_logo_mrvn"
     dialogData.header = "Parkour information"
@@ -19,6 +21,8 @@ void function Parkour_OpenRobotDialog()
 
 void function ParkourShowMoreDetails()
 {
+    EmitUISound( "diag_spectre_gs_LeechAborted_01_1" )
+
     DialogData dialogData
     dialogData.image = $"rui/faction/faction_logo_mrvn"
     dialogData.header = "More about Parkour"
