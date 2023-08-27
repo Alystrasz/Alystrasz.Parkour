@@ -273,7 +273,6 @@ void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
     RuiSetBool( file.startIndicatorRUI, "isVisible", show )
     if (show) {
         entity player = GetLocalClientPlayer()
-        EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
 
         // Only display warning message once every two minutes
         int now = GetUnixTimestamp()
@@ -282,6 +281,9 @@ void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
             string message = format(template, ROBOT_NAME, GetLocalClientPlayer().GetPlayerName())
             Chat_GameWriteLine(message)
             file.startIndicatorTime = GetUnixTimestamp()
+            EmitSoundOnEntity( player, "diag_spectre_gs_LeechStart_01_1" )
+        } else {
+            EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
         }
     }
 }
