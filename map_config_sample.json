@@ -6,7 +6,7 @@
         "kit": "15"
     },
     "configuration": {
-        "startLine": {
+        "start_line": {
             "origin": [-160.82, -3041.79, -35.0],
             "angles": [0, 0, 0],
             "dimensions": [120, 80],
@@ -15,7 +15,7 @@
                 [-68.0326, -2931.55, -53.4112]
             ]
         },
-        "finishLine": {
+        "finish_line": {
             "origin": [-399.065, -2906.22, -43.9688],
             "angles": [0, -90, 0],
             "dimensions": [120, 80],
@@ -77,6 +77,16 @@
                 [1604.62, -2300.76, 465.017],
                 [1601.41, -1298.66, 521.017]
             ]
-        ]
+        ],
+        "robot": {
+            "origin": [-590.0,-3234.85,-105.969],
+            "angles": [0,180,0],
+            "talkable_radius": 60,
+            "animation": "mv_idle_weld"
+        },
+        "indicator": {
+            "coordinates": [-331.044,-3128.37,118.0313],
+            "trigger_radius": 400
+        }
     }
 }
