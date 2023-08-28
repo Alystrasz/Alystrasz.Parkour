@@ -277,9 +277,9 @@ void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
         // Only display warning message once every two minutes
         int now = GetUnixTimestamp()
         if ( show && now - file.startIndicatorTime > 120) {
-            string template = "\x1b[93m%s:\x1b[0m Getting lost, %s?\nI added coordinates of the parkour start to your HUD."
-            string message = format(template, ROBOT_NAME, GetLocalClientPlayer().GetPlayerName())
-            Chat_GameWriteLine(message)
+            string prefix = format("\x1b[93m%s:\x1b[0m ", ROBOT_NAME)
+            string message = Localize("#ROBOT_LOST_PLAYER", GetLocalClientPlayer().GetPlayerName())
+            Chat_GameWriteLine(prefix + message)
             file.startIndicatorTime = GetUnixTimestamp()
             EmitSoundOnEntity( player, "diag_spectre_gs_LeechStart_01_1" )
         } else {
@@ -359,6 +359,6 @@ void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
     file.startIndicatorRUI = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
     RuiSetBool( file.startIndicatorRUI, "isVisible", false )
     RuiSetImage( file.startIndicatorRUI, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
-    RuiSetString( file.startIndicatorRUI, "statusText", "Parkour start" )
+    RuiSetString( file.startIndicatorRUI, "statusText", "#PARKOUR_START" )
     RuiTrackFloat3( file.startIndicatorRUI, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
 }

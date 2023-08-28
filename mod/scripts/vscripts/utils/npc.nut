@@ -37,6 +37,5 @@ void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadi
 	npc_marvin.SetUsable()
 	npc_marvin.SetUsableRadius( talkableRadius )
 	npc_marvin.AddUsableValue( USABLE_BY_PILOTS | USABLE_HINT_ONLY )
-	string prompt = "Press %use% to talk to " + ROBOT_NAME
-	npc_marvin.SetUsePrompts( prompt, prompt )
+	npc_marvin.SetUsePrompts( "#ROBOT_INTERACTION_PROMPT", "#ROBOT_INTERACTION_PROMPT" )
 }

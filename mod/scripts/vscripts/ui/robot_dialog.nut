@@ -10,15 +10,15 @@ void function Parkour_OpenRobotDialog( string mapName )
 
     DialogData dialogData
     dialogData.image = $"rui/faction/faction_logo_mrvn"
-    dialogData.header = "Parkour information"
+    dialogData.header = Localize( "#ROBOT_DIALOG1_TITLE" )
 
-    dialogData.message = "Hello pilot, and welcome to the Parkour mode!\n\n\n"
-    + "The goal is simple: go through the start line, and get to the finish line as fast as you can while crossing all checkpoints in order!\n\n"
-    + "If you are fast enough, you might see your name appear on the local or (even better) world scoreboard!!\n\n\n"
-    + "Wanna know more?"
+    dialogData.message = Localize( "#ROBOT_DIALOG1_TEXT1" ) + "\n\n\n"
+    + Localize( "#ROBOT_DIALOG1_TEXT2" ) + "\n\n"
+    + Localize( "#ROBOT_DIALOG1_TEXT3" ) + "\n\n\n"
+    + Localize( "#ROBOT_DIALOG1_TEXT4" )
 
-    AddDialogButton( dialogData, "Tell me more!", ParkourShowMoreDetails )
-    AddDialogButton( dialogData, "Nope, thank you!", ParkourExitDialog )
+    AddDialogButton( dialogData, "#ROBOT_DIALOG1_BTN1", ParkourShowMoreDetails )
+    AddDialogButton( dialogData, "#ROBOT_DIALOG1_BTN2", ParkourExitDialog )
     dialogData.forceChoice = true
 
     OpenDialog( dialogData )
@@ -30,17 +30,17 @@ void function ParkourShowMoreDetails()
 
     DialogData dialogData
     dialogData.image = $"rui/faction/faction_logo_mrvn"
-    dialogData.header = "More about Parkour"
+    dialogData.header = Localize( "#ROBOT_DIALOG2_TITLE" )
 
-    dialogData.message = "Don't try to switch weapons, all pilots have a predefined set of weapons and abilities, so that everyone is on an equal footing.\n\n"
-    + "If your run is not going well, you can press %offhand4% to reappear here, and restart a new one!\n\n"
-    + "And if your time does not appear on the leaderboards, don't worry!\n"
-    + "I register scores of all pilots on this map; even scores not appearing here are saved, so pilots can compare to other pilots."
+    dialogData.message = Localize( "#ROBOT_DIALOG2_TEXT1" ) + "\n\n"
+    + Localize( "#ROBOT_DIALOG2_TEXT2" ) + "\n\n"
+    + Localize( "#ROBOT_DIALOG2_TEXT3" ) + "\n"
+    + Localize( "#ROBOT_DIALOG2_TEXT4" )
 
-    AddDialogButton(dialogData, "Show me the world scoreboard!", void function() {
+    AddDialogButton(dialogData, "#ROBOT_DIALOG2_BTN1", void function() {
         thread ParkourOpenWebScoreboard()
     })
-    AddDialogButton( dialogData, "Thanks!", ParkourExitDialog )
+    AddDialogButton( dialogData, "#ROBOT_DIALOG2_BTN2", ParkourExitDialog )
     dialogData.forceChoice = true
 
     OpenDialog( dialogData )
@@ -59,7 +59,7 @@ void function ParkourOpenWebScoreboard()
 {
     ParkourExitDialog()
 
-    wait 0.2
+    wait 0.8
     string endpoint = GetConVarString("parkour_api_endpoint") + "?map=" + file.mapName
     LaunchExternalWebBrowser(endpoint, WEBBROWSER_FLAG_FORCEEXTERNAL)
 }
