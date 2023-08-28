@@ -359,6 +359,6 @@ void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
     file.startIndicatorRUI = CreateCockpitRui( $"ui/overhead_icon_evac.rpak" )
     RuiSetBool( file.startIndicatorRUI, "isVisible", false )
     RuiSetImage( file.startIndicatorRUI, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
-    RuiSetString( file.startIndicatorRUI, "statusText", "Parkour start" )
+    RuiSetString( file.startIndicatorRUI, "statusText", "#PARKOUR_START" )
     RuiTrackFloat3( file.startIndicatorRUI, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
 }
