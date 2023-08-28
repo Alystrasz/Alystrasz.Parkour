@@ -120,12 +120,12 @@ void function LoadParkourMapConfiguration(table data)
 
         // Start/finish lines
         // Start
-        table startLineData = expect table(data["startLine"])
+        table startLineData = expect table(data["start_line"])
         ParkourLine startLine = BuildParkourLine(startLineData)
         file.startMins = startLine.triggerMins
         file.startMaxs = startLine.triggerMaxs
         // End
-        table finishLineData = expect table(data["finishLine"])
+        table finishLineData = expect table(data["finish_line"])
         ParkourLine endLine = BuildParkourLine(finishLineData)
         file.endMins = endLine.triggerMins
         file.endMaxs = endLine.triggerMaxs
