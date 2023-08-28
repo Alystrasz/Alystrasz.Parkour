@@ -59,7 +59,7 @@ void function ParkourOpenWebScoreboard()
 {
     ParkourExitDialog()
 
-    wait 0.2
+    wait 0.8
     string endpoint = GetConVarString("parkour_api_endpoint") + "?map=" + file.mapName
     LaunchExternalWebBrowser(endpoint, WEBBROWSER_FLAG_FORCEEXTERNAL)
 }
