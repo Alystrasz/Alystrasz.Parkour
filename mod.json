@@ -2,7 +2,7 @@
     "Name": "Parkour",
     "Description": "Reach all checkpoints and end the race as fast as you can.",
     "LoadPriority": 2,
-    "Version": "0.1.2",
+    "Version": "0.2.0",
     "RequiredOnClient": true,
     "ConVars": [
         {
