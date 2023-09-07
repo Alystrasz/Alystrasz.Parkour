@@ -80,7 +80,7 @@ void function OnPlayerConnected(entity player)
 void function OnPlayerReset(entity player) {
 	string playerName = player.GetPlayerName()
 	PlayerStats stats = localStats[playerName]
-	if (!stats.isRunning) return;
+	if (stats.isResetting) return;
 
 	stats.isResetting = true
 	stats.isRunning = false
@@ -91,6 +91,7 @@ void function OnPlayerReset(entity player) {
 
 	// Reset weapons as well
 	ForcePlayerLoadout(player)
+	Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", false )
 }
 
 /**
