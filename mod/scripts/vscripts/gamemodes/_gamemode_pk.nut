@@ -104,6 +104,11 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	// Do nothing if called during server initialization
 	if (mapConfiguration.finishedFetchingData == false) return
 
+	// Freeze player if respawn occurs after match end
+	if (GetGameState() > eGameState.SuddenDeath) {
+		player.FreezeControlsOnServer()
+	}
+
 	int checkpointIndex = localStats[player.GetPlayerName()].currentCheckpoint
 	vector checkpoint = checkpoints[checkpointIndex]
 	player.SetOrigin( checkpoint )
@@ -141,14 +146,12 @@ void function MovePlayerToMapStart( entity player )
 		mover.Destroy()
 	}
 
-	ResetPlayerStats( player, true )
-	RespawnPlayerToConfirmedCheckpoint(player)
-
-	player.SetAngles(startAngles)
 	player.UnfreezeControlsOnServer()
-
-	// localStats[player.GetPlayerName()].isResetting = false
+	ResetPlayerStats( player, true )
 	ResetPlayerCooldowns(player)
+	
+	RespawnPlayerToConfirmedCheckpoint(player)
+	player.SetAngles(startAngles)
 }
 
 int function ParkourDecideWinner()
