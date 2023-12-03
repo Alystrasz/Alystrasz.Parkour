@@ -9,7 +9,7 @@ global array<entity> checkpointEntities = []
 global vector startAngles
 
 global bool has_api_access = false
-global function OnPlayerConnected
+global function PK_OnPlayerConnected
 
 
 void function _PK_Init() {
@@ -28,7 +28,7 @@ void function _PK_Init() {
 	Riff_ForceBoostAvailability( eBoostAvailability.Disabled )
 
 	// teleport connected players to map start
-	AddCallback_OnClientConnected( OnPlayerConnected )
+	AddCallback_OnClientConnected( PK_OnPlayerConnected )
 	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
 
 	// Prepare map for parkour gamemode
@@ -41,7 +41,7 @@ void function _PK_Init() {
  * This initializes gamemode variables for player, and sends him the entire
  * leaderboard state.
  **/
-void function OnPlayerConnected(entity player)
+void function PK_OnPlayerConnected(entity player)
 {
 	// Do nothing if called during server initialization
 	if (mapConfiguration.finishedFetchingData == false) return
