@@ -5,6 +5,7 @@ global struct PlayerStats
 {
 	bool isRunning = false
 	bool isResetting = false
+    bool justFinished = false
 	int currentCheckpoint = 0
 	array<vector> checkpointAngles
 	float startTime

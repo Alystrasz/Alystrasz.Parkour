@@ -89,7 +89,7 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 
 			if (PointIsWithinBounds( player.GetOrigin(), volumeMins, volumeMaxs ))
 			{
-				if (!localStats[playerName].isRunning && !localStats[playerName].isResetting)
+				if (!localStats[playerName].justFinished && !localStats[playerName].isRunning && !localStats[playerName].isResetting)
 				{
 					localStats[playerName].startTime = Time()
 					localStats[playerName].isRunning = true
@@ -140,6 +140,7 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 				if (playerStats.isRunning && playerStats.currentCheckpoint == checkpoints.len()-2) {
                     float duration = Time() - playerStats.startTime
 
+					thread PreventPlayerToImmediatelyStartAgain(playerStats)
                     playerStats.isRunning = false
                     playerStats.currentCheckpoint = 0
                     playerStats.checkpointAngles = [startAngles]
@@ -164,4 +165,16 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 		}
 		WaitFrame()
 	}
+}
+
+/**
+ * Raises a flag preventing player to start a new run.
+ * This is useful on maps that share the same trigger for starting and finish lines, for
+ * players not to start a new run instantly after ending one.
+ **/
+void function PreventPlayerToImmediatelyStartAgain(PlayerStats playerStats)
+{
+	playerStats.justFinished = true
+	wait 1
+	playerStats.justFinished = false
 }
