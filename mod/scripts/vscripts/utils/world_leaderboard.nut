@@ -30,26 +30,32 @@ void function WorldLeaderboard_FetchScores()
     {
         void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
         {
-            print("Received scores from parkour API...")
-
             string inputStr = "{\"data\":" + response.body + "}"
             table data = DecodeJSON(inputStr)
             array scores = expect array(data["data"])
 
-            // TODO Each time we receive a scores list, we sent it entirely to clients, which should be improved.
-            array<LeaderboardEntry> localWorldLeaderboard = []
+            array<LeaderboardEntry> distantWorldLeaderboard = []
             foreach (value in scores) {
                 table raw_score = expect table(value)
                 LeaderboardEntry entry
                 entry.playerName = expect string(raw_score["name"])
                 entry.time = expect float(raw_score["time"])
-                localWorldLeaderboard.append(entry)
+                distantWorldLeaderboard.append(entry)
             }
 
-            worldLeaderboard = localWorldLeaderboard;
             print("Scores received.")
             has_api_access = true
-            UpdatePlayersLeaderboard(0, true)
+
+            // Each time a distant scores list is retrieved, we check if local list is the same
+            // (to avoid sending updates to clients if nothing changed)
+            int difference_index = CompareLeaderboards(worldLeaderboard, distantWorldLeaderboard)
+            if (difference_index == -1) {
+                print("=> Local leaderboard already up-to-date.")
+            } else {
+                print("=> Transmitting leaderboard updates to players.")
+                worldLeaderboard = distantWorldLeaderboard;
+                UpdatePlayersLeaderboard(difference_index, true)
+            }
         }
 
         void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
@@ -97,4 +103,33 @@ void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
     request.body = json
 
     NSHttpRequest( request, onSubmissionSuccess, onSubmissionFailure )
+}
+
+/**
+ * Returns the first entry index that differs between input leaderboards, or -1 if both
+ * are identical.
+ **/
+int function CompareLeaderboards( array<LeaderboardEntry> l1, array<LeaderboardEntry> l2 )
+{
+    int len1 = l1.len()
+    int len2 = l2.len()
+    int max_len = -1
+    int min_len = -1
+
+    if (len1 > len2) {
+        max_len = len1
+        min_len = len2
+    } else {
+        max_len = len2
+        min_len = len1
+    }
+
+    for (int i=0; i<max_len; i++) {
+        if (i == min_len || l1[i].playerName != l2[i].playerName || l1[i].playerName == l2[i].playerName && l1[i].time != l2[i].time) {
+            return i
+        }
+    }
+
+    return -1
+
 }
