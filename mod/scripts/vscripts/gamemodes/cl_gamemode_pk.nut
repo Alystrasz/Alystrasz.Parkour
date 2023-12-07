@@ -195,7 +195,7 @@ void function ShowNewHighscoreMessage( string playerName, float playerTime )
     SafeDestroyRUI(  file.newHighscoreRUI )
 
     file.newHighscoreRUI = CreatePermanentCockpitRui( $"ui/death_hint_mp.rpak" )
-    RuiSetString( file.newHighscoreRUI, "hintText", Localize( "#NEW_HIGHSCORE", playerName, playerTime ) )
+    RuiSetString( file.newHighscoreRUI, "hintText", Localize( "#NEW_HIGHSCORE", playerName, format( "%.2f", playerTime ) ) )
     RuiSetGameTime( file.newHighscoreRUI, "startTime", Time() )
     RuiSetFloat3( file.newHighscoreRUI, "bgColor", < 0, 0, 0 > )
     RuiSetFloat( file.newHighscoreRUI, "bgAlpha", 0.5 )
