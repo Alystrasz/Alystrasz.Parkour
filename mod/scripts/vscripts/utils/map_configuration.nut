@@ -375,7 +375,7 @@ void function FindMapIdentifier()
             if ( map_name.find( mapName) != null ) {
                 print("==> Parkour map found!")
                 credentials.mapId = expect string(map["id"])
-                thread WorldLeaderboard_FetchScores()
+                thread WorldLeaderboard_StartPeriodicFetching()
                 has_api_access = true
 
                 table perks = expect table(map["perks"]);

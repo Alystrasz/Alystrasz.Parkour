@@ -4,7 +4,7 @@
  * (source code for the API is available here: https://github.com/Alystrasz/parkour-api)
  **/
 
-global function WorldLeaderboard_FetchScores
+global function WorldLeaderboard_StartPeriodicFetching
 global function SendWorldLeaderboardEntryToAPI
 
 
@@ -16,9 +16,55 @@ global function SendWorldLeaderboardEntryToAPI
  * On scores reception, those are sent to connected game clients, to update the in-game
  * "world" leaderboard.
  **/
+void function WorldLeaderboard_StartPeriodicFetching()
+{
+    while (GetGameState() <= eGameState.SuddenDeath)
+    {
+        WorldLeaderboard_FetchScores()
+        wait 10
+    }
+}
+
+void function WorldLeaderboard_FetchScores_OnSuccess( HttpRequestResponse response )
+{
+    string inputStr = "{\"data\":" + response.body + "}"
+    table data = DecodeJSON(inputStr)
+    array scores = expect array(data["data"])
+
+    array<LeaderboardEntry> distantWorldLeaderboard = []
+    foreach (value in scores) {
+        table raw_score = expect table(value)
+        LeaderboardEntry entry
+        entry.playerName = expect string(raw_score["name"])
+        entry.time = expect float(raw_score["time"])
+        distantWorldLeaderboard.append(entry)
+    }
+
+    print("Scores received.")
+    has_api_access = true
+
+    // Each time a distant scores list is retrieved, we check if local list is the same
+    // (to avoid sending updates to clients if nothing changed)
+    int difference_index = CompareLeaderboards(worldLeaderboard, distantWorldLeaderboard)
+    if (difference_index == -1) {
+        print("=> Local leaderboard already up-to-date.")
+    } else {
+        print("=> Transmitting leaderboard updates to players.")
+        worldLeaderboard = distantWorldLeaderboard;
+        UpdatePlayersLeaderboard(difference_index, true)
+    }
+}
+
+void function WorldLeaderboard_FetchScores_OnFailure( HttpRequestFailure failure )
+{
+    print("Something went wrong while fetching scores from parkour API.")
+    print("=> " + failure.errorCode)
+    print("=> " + failure.errorMessage)
+    has_api_access = false
+}
+
 void function WorldLeaderboard_FetchScores()
 {
-    print("Fetching scores for map n°" + credentials.mapId)
     HttpRequest request
     request.method = HttpRequestMethod.GET
     request.url = format("%s/v1/maps/%s/scores", credentials.endpoint, credentials.mapId)
@@ -26,49 +72,7 @@ void function WorldLeaderboard_FetchScores()
     headers[ "authentication" ] <- [credentials.secret]
     request.headers = headers
 
-    while (GetGameState() <= eGameState.SuddenDeath)
-    {
-        void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
-        {
-            string inputStr = "{\"data\":" + response.body + "}"
-            table data = DecodeJSON(inputStr)
-            array scores = expect array(data["data"])
-
-            array<LeaderboardEntry> distantWorldLeaderboard = []
-            foreach (value in scores) {
-                table raw_score = expect table(value)
-                LeaderboardEntry entry
-                entry.playerName = expect string(raw_score["name"])
-                entry.time = expect float(raw_score["time"])
-                distantWorldLeaderboard.append(entry)
-            }
-
-            print("Scores received.")
-            has_api_access = true
-
-            // Each time a distant scores list is retrieved, we check if local list is the same
-            // (to avoid sending updates to clients if nothing changed)
-            int difference_index = CompareLeaderboards(worldLeaderboard, distantWorldLeaderboard)
-            if (difference_index == -1) {
-                print("=> Local leaderboard already up-to-date.")
-            } else {
-                print("=> Transmitting leaderboard updates to players.")
-                worldLeaderboard = distantWorldLeaderboard;
-                UpdatePlayersLeaderboard(difference_index, true)
-            }
-        }
-
-        void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
-        {
-            print("Something went wrong while fetching scores from parkour API.")
-            print("=> " + failure.errorCode)
-            print("=> " + failure.errorMessage)
-            has_api_access = false
-        }
-
-        NSHttpRequest( request, onSuccess, onFailure )
-        wait 10
-    }
+    NSHttpRequest( request, WorldLeaderboard_FetchScores_OnSuccess, WorldLeaderboard_FetchScores_OnFailure )
 }
 
 // Score submissions
