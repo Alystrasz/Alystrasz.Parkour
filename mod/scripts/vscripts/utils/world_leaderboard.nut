@@ -6,6 +6,7 @@
 
 global function WorldLeaderboard_StartPeriodicFetching
 global function SendWorldLeaderboardEntryToAPI
+global function WorldLeaderboard_FetchScores
 
 
 /**

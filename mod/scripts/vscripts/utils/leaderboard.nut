@@ -93,8 +93,19 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 		if (insertionIndex <= 2)
 			AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
 
-		if ( has_api_access )
+		// Send new score to API
+		// If score should appear in world scoreboard, refresh world scoreboard
+		if ( has_api_access ) {
 			SendWorldLeaderboardEntryToAPI( entry )
+
+			int length = worldLeaderboard.len()
+			if (length < 10 || entry.time < worldLeaderboard[length-1].time ) {
+				// Leave some time to API to store new score
+				wait 1
+				print("Forcing world scores updating.")
+				WorldLeaderboard_FetchScores()
+			}
+		}
 	}
 
 	UpdatePlayersLeaderboard( insertionIndex )
