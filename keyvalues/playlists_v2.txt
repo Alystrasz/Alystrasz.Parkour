@@ -54,6 +54,8 @@ playlists
 					maps
 					{
                         mp_thaw 1
+						mp_angel_city 1
+						mp_wargames 1
 					}
 				}
 			}
