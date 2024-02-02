@@ -81,6 +81,10 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 {
 	int checkpointsCount = checkpoints.len()-1
 
+	// Debugging
+	// vector origin = volumeMaxs - volumeMins
+	DebugDrawBox( <0,0,0>, volumeMins, volumeMaxs, 255, 50, 255, 50, 10000.0 )
+
 	while (GetGameState() <= eGameState.SuddenDeath)
 	{
 		foreach(player in GetPlayerArray())
