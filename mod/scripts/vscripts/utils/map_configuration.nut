@@ -87,6 +87,9 @@ void function InitializeMapConfiguration()
     // Init players
     foreach(player in GetPlayerArray())
     {
+        if ( !IsValid( player ) ) {
+			continue
+		}
         PK_OnPlayerConnected(player)
     }
 }

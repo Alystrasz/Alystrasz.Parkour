@@ -163,6 +163,10 @@ int function ParkourDecideWinner()
 	string winnerName = leaderboard[0].playerName
 	float time = leaderboard[0].time
 	foreach( player in GetPlayerArray() ) {
+		if ( !IsValid( player ) ) {
+			continue
+		}
+
 		if ( player.GetPlayerName() == winnerName ) {
 			SetTeam( player, TEAM_MILITIA )
 			found = true

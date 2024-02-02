@@ -85,6 +85,10 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 	{
 		foreach(player in GetPlayerArray())
 		{
+			if ( !IsValid( player ) ) {
+				continue
+			}
+
 			string playerName = player.GetPlayerName()
 
 			if (PointIsWithinBounds( player.GetOrigin(), volumeMins, volumeMaxs ))
@@ -132,6 +136,10 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 	{
 		foreach(player in GetPlayerArray())
 		{
+			if ( !IsValid( player ) ) {
+				continue
+			}
+
 			string playerName = player.GetPlayerName()
 
 			if (PointIsWithinBounds( player.GetOrigin(), volumeMins, volumeMaxs ))
