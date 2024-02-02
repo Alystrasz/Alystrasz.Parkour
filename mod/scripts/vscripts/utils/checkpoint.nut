@@ -117,6 +117,11 @@ entity function SpawnEndTrigger( vector origin, vector volumeMins, vector volume
     point.Hide()
     DispatchSpawn( point )
     thread FinishTriggerThink(volumeMins, volumeMaxs)
+
+	// Debugging
+	DebugDrawBox( origin, volumeMins - origin, volumeMaxs - origin, 255, 255, 0, 1, 10000.0 )
+	DebugDrawSphere( origin, 25.0, 255, 0, 0, true, 10000.0 )
+
     return point
 }
 
