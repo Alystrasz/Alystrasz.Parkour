@@ -11,6 +11,8 @@ global vector startAngles
 global bool has_api_access = false
 global function PK_OnPlayerConnected
 
+string endpoint = ""
+
 
 void function _PK_Init() {
 	IS_PK = true
@@ -30,6 +32,11 @@ void function _PK_Init() {
 	// teleport connected players to map start
 	AddCallback_OnClientConnected( PK_OnPlayerConnected )
 	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
+
+	// Save endpoint address, to send it to players on connection
+	table t = {}
+	t["url"] <- GetConVarString("parkour_api_endpoint")
+	endpoint = EncodeJSON( t )
 
 	// Prepare map for parkour gamemode
 	thread InitializeMapConfiguration()
@@ -54,6 +61,7 @@ void function PK_OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitLine end " + mapConfiguration.finishLineStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
+	ServerToClientStringCommand( player, "ParkourInitEndpoint " + endpoint )
 	Remote_CallFunction_NonReplay( player, "ServerCallback_CreateStartIndicator", mapConfiguration.startIndicator.GetEncodedEHandle() )
 
 	UpdatePlayerLeaderboard( player, 0 )
