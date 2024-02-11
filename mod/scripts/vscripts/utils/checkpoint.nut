@@ -52,7 +52,7 @@ void function SpawnCheckpoints( vector startMins, vector startMaxs, vector endMi
  * The second argument is a callback that is summoned each time a player enters the
  * current checkpoint.
  **/
-entity function CreateCheckpoint(vector origin, void functionref(entity) callback, float size = 0.5, string color = "0 155 0")
+entity function CreateCheckpoint(vector origin, void functionref(entity) callback, float size = 0.5, string color = "0 30 0")
 {
     // Spawn bubble
     entity point = CreateEntity( "prop_dynamic" )
