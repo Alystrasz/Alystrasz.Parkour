@@ -25,6 +25,7 @@ struct {
 
     bool isRunning = false
     var nextCheckpointRui
+    entity nextCheckpointEnt
     float bestTime = 0
 
     bool canTalktoRobot = false
@@ -226,6 +227,24 @@ void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, 
 
     // Update checkpoint overhead icon
     RuiTrackFloat3( file.nextCheckpointRui, "pos", checkpoint, RUI_TRACK_OVERHEAD_FOLLOW )
+
+    // Spawn bubble showing next checkpoint
+    if ( file.nextCheckpointEnt != null ) 
+    {
+        file.nextCheckpointEnt.Destroy()
+        file.nextCheckpointEnt = null
+    }
+    if (checkpointIndex < totalCheckpointsCount - 1 )
+    {
+        file.nextCheckpointEnt = CreateCheckpoint( checkpoint.GetOrigin() )
+    }
+}
+
+entity function CreateCheckpoint( vector origin )
+{
+    entity point = CreateClientSidePropDynamic( origin, <0, 0, 0>, $"models/fx/xo_emp_field.mdl" )
+    point.kv.rendercolor = "0 155 0"
+    return point
 }
 
 void function ServerCallback_StopRun( float runDuration, bool isBestTime )
