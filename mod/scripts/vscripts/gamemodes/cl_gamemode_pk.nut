@@ -7,6 +7,8 @@ global function ServerCallback_TalkToRobot
 global function ServerCallback_CreateStartIndicator
 global function ServerCallback_ToggleStartIndicatorDisplay
 
+global int PARKOUR_FX_PARTICLE_SYSTEM_INDEX
+
 struct {
     entity mover
     var topology
@@ -67,6 +69,10 @@ void function Cl_Parkour_Init()
 
     // hide boost progress
     Cl_GGEarnMeter_Init(ClGamemodePK_GetWeaponIcon, ClGamemodePK_ShouldChangeWeaponIcon)
+
+    // precache particle effects
+    PARKOUR_FX_PARTICLE_SYSTEM_INDEX = PrecacheParticleSystem( $"P_shield_hld_01_CP" )
+    // PrecacheParticleSystem( FX_HARVESTER_BEAM )
 }
 
 asset function ClGamemodePK_GetWeaponIcon()
@@ -236,14 +242,27 @@ void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, 
     }
     if (checkpointIndex < totalCheckpointsCount - 1 )
     {
-        file.nextCheckpointEnt = CreateCheckpoint( checkpoint.GetOrigin() )
+        file.nextCheckpointEnt = CreateCheckpoint( checkpoint.GetOrigin(), checkpoint )
     }
 }
 
-entity function CreateCheckpoint( vector origin )
+entity function CreateCheckpoint( vector origin, entity checkpoint )
 {
-    entity point = CreateClientSidePropDynamic( origin, <0, 0, 0>, $"models/fx/xo_emp_field.mdl" )
+    /*asset effect = $"P_menu_motes" // $"wpn_grenade_TT_activate"
+    int fxId = GetParticleSystemIndex( FX_HARVESTER_BEAM )
+    int harvesterBeamFX = StartParticleEffectOnEntity( checkpoint, fxId, FX_PATTACH_ABSORIGIN_FOLLOW, -1 )
+    EffectSetControlPointVector( harvesterBeamFX, 1, < 26.0, 188.0, 0.0 > )*/ // TODO creuser ça
+
+    /*int friendlyColoredFX = StartParticleEffectOnEntity( checkpoint, PARKOUR_FX_PARTICLE_SYSTEM_INDEX, FX_PATTACH_ABSORIGIN_FOLLOW, -1 )
+    EffectSetControlPointVector( friendlyColoredFX, 1, < 26.0, 188.0, 0.0 > )
+    EffectSetControlPointVector( friendlyColoredFX, 3, <100.0, 0.0, 0.0> )*/
+
+    // entity point = CreateClientSidePropDynamic( origin, <0, 0, 0>, $"models/fx/xo_emp_field.mdl" )
+    entity point = CreatePropDynamic( $"models/fx/xo_emp_field.mdl", origin, <0, 0, 0> )
     point.kv.rendercolor = "0 155 0"
+    // point.kv.scale = 0.3
+    // point.kv.modelscale = 0.3
+    // point.kv.modelscale = 50
     return point
 }
 
