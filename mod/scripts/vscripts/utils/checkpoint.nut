@@ -82,8 +82,7 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 	int checkpointsCount = checkpoints.len()-1
 
 	// Debugging
-	// vector origin = volumeMaxs - volumeMins
-	DebugDrawBox( <0,0,0>, volumeMins, volumeMaxs, 255, 0, 255, 10, 10000.0 )
+	DebugDrawBox( <0,0,0>, volumeMins, volumeMaxs, 255, 0, 0, 10, 10000.0 )
 
 	while (GetGameState() <= eGameState.SuddenDeath)
 	{
@@ -128,7 +127,7 @@ entity function SpawnEndTrigger( vector origin, vector volumeMins, vector volume
 
 	// Debugging
 	DebugDrawBox( origin, volumeMins - origin, volumeMaxs - origin, 255, 255, 0, 10, 10000.0 )
-	DebugDrawSphere( origin, 25.0, 255, 0, 0, true, 10000.0 )
+	DebugDrawSphere( origin, 25.0, 255, 255, 0, true, 10000.0 )
 
     return point
 }
