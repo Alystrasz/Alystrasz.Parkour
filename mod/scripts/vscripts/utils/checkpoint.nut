@@ -69,9 +69,8 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
     })
 
 	// Debugging
-    // Height is indicative here, as `trigger` has no defined height attribute
-    float cylinderHeight = 200.0
-    DebugDrawCylinder( <origin.x, origin.y, origin.z - cylinderHeight>, <90, 0, 0>, 140.0, -2*cylinderHeight, 0, 255, 0, true, 10000.0 )
+    float cylinderHeight = 160.0
+    DebugDrawCylinder( <origin.x, origin.y, origin.z + cylinderHeight>, <90, 0, 0>, 140.0, cylinderHeight, 0, 255, 0, true, 10000.0 )
 
     return point
 }
