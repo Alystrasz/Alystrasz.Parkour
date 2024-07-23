@@ -119,6 +119,10 @@ void function UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderbo
 {
 	foreach(player in GetPlayerArray())
 	{
+		if ( !IsValid( player ) ) {
+			continue
+		}
+		
 		UpdatePlayerLeaderboard( player, startIndex, updateWorldLeaderboard )
 	}
 }

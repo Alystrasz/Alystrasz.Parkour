@@ -28,6 +28,7 @@ struct {
     float bestTime = 0
 
     bool canTalktoRobot = false
+    string endpoint = ""
 } file;
 
 
@@ -61,6 +62,7 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
+    AddServerToClientStringCommandCallback( "ParkourInitEndpoint", ServerCallback_SaveParkourEndpoint )
 
     // hide boost progress
     Cl_GGEarnMeter_Init(ClGamemodePK_GetWeaponIcon, ClGamemodePK_ShouldChangeWeaponIcon)
@@ -296,6 +298,12 @@ void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
 // ██║  ██║╚██████╔╝██████╔╝╚██████╔╝   ██║
 // ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝    ╚═╝
 
+void function ServerCallback_SaveParkourEndpoint( array<string> args )
+{
+    table endpoint = DecodeJSON( args[0] )
+    file.endpoint = expect string( endpoint["url"] )
+}
+
 void function ServerCallback_SetRobotTalkState( bool canTalk )
 {
     file.canTalktoRobot = canTalk
@@ -304,7 +312,7 @@ void function ServerCallback_SetRobotTalkState( bool canTalk )
 void function ServerCallback_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
-    RunUIScript( "Parkour_OpenRobotDialog", GetMapName() )
+    RunUIScript( "Parkour_OpenRobotDialog", GetMapName(), file.endpoint )
 }
 
 
