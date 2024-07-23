@@ -83,7 +83,7 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 
 	// Debugging
 	// vector origin = volumeMaxs - volumeMins
-	DebugDrawBox( <0,0,0>, volumeMins, volumeMaxs, 255, 50, 255, 50, 10000.0 )
+	DebugDrawBox( <0,0,0>, volumeMins, volumeMaxs, 255, 0, 255, 10, 10000.0 )
 
 	while (GetGameState() <= eGameState.SuddenDeath)
 	{
@@ -127,7 +127,7 @@ entity function SpawnEndTrigger( vector origin, vector volumeMins, vector volume
     thread FinishTriggerThink(volumeMins, volumeMaxs)
 
 	// Debugging
-	DebugDrawBox( origin, volumeMins - origin, volumeMaxs - origin, 255, 255, 0, 1, 10000.0 )
+	DebugDrawBox( origin, volumeMins - origin, volumeMaxs - origin, 255, 255, 0, 10, 10000.0 )
 	DebugDrawSphere( origin, 25.0, 255, 0, 0, true, 10000.0 )
 
     return point
