@@ -51,7 +51,7 @@ void function SetupMap()
 {
 	waitthread InitializeMapConfiguration()
 	print("=> Map configuration loaded.")
-	print(checkpoints.len().tostring())
+	PK_InitTrajectoryHighlight()
 }
 
 /**

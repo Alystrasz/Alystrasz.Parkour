@@ -70,6 +70,10 @@
             "RunOn": "SERVER"
         },
         {
+            "Path": "utils/trajectory.nut",
+            "RunOn": "SERVER"
+        },
+        {
             "Path": "gamemodes/_gamemode_pk.nut",
             "RunOn": "SERVER"
         }
