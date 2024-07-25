@@ -38,10 +38,21 @@ void function _PK_Init() {
 	t["url"] <- GetConVarString("parkour_api_endpoint")
 	endpoint = EncodeJSON( t )
 
-	// Prepare map for parkour gamemode
-	thread InitializeMapConfiguration()
+	thread SetupMap()
 }
 
+/**
+ * Prepares map for parkour gamemode.
+ * First, this will retrieve map configuration (from either local file or
+ * distant API) and initialize gamemode state with it; then, this will
+ * use checkpoint coordinates to set up trajectory highlighting.
+ **/
+void function SetupMap()
+{
+	waitthread InitializeMapConfiguration()
+	print("=> Map configuration loaded.")
+	print(checkpoints.len().tostring())
+}
 
 /**
  * Callback invoked on player connection.
