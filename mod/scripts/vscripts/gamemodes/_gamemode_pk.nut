@@ -62,7 +62,7 @@ void function PK_OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitEndpoint " + endpoint )
-	Remote_CallFunction_NonReplay( player, "ServerCallback_CreateStartIndicator", mapConfiguration.startIndicator.GetEncodedEHandle() )
+	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_CreateStartIndicator", mapConfiguration.startIndicator.GetEncodedEHandle() )
 
 	UpdatePlayerLeaderboard( player, 0 )
 	UpdatePlayerLeaderboard( player, 0, true )
@@ -76,7 +76,7 @@ void function PK_OnPlayerConnected(entity player)
 	AddButtonPressedPlayerInputCallback( player, IN_OFFHAND4, OnPlayerReset )
 	// Listen for players who wanna talk to robot
 	AddButtonPressedPlayerInputCallback( player, IN_USE, void function( entity player ) {
-		Remote_CallFunction_NonReplay( player, "ServerCallback_TalkToRobot" )
+		Remote_CallFunction_NonReplay( player, "ServerCallback_PK_TalkToRobot" )
 	} )
 }
 
@@ -94,12 +94,12 @@ void function OnPlayerReset(entity player) {
 	stats.isRunning = false
 	thread MovePlayerToMapStart(player)
 
-	Remote_CallFunction_NonReplay(player, "ServerCallback_ResetRun")
+	Remote_CallFunction_NonReplay(player, "ServerCallback_PK_ResetRun")
 	AddPlayerParkourStat(player, ePlayerParkourStatType.Resets)
 
 	// Reset weapons as well
 	ForcePlayerLoadout(player)
-	Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", false )
+	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", false )
 }
 
 /**

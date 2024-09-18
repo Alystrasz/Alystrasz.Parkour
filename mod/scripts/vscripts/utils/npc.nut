@@ -27,10 +27,10 @@ void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadi
 	// Check if player is close to robot
     entity trigger = CreateTriggerRadiusMultiple( origin, talkableRadius.tofloat() + 6, [], TRIG_FLAG_PLAYERONLY, 80, -80)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
-		Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", true)
+		Remote_CallFunction_NonReplay( player, "ServerCallback_PK_SetRobotTalkState", true)
     })
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
-        Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", false)
+        Remote_CallFunction_NonReplay( player, "ServerCallback_PK_SetRobotTalkState", false)
     })
 
 	// Set robot as talkable to

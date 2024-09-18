@@ -33,7 +33,7 @@ void function SpawnCheckpoints( vector startMins, vector startMaxs, vector endMi
 					pStats.currentCheckpoint = index						// Updates player's last reached checkpoint
 					Remote_CallFunction_NonReplay( 							// Send player's client next checkpoint location, for it to be RUI displayed
 						player,
-						"ServerCallback_UpdateNextCheckpointMarker",
+						"ServerCallback_PK_UpdateNextCheckpointMarker",
 						checkpointEntities[index].GetEncodedEHandle(),
 						index,
 						checkpointsCount
@@ -97,7 +97,7 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 				{
 					localStats[playerName].startTime = Time()
 					localStats[playerName].isRunning = true
-					Remote_CallFunction_NonReplay( player, "ServerCallback_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
+					Remote_CallFunction_NonReplay( player, "ServerCallback_PK_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
 					EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_start" )
 					AddPlayerParkourStat( player, ePlayerParkourStatType.Starts )
 				}
@@ -162,7 +162,7 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 						EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_end" )
 					}
 
-                    Remote_CallFunction_NonReplay( player, "ServerCallback_StopRun", duration, isBestTime )
+                    Remote_CallFunction_NonReplay( player, "ServerCallback_PK_StopRun", duration, isBestTime )
 					ResetPlayerCooldowns(player)
 
 					// Score update

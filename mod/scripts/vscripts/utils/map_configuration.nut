@@ -180,13 +180,13 @@ void function SetUpStartIndicator( vector origin, int triggerRadius )
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
         string playerName = player.GetPlayerName()
         if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
-            Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", false )
+            Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", false )
         }
     })
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
         string playerName = player.GetPlayerName()
         if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting && IsAlive(player) ) {
-            Remote_CallFunction_NonReplay( player, "ServerCallback_ToggleStartIndicatorDisplay", true )
+            Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", true )
         }
     })
 }
