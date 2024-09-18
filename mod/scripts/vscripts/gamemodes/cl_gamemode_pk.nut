@@ -1,11 +1,11 @@
 global function Cl_Parkour_Init
-global function ServerCallback_UpdateNextCheckpointMarker
-global function ServerCallback_StopRun
-global function ServerCallback_ResetRun
-global function ServerCallback_SetRobotTalkState
-global function ServerCallback_TalkToRobot
-global function ServerCallback_CreateStartIndicator
-global function ServerCallback_ToggleStartIndicatorDisplay
+global function ServerCallback_PK_UpdateNextCheckpointMarker
+global function ServerCallback_PK_StopRun
+global function ServerCallback_PK_ResetRun
+global function ServerCallback_PK_SetRobotTalkState
+global function ServerCallback_PK_TalkToRobot
+global function ServerCallback_PK_CreateStartIndicator
+global function ServerCallback_PK_ToggleStartIndicatorDisplay
 
 struct {
     entity mover
@@ -152,7 +152,7 @@ void function ShowResetHint()
     	AddPlayerHint( 5.0, 0.5, $"", "#RESET_RUN_HINT" )
 }
 
-void function ServerCallback_ResetRun()
+void function ServerCallback_PK_ResetRun()
 {
     DestroyRemainingRUIs()
 	file.isRunning = false
@@ -207,7 +207,7 @@ void function ShowNewHighscoreMessage( string playerName, float playerTime )
     SafeDestroyRUI( file.newHighscoreRUI )
 }
 
-void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, int checkpointIndex, int totalCheckpointsCount )
+void function ServerCallback_PK_UpdateNextCheckpointMarker ( int checkpointHandle, int checkpointIndex, int totalCheckpointsCount )
 {
 	entity checkpoint = GetEntityFromEncodedEHandle( checkpointHandle )
 	if (!IsValid(checkpoint))
@@ -228,7 +228,7 @@ void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, 
     RuiTrackFloat3( file.nextCheckpointRui, "pos", checkpoint, RUI_TRACK_OVERHEAD_FOLLOW )
 }
 
-void function ServerCallback_StopRun( float runDuration, bool isBestTime )
+void function ServerCallback_PK_StopRun( float runDuration, bool isBestTime )
 {
     file.isRunning = false
 	thread DestroyCheckpointsCountRUI()
@@ -270,7 +270,7 @@ void function DestroyCheckpointsCountRUI()
     SafeDestroyRUI( file.checkpointsCountRUI )
 }
 
-void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
+void function ServerCallback_PK_ToggleStartIndicatorDisplay( bool show )
 {
     RuiSetBool( file.startIndicatorRUI, "isVisible", show )
     if (show) {
@@ -279,7 +279,7 @@ void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
         // Only display warning message once every two minutes
         int now = GetUnixTimestamp()
         if ( show && now - file.startIndicatorTime > 120) {
-            string prefix = format("\x1b[93m%s:\x1b[0m ", ROBOT_NAME)
+            string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
             string message = Localize("#ROBOT_LOST_PLAYER", GetLocalClientPlayer().GetPlayerName())
             Chat_GameWriteLine(prefix + message)
             file.startIndicatorTime = GetUnixTimestamp()
@@ -304,12 +304,12 @@ void function ServerCallback_SaveParkourEndpoint( array<string> args )
     file.endpoint = expect string( endpoint["url"] )
 }
 
-void function ServerCallback_SetRobotTalkState( bool canTalk )
+void function ServerCallback_PK_SetRobotTalkState( bool canTalk )
 {
     file.canTalktoRobot = canTalk
 }
 
-void function ServerCallback_TalkToRobot()
+void function ServerCallback_PK_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
     RunUIScript( "Parkour_OpenRobotDialog", GetMapName(), file.endpoint )
@@ -329,7 +329,7 @@ void function ServerCallback_CreateLine( array<string> args )
 {
     bool isStartLine = args[0] == "start"
     table data = DecodeJSON(args[1]);
-    ParkourLine line = BuildParkourLine( data )
+    ParkourLine line = PK_BuildParkourLine( data )
 	var topo = CreateTopology(line.origin, line.angles, line.dimensions[0].tofloat(), line.dimensions[1].tofloat())
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( startRui, "displayText", isStartLine ? "#GAUNTLET_START_TEXT" : "#GAUNTLET_FINISH_TEXT" )
@@ -339,7 +339,7 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 {
     bool isLocalLeaderboard = args[0] == "local"
     table data = DecodeJSON(args[1]);
-    ParkourLeaderboard pl = BuildParkourLeaderboard( data )
+    ParkourLeaderboard pl = PK_BuildParkourLeaderboard( data )
 
     // Build leaderboard
     var topo = CreateTopology(pl.origin, pl.angles, pl.dimensions[0].tofloat(), pl.dimensions[1].tofloat())
@@ -358,7 +358,7 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
 }
 
-void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
+void function ServerCallback_PK_CreateStartIndicator( int indicatorEntityHandle )
 {
     entity indicator = GetEntityFromEncodedEHandle( indicatorEntityHandle )
     if (!IsValid(indicator))

@@ -1,12 +1,12 @@
-global function SpawnAmbientMarvin
+global function PK_SpawnAmbientMarvin
 
-void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadius, string animation )
+void function PK_SpawnAmbientMarvin( vector origin, vector angles, int talkableRadius, string animation )
 {
 	entity npc_marvin = CreateEntity( "npc_marvin" )
 	npc_marvin.SetOrigin( origin )
 	npc_marvin.SetAngles( angles )
     SetTeam( npc_marvin, TEAM_IMC )
-    npc_marvin.SetTitle( ROBOT_NAME )
+    npc_marvin.SetTitle( PK_ROBOT_NAME )
 	npc_marvin.kv.rendercolor = "255 255 255"
 	npc_marvin.kv.health = -1
 	npc_marvin.kv.max_health = -1
@@ -27,10 +27,10 @@ void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadi
 	// Check if player is close to robot
     entity trigger = CreateTriggerRadiusMultiple( origin, talkableRadius.tofloat() + 6, [], TRIG_FLAG_PLAYERONLY, 80, -80)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
-		Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", true)
+		Remote_CallFunction_NonReplay( player, "ServerCallback_PK_SetRobotTalkState", true)
     })
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
-        Remote_CallFunction_NonReplay( player, "ServerCallback_SetRobotTalkState", false)
+        Remote_CallFunction_NonReplay( player, "ServerCallback_PK_SetRobotTalkState", false)
     })
 
 	// Set robot as talkable to

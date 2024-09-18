@@ -1,8 +1,7 @@
 global function PKMode_Init
 
 global const GAMEMODE_PK = "pk"
-
-global const ROBOT_NAME = "R-MY"
+global const PK_ROBOT_NAME = "R-MY"
 
 void function PKMode_Init() {
     AddCallback_OnCustomGamemodesInit( CreateGamemode )
@@ -38,13 +37,13 @@ void function PKRegisterNetworkVars()
 	if ( GAMETYPE != GAMEMODE_PK )
 		return
 
-    Remote_RegisterFunction( "ServerCallback_UpdateNextCheckpointMarker" )
-    Remote_RegisterFunction( "ServerCallback_StopRun" )
-    Remote_RegisterFunction( "ServerCallback_ResetRun" )
-    Remote_RegisterFunction( "ServerCallback_SetRobotTalkState" )
-    Remote_RegisterFunction( "ServerCallback_TalkToRobot" )
-    Remote_RegisterFunction( "ServerCallback_CreateStartIndicator" )
-    Remote_RegisterFunction( "ServerCallback_ToggleStartIndicatorDisplay" )
+    Remote_RegisterFunction( "ServerCallback_PK_UpdateNextCheckpointMarker" )
+    Remote_RegisterFunction( "ServerCallback_PK_StopRun" )
+    Remote_RegisterFunction( "ServerCallback_PK_ResetRun" )
+    Remote_RegisterFunction( "ServerCallback_PK_SetRobotTalkState" )
+    Remote_RegisterFunction( "ServerCallback_PK_TalkToRobot" )
+    Remote_RegisterFunction( "ServerCallback_PK_CreateStartIndicator" )
+    Remote_RegisterFunction( "ServerCallback_PK_ToggleStartIndicatorDisplay" )
 
     RegisterNetworkedVariable( "gunGameLevelPercentage", SNDC_PLAYER_EXCLUSIVE, SNVT_FLOAT_RANGE, 0.0, 0.0, 1.0 )
 }
