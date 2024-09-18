@@ -6,7 +6,7 @@ void function PK_SpawnAmbientMarvin( vector origin, vector angles, int talkableR
 	npc_marvin.SetOrigin( origin )
 	npc_marvin.SetAngles( angles )
     SetTeam( npc_marvin, TEAM_IMC )
-    npc_marvin.SetTitle( ROBOT_NAME )
+    npc_marvin.SetTitle( PK_ROBOT_NAME )
 	npc_marvin.kv.rendercolor = "255 255 255"
 	npc_marvin.kv.health = -1
 	npc_marvin.kv.max_health = -1

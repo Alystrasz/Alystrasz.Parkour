@@ -8,13 +8,13 @@ global function PK_InitializeMapConfiguration
  * These information are used by the world leaderboard to fetch scores,
  * for instance.
  **/
-global struct Credentials {
+global struct PK_Credentials {
     string eventId = ""
     string mapId = ""
     string endpoint
     string secret
 }
-global Credentials credentials
+global PK_Credentials PK_credentials
 
 /**
  * This global object stores serialized coordinates of in-game entities
@@ -22,7 +22,7 @@ global Credentials credentials
  * (hence the string type, since they're passed to clients using
  * `ServerToClientStringCommand` calls).
  **/
-global struct MapConfiguration {
+global struct PK_MapConfiguration {
     bool finishedFetchingData = false
     entity startIndicator
     string startLineStr
@@ -30,7 +30,7 @@ global struct MapConfiguration {
     string localLeaderboardStr
     string worldLeaderboardStr
 }
-global MapConfiguration mapConfiguration
+global PK_MapConfiguration PK_mapConfiguration
 
 /**
  * This object stores start and finish triggers plus ziplines coordinates.
@@ -75,7 +75,7 @@ void function PK_InitializeMapConfiguration()
         print("Loading map configuration from API.")
         thread InitializeMapConfigurationFromAPI()
     }
-    while(mapConfiguration.finishedFetchingData == false) {
+    while(PK_mapConfiguration.finishedFetchingData == false) {
         WaitFrame()
     }
 
@@ -110,16 +110,16 @@ void function LoadParkourMapConfiguration(table data)
         // Checkpoints
         array fCheckpoints = expect array(data["checkpoints"])
         foreach( checkpoint in fCheckpoints ) {
-            checkpoints.push( PK_ArrayToFloatVector(expect array(checkpoint)) )
+            PK_checkpoints.push( PK_ArrayToFloatVector(expect array(checkpoint)) )
         }
         table startData = expect table(data["start"])
         vector start = PK_ArrayToFloatVector( expect array(startData["origin"]) )
-        checkpoints.insert( 0, start )
+        PK_checkpoints.insert( 0, start )
         vector angles = PK_ArrayToIntVector( expect array(startData["angles"]) )
-        startAngles = angles
+        PK_startAngles = angles
         table endData = expect table(data["end"])
         vector end = PK_ArrayToFloatVector( expect array(endData["origin"]) )
-        checkpoints.append( end )
+        PK_checkpoints.append( end )
 
         // Start/finish lines
         // Start
@@ -138,10 +138,10 @@ void function LoadParkourMapConfiguration(table data)
         table worldLeaderboardData = expect table(leaderboardsData["world"])
 
         // Serialized
-        mapConfiguration.startLineStr = EncodeJSON(startLineData)
-        mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
-        mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
-        mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
+        PK_mapConfiguration.startLineStr = EncodeJSON(startLineData)
+        PK_mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
+        PK_mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
+        PK_mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
 
         // Robot
         table robotData = expect table(data["robot"])
@@ -157,7 +157,7 @@ void function LoadParkourMapConfiguration(table data)
         SetUpStartIndicator( startIndicatorOrigin, startIndicatorRadius )
 
         file.ziplines = expect array(data["ziplines"])
-        mapConfiguration.finishedFetchingData = true
+        PK_mapConfiguration.finishedFetchingData = true
     } catch (err) {
         print("Error while loading map configuration: " + err)
     }
@@ -173,19 +173,19 @@ void function SetUpStartIndicator( vector origin, int triggerRadius )
     point.kv.modelscale = 1
     point.Hide()
     DispatchSpawn( point )
-    mapConfiguration.startIndicator = point
+    PK_mapConfiguration.startIndicator = point
 
     // Only showing indicator when player is far from its origin
     entity trigger = CreateTriggerRadiusMultiple( origin, triggerRadius.tofloat(), [], TRIG_FLAG_PLAYERONLY)
     AddCallback_ScriptTriggerEnter( trigger, void function (entity trigger, entity player) {
         string playerName = player.GetPlayerName()
-        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting ) {
+        if ( !PK_localStats[playerName].isRunning && !PK_localStats[playerName].isResetting ) {
             Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", false )
         }
     })
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
         string playerName = player.GetPlayerName()
-        if ( !localStats[playerName].isRunning && !localStats[playerName].isResetting && IsAlive(player) ) {
+        if ( !PK_localStats[playerName].isRunning && !PK_localStats[playerName].isResetting && IsAlive(player) ) {
             Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", true )
         }
     })
@@ -249,7 +249,7 @@ void function InitializeMapConfigurationFromFile()
         table data = DecodeJSON(result)
         LoadParkourMapConfiguration( expect table(data["configuration"]) )
         PK_ApplyPerks( expect table(data["perks"]) )
-        mapConfiguration.finishedFetchingData = true;
+        PK_mapConfiguration.finishedFetchingData = true;
     }
     NSLoadFile(fileName, onFileLoad)
 }
@@ -273,14 +273,14 @@ void function InitializeMapConfigurationFromFile()
 void function InitializeMapConfigurationFromAPI()
 {
     // Initialize credentials
-    credentials.endpoint = GetConVarString("parkour_api_endpoint")
-    credentials.secret = GetConVarString("parkour_api_secret")
+    PK_credentials.endpoint = GetConVarString("parkour_api_endpoint")
+    PK_credentials.secret = GetConVarString("parkour_api_secret")
     thread FindEventIdentifier()
-    while (credentials.eventId == "") {
+    while (PK_credentials.eventId == "") {
         WaitFrame()
     }
     thread FindMapIdentifier()
-    while (credentials.mapId == "") {
+    while (PK_credentials.mapId == "") {
         WaitFrame()
     }
 
@@ -302,9 +302,9 @@ void function FindEventIdentifier()
 {
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = format("%s/v1/events", credentials.endpoint)
+    request.url = format("%s/v1/events", PK_credentials.endpoint)
     table<string, array<string> > headers
-    headers[ "authentication" ] <- [credentials.secret]
+    headers[ "authentication" ] <- [PK_credentials.secret]
     request.headers = headers
 
     void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
@@ -321,14 +321,14 @@ void function FindEventIdentifier()
             int currentTime = GetUnixTimestamp();
 
             if (currentTime >= start && currentTime <= end) {
-                credentials.eventId = expect string(event["id"])
+                PK_credentials.eventId = expect string(event["id"])
                 print("==> Parkour event found!")
                 return;
             }
         }
 
         print("No parkour event is available at the moment.")
-        has_api_access = false
+        PK_has_api_access = false
     }
 
     void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
@@ -336,7 +336,7 @@ void function FindEventIdentifier()
         print("Something went wrong while fetching events from parkour API.")
         print("=> " + failure.errorCode)
         print("=> " + failure.errorMessage)
-        has_api_access = false
+        PK_has_api_access = false
     }
 
     NSHttpRequest( request, onSuccess, onFailure )
@@ -359,9 +359,9 @@ void function FindMapIdentifier()
 {
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = format("%s/v1/events/%s/maps", credentials.endpoint, credentials.eventId)
+    request.url = format("%s/v1/events/%s/maps", PK_credentials.endpoint, PK_credentials.eventId)
     table<string, array<string> > headers
-    headers[ "authentication" ] <- [credentials.secret]
+    headers[ "authentication" ] <- [PK_credentials.secret]
     request.headers = headers
 
     void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
@@ -377,9 +377,9 @@ void function FindMapIdentifier()
             string map_name = expect string(map["map_name"])
             if ( map_name.find( mapName) != null ) {
                 print("==> Parkour map found!")
-                credentials.mapId = expect string(map["id"])
+                PK_credentials.mapId = expect string(map["id"])
                 thread PK_WorldLeaderboard_StartPeriodicFetching()
-                has_api_access = true
+                PK_has_api_access = true
 
                 table perks = expect table(map["perks"]);
                 PK_ApplyPerks( perks )
@@ -389,7 +389,7 @@ void function FindMapIdentifier()
         }
 
         print("No map matches the event id and current map.")
-        has_api_access = false
+        PK_has_api_access = false
     }
 
     void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )
@@ -397,7 +397,7 @@ void function FindMapIdentifier()
         print("Something went wrong while fetching maps from parkour API.")
         print("=> " + failure.errorCode)
         print("=> " + failure.errorMessage)
-        has_api_access = false
+        PK_has_api_access = false
     }
 
     NSHttpRequest( request, onSuccess, onFailure )
@@ -417,9 +417,9 @@ void function FetchMapConfigurationFromAPI()
 {
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = format("%s/v1/maps/%s/configuration", credentials.endpoint, credentials.mapId)
+    request.url = format("%s/v1/maps/%s/configuration", PK_credentials.endpoint, PK_credentials.mapId)
     table<string, array<string> > headers
-    headers[ "authentication" ] <- [credentials.secret]
+    headers[ "authentication" ] <- [PK_credentials.secret]
     request.headers = headers
 
     void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
@@ -434,7 +434,7 @@ void function FetchMapConfigurationFromAPI()
         print("Something went wrong while fetching map configuration from parkour API.")
         print("=> " + failure.errorCode)
         print("=> " + failure.errorMessage)
-        has_api_access = false
+        PK_has_api_access = false
     }
 
     NSHttpRequest( request, onSuccess, onFailure )

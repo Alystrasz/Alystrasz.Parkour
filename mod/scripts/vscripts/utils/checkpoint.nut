@@ -9,22 +9,22 @@ global function PK_SpawnCheckpoints
  **/
 void function PK_SpawnCheckpoints( vector startMins, vector startMaxs, vector endMins, vector endMaxs )
 {
-	int checkpointsCount = checkpoints.len()-1
+	int checkpointsCount = PK_checkpoints.len()-1
 
-	foreach (int index, vector checkpoint in checkpoints)
+	foreach (int index, vector checkpoint in PK_checkpoints)
 	{
 		if (index == 0)
 		{
 			thread SpawnStartTrigger( startMins, startMaxs )
 		}
-		else if (index == checkpoints.len()-1)
+		else if (index == PK_checkpoints.len()-1)
 		{
-			checkpointEntities.append( SpawnEndTrigger( checkpoint, endMins, endMaxs ) )
+			PK_checkpointEntities.append( SpawnEndTrigger( checkpoint, endMins, endMaxs ) )
 		}
 		else
 		{
 			entity checkpoint = CreateCheckpoint(checkpoint, void function (entity player): (index, checkpointsCount) {
-				PlayerStats pStats = localStats[player.GetPlayerName()]
+				PK_PlayerStats pStats = PK_localStats[player.GetPlayerName()]
 
 				// Only update player info if their currentCheckpoint index is the previous one!
 				if (pStats.isRunning && !pStats.isResetting && pStats.currentCheckpoint == index-1)
@@ -34,14 +34,14 @@ void function PK_SpawnCheckpoints( vector startMins, vector startMaxs, vector en
 					Remote_CallFunction_NonReplay( 							// Send player's client next checkpoint location, for it to be RUI displayed
 						player,
 						"ServerCallback_PK_UpdateNextCheckpointMarker",
-						checkpointEntities[index].GetEncodedEHandle(),
+						PK_checkpointEntities[index].GetEncodedEHandle(),
 						index,
 						checkpointsCount
 					)
 					EmitSoundOnEntityOnlyToPlayer( player, player, "Burn_Card_Map_Hack_Radar_Pulse_V1_1P" )
 				}
 			})
-			checkpointEntities.append( checkpoint )
+			PK_checkpointEntities.append( checkpoint )
 		}
 	}
 }
@@ -79,7 +79,7 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
  **/
 void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 {
-	int checkpointsCount = checkpoints.len()-1
+	int checkpointsCount = PK_checkpoints.len()-1
 
 	while (GetGameState() <= eGameState.SuddenDeath)
 	{
@@ -93,11 +93,11 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 
 			if (PointIsWithinBounds( player.GetOrigin(), volumeMins, volumeMaxs ))
 			{
-				if (!localStats[playerName].justFinished && !localStats[playerName].isRunning && !localStats[playerName].isResetting)
+				if (!PK_localStats[playerName].justFinished && !PK_localStats[playerName].isRunning && !PK_localStats[playerName].isResetting)
 				{
-					localStats[playerName].startTime = Time()
-					localStats[playerName].isRunning = true
-					Remote_CallFunction_NonReplay( player, "ServerCallback_PK_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
+					PK_localStats[playerName].startTime = Time()
+					PK_localStats[playerName].isRunning = true
+					Remote_CallFunction_NonReplay( player, "ServerCallback_PK_UpdateNextCheckpointMarker", PK_checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
 					EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_start" )
 					PK_AddPlayerParkourStat( player, ePlayerParkourStatType.Starts )
 				}
@@ -144,14 +144,14 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 
 			if (PointIsWithinBounds( player.GetOrigin(), volumeMins, volumeMaxs ))
 			{
-                PlayerStats playerStats = localStats[playerName]
-				if (playerStats.isRunning && playerStats.currentCheckpoint == checkpoints.len()-2) {
+                PK_PlayerStats playerStats = PK_localStats[playerName]
+				if (playerStats.isRunning && playerStats.currentCheckpoint == PK_checkpoints.len()-2) {
                     float duration = Time() - playerStats.startTime
 
 					thread PreventPlayerToImmediatelyStartAgain(playerStats)
                     playerStats.isRunning = false
                     playerStats.currentCheckpoint = 0
-                    playerStats.checkpointAngles = [startAngles]
+                    playerStats.checkpointAngles = [PK_startAngles]
 
                     bool isBestTime = duration < playerStats.bestTime
                     if (isBestTime)
@@ -180,7 +180,7 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
  * This is useful on maps that share the same trigger for starting and finish lines, for
  * players not to start a new run instantly after ending one.
  **/
-void function PreventPlayerToImmediatelyStartAgain(PlayerStats playerStats)
+void function PreventPlayerToImmediatelyStartAgain(PK_PlayerStats playerStats)
 {
 	playerStats.justFinished = true
 	wait 1

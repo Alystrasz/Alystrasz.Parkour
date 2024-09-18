@@ -279,7 +279,7 @@ void function ServerCallback_PK_ToggleStartIndicatorDisplay( bool show )
         // Only display warning message once every two minutes
         int now = GetUnixTimestamp()
         if ( show && now - file.startIndicatorTime > 120) {
-            string prefix = format("\x1b[93m%s:\x1b[0m ", ROBOT_NAME)
+            string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
             string message = Localize("#ROBOT_LOST_PLAYER", GetLocalClientPlayer().GetPlayerName())
             Chat_GameWriteLine(prefix + message)
             file.startIndicatorTime = GetUnixTimestamp()

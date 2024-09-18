@@ -2,13 +2,13 @@ untyped
 global function _PK_Init
 global bool IS_PK = false
 
-global array<LeaderboardEntry> leaderboard = []
-global array<LeaderboardEntry> worldLeaderboard = []
-global array<vector> checkpoints = []
-global array<entity> checkpointEntities = []
-global vector startAngles
+global array<PK_LeaderboardEntry> PK_leaderboard = []
+global array<PK_LeaderboardEntry> PK_worldLeaderboard = []
+global array<vector> PK_checkpoints = []
+global array<entity> PK_checkpointEntities = []
+global vector PK_startAngles
 
-global bool has_api_access = false
+global bool PK_has_api_access = false
 global function PK_OnPlayerConnected
 
 string endpoint = ""
@@ -51,18 +51,18 @@ void function _PK_Init() {
 void function PK_OnPlayerConnected(entity player)
 {
 	// Do nothing if called during server initialization
-	if (mapConfiguration.finishedFetchingData == false) return
+	if (PK_mapConfiguration.finishedFetchingData == false) return
 
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )
 
 	// Init client-side elements
-	ServerToClientStringCommand( player, "ParkourInitLine start " + mapConfiguration.startLineStr)
-	ServerToClientStringCommand( player, "ParkourInitLine end " + mapConfiguration.finishLineStr)
-	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + mapConfiguration.localLeaderboardStr)
-	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + mapConfiguration.worldLeaderboardStr)
+	ServerToClientStringCommand( player, "ParkourInitLine start " + PK_mapConfiguration.startLineStr)
+	ServerToClientStringCommand( player, "ParkourInitLine end " + PK_mapConfiguration.finishLineStr)
+	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + PK_mapConfiguration.localLeaderboardStr)
+	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + PK_mapConfiguration.worldLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitEndpoint " + endpoint )
-	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_CreateStartIndicator", mapConfiguration.startIndicator.GetEncodedEHandle() )
+	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_CreateStartIndicator", PK_mapConfiguration.startIndicator.GetEncodedEHandle() )
 
 	PK_UpdatePlayerLeaderboard( player, 0 )
 	PK_UpdatePlayerLeaderboard( player, 0, true )
@@ -87,7 +87,7 @@ void function PK_OnPlayerConnected(entity player)
  **/
 void function OnPlayerReset(entity player) {
 	string playerName = player.GetPlayerName()
-	PlayerStats stats = localStats[playerName]
+	PK_PlayerStats stats = PK_localStats[playerName]
 	if (stats.isResetting) return;
 
 	stats.isResetting = true
@@ -110,17 +110,17 @@ void function OnPlayerReset(entity player) {
 void function RespawnPlayerToConfirmedCheckpoint(entity player)
 {
 	// Do nothing if called during server initialization
-	if (mapConfiguration.finishedFetchingData == false) return
+	if (PK_mapConfiguration.finishedFetchingData == false) return
 
 	// Freeze player if respawn occurs after match end
 	if (GetGameState() > eGameState.SuddenDeath) {
 		player.FreezeControlsOnServer()
 	}
 
-	int checkpointIndex = localStats[player.GetPlayerName()].currentCheckpoint
-	vector checkpoint = checkpoints[checkpointIndex]
+	int checkpointIndex = PK_localStats[player.GetPlayerName()].currentCheckpoint
+	vector checkpoint = PK_checkpoints[checkpointIndex]
 	player.SetOrigin( checkpoint )
-	player.SetAngles(localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
+	player.SetAngles(PK_localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
 
 	// Give player predefined weapons
 	PK_ForcePlayerLoadout(player)
@@ -145,8 +145,8 @@ void function MovePlayerToMapStart( entity player )
 		PhaseShift(player, 0, 1)
 		entity mover = CreateOwnedScriptMover (player)
 		player.SetParent(mover)
-		mover.NonPhysicsMoveTo (checkpoints[0], 1, 0, 0)
-		mover.NonPhysicsRotateTo (startAngles, 1, 0, 0)
+		mover.NonPhysicsMoveTo (PK_checkpoints[0], 1, 0, 0)
+		mover.NonPhysicsRotateTo (PK_startAngles, 1, 0, 0)
 		wait 1
 
 		player.SetVelocity(<0,0,0>)
@@ -159,17 +159,17 @@ void function MovePlayerToMapStart( entity player )
 	ResetPlayerCooldowns(player)
 	
 	RespawnPlayerToConfirmedCheckpoint(player)
-	player.SetAngles(startAngles)
+	player.SetAngles(PK_startAngles)
 }
 
 int function ParkourDecideWinner()
 {
-	if (leaderboard.len() == 0)
+	if (PK_leaderboard.len() == 0)
 		return TEAM_UNASSIGNED
 
 	bool found = false
-	string winnerName = leaderboard[0].playerName
-	float time = leaderboard[0].time
+	string winnerName = PK_leaderboard[0].playerName
+	float time = PK_leaderboard[0].time
 	foreach( player in GetPlayerArray() ) {
 		if ( !IsValid( player ) ) {
 			continue

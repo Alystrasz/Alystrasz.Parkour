@@ -1,8 +1,7 @@
 global function PKMode_Init
 
 global const GAMEMODE_PK = "pk"
-
-global const ROBOT_NAME = "R-MY"
+global const PK_ROBOT_NAME = "R-MY"
 
 void function PKMode_Init() {
     AddCallback_OnCustomGamemodesInit( CreateGamemode )
