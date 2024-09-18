@@ -1,5 +1,5 @@
-global function ApplyPerks
-global function ForcePlayerLoadout
+global function PK_ApplyPerks
+global function PK_ForcePlayerLoadout
 
 global struct Perks {
 	string ability = ""
@@ -13,7 +13,7 @@ array<string> abilities = [ "mp_ability_cloak", "mp_weapon_grenade_sonar", "mp_a
 array<string> grenades = [ "mp_weapon_frag_grenade", "mp_weapon_grenade_emp", "mp_weapon_thermite_grenade", "mp_weapon_grenade_gravity", "mp_weapon_grenade_electric_smoke", "mp_weapon_satchel" ]
 
 
-void function ApplyPerks( table tPerks ) {
+void function PK_ApplyPerks( table tPerks ) {
 	if ("weapon" in tPerks) {
 		string weapon = expect string(tPerks["weapon"])
 		print(format("Applying weapon perk (%s)", weapon))
@@ -42,7 +42,7 @@ void function ApplyPerks( table tPerks ) {
 /**
  * This gives player predefined weapon, grenade and ability.
  **/
-void function ForcePlayerLoadout(entity player) {
+void function PK_ForcePlayerLoadout(entity player) {
 	if (IsAlive(player) && player != null)
 	{
 		// Weapon switch (removes all weapons and give one perk weapon)

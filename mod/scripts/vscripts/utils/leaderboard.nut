@@ -1,6 +1,6 @@
-global function StoreNewLeaderboardEntry
-global function UpdatePlayersLeaderboard
-global function UpdatePlayerLeaderboard
+global function PK_StoreNewLeaderboardEntry
+global function PK_UpdatePlayersLeaderboard
+global function PK_UpdatePlayerLeaderboard
 
 global struct LeaderboardEntry
 {
@@ -19,7 +19,7 @@ global struct LeaderboardEntry
  * sending whole leaderboard on new score registration that's not the best time
  * of the match.
  **/
-void function StoreNewLeaderboardEntry( entity player, float duration )
+void function PK_StoreNewLeaderboardEntry( entity player, float duration )
 {
 	print("New time for " + player.GetPlayerName() + ": " + duration)
 	int insertionIndex = 0
@@ -91,31 +91,31 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 
 		// Update player stats
 		if (insertionIndex <= 2)
-			AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
+			PK_AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
 
 		// Send new score to API
 		// If score should appear in world scoreboard, refresh world scoreboard
 		if ( has_api_access ) {
-			SendWorldLeaderboardEntryToAPI( entry )
+			PK_SendWorldLeaderboardEntryToAPI( entry )
 
 			int length = worldLeaderboard.len()
 			if (length < 10 || entry.time < worldLeaderboard[length-1].time ) {
 				// Leave some time to API to store new score
 				wait 1
 				print("Forcing world scores updating.")
-				WorldLeaderboard_FetchScores()
+				PK_WorldLeaderboard_FetchScores()
 			}
 		}
 	}
 
-	UpdatePlayersLeaderboard( insertionIndex )
+	PK_UpdatePlayersLeaderboard( insertionIndex )
 }
 
 /**
  * If a new time enters the leaderboard, we don't need to send all 10 entries to all players
  * (if new entry has 7th position, we only need to send 7th, 8th, 9th and 10th entries for instance).
  **/
-void function UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderboard = false )
+void function PK_UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderboard = false )
 {
 	foreach(player in GetPlayerArray())
 	{
@@ -123,11 +123,11 @@ void function UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderbo
 			continue
 		}
 		
-		UpdatePlayerLeaderboard( player, startIndex, updateWorldLeaderboard )
+		PK_UpdatePlayerLeaderboard( player, startIndex, updateWorldLeaderboard )
 	}
 }
 
-void function UpdatePlayerLeaderboard( entity player, int startIndex, bool updateWorldLeaderboard = false )
+void function PK_UpdatePlayerLeaderboard( entity player, int startIndex, bool updateWorldLeaderboard = false )
 {
 	array<LeaderboardEntry> board = updateWorldLeaderboard ? worldLeaderboard : leaderboard;
 

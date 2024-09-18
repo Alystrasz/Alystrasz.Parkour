@@ -329,7 +329,7 @@ void function ServerCallback_CreateLine( array<string> args )
 {
     bool isStartLine = args[0] == "start"
     table data = DecodeJSON(args[1]);
-    ParkourLine line = BuildParkourLine( data )
+    ParkourLine line = PK_BuildParkourLine( data )
 	var topo = CreateTopology(line.origin, line.angles, line.dimensions[0].tofloat(), line.dimensions[1].tofloat())
     var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( startRui, "displayText", isStartLine ? "#GAUNTLET_START_TEXT" : "#GAUNTLET_FINISH_TEXT" )
@@ -339,7 +339,7 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 {
     bool isLocalLeaderboard = args[0] == "local"
     table data = DecodeJSON(args[1]);
-    ParkourLeaderboard pl = BuildParkourLeaderboard( data )
+    ParkourLeaderboard pl = PK_BuildParkourLeaderboard( data )
 
     // Build leaderboard
     var topo = CreateTopology(pl.origin, pl.angles, pl.dimensions[0].tofloat(), pl.dimensions[1].tofloat())

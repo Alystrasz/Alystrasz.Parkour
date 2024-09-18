@@ -4,9 +4,9 @@
  * (source code for the API is available here: https://github.com/Alystrasz/parkour-api)
  **/
 
-global function WorldLeaderboard_StartPeriodicFetching
-global function SendWorldLeaderboardEntryToAPI
-global function WorldLeaderboard_FetchScores
+global function PK_WorldLeaderboard_StartPeriodicFetching
+global function PK_SendWorldLeaderboardEntryToAPI
+global function PK_WorldLeaderboard_FetchScores
 
 
 /**
@@ -17,11 +17,11 @@ global function WorldLeaderboard_FetchScores
  * On scores reception, those are sent to connected game clients, to update the in-game
  * "world" leaderboard.
  **/
-void function WorldLeaderboard_StartPeriodicFetching()
+void function PK_WorldLeaderboard_StartPeriodicFetching()
 {
     while (GetGameState() <= eGameState.SuddenDeath)
     {
-        WorldLeaderboard_FetchScores()
+        PK_WorldLeaderboard_FetchScores()
         wait 10
     }
 }
@@ -52,7 +52,7 @@ void function WorldLeaderboard_FetchScores_OnSuccess( HttpRequestResponse respon
     } else {
         print("=> Transmitting leaderboard updates to players.")
         worldLeaderboard = distantWorldLeaderboard;
-        UpdatePlayersLeaderboard(difference_index, true)
+        PK_UpdatePlayersLeaderboard(difference_index, true)
     }
 }
 
@@ -64,7 +64,7 @@ void function WorldLeaderboard_FetchScores_OnFailure( HttpRequestFailure failure
     has_api_access = false
 }
 
-void function WorldLeaderboard_FetchScores()
+void function PK_WorldLeaderboard_FetchScores()
 {
     HttpRequest request
     request.method = HttpRequestMethod.GET
@@ -91,7 +91,7 @@ void function onSubmissionFailure ( HttpRequestFailure failure )
     has_api_access = false
 }
 
-void function SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
+void function PK_SendWorldLeaderboardEntryToAPI( LeaderboardEntry entry )
 {
     HttpRequest request
     request.method = HttpRequestMethod.POST

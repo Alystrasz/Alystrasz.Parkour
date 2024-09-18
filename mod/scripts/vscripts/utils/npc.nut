@@ -1,6 +1,6 @@
-global function SpawnAmbientMarvin
+global function PK_SpawnAmbientMarvin
 
-void function SpawnAmbientMarvin( vector origin, vector angles, int talkableRadius, string animation )
+void function PK_SpawnAmbientMarvin( vector origin, vector angles, int talkableRadius, string animation )
 {
 	entity npc_marvin = CreateEntity( "npc_marvin" )
 	npc_marvin.SetOrigin( origin )

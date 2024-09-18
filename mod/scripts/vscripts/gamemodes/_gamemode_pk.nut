@@ -39,7 +39,7 @@ void function _PK_Init() {
 	endpoint = EncodeJSON( t )
 
 	// Prepare map for parkour gamemode
-	thread InitializeMapConfiguration()
+	thread PK_InitializeMapConfiguration()
 }
 
 
@@ -64,11 +64,11 @@ void function PK_OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitEndpoint " + endpoint )
 	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_CreateStartIndicator", mapConfiguration.startIndicator.GetEncodedEHandle() )
 
-	UpdatePlayerLeaderboard( player, 0 )
-	UpdatePlayerLeaderboard( player, 0, true )
+	PK_UpdatePlayerLeaderboard( player, 0 )
+	PK_UpdatePlayerLeaderboard( player, 0, true )
 
 	// Init server player state
-	InitPlayerStats(player)
+	PK_InitPlayerStats(player)
 	RespawnPlayerToConfirmedCheckpoint(player)
 	player.SetPlayerNetFloat( "gunGameLevelPercentage", 0 )
 
@@ -95,10 +95,10 @@ void function OnPlayerReset(entity player) {
 	thread MovePlayerToMapStart(player)
 
 	Remote_CallFunction_NonReplay(player, "ServerCallback_PK_ResetRun")
-	AddPlayerParkourStat(player, ePlayerParkourStatType.Resets)
+	PK_AddPlayerParkourStat(player, ePlayerParkourStatType.Resets)
 
 	// Reset weapons as well
-	ForcePlayerLoadout(player)
+	PK_ForcePlayerLoadout(player)
 	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", false )
 }
 
@@ -123,7 +123,7 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	player.SetAngles(localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
 
 	// Give player predefined weapons
-	ForcePlayerLoadout(player)
+	PK_ForcePlayerLoadout(player)
 
 	// Disable boost meter
 	thread OnPlayerRespawned_Threaded( player )
@@ -155,7 +155,7 @@ void function MovePlayerToMapStart( entity player )
 	}
 
 	player.UnfreezeControlsOnServer()
-	ResetPlayerStats( player, true )
+	PK_ResetPlayerStats( player, true )
 	ResetPlayerCooldowns(player)
 	
 	RespawnPlayerToConfirmedCheckpoint(player)

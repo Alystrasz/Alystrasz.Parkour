@@ -1,4 +1,4 @@
-global function SpawnCheckpoints
+global function PK_SpawnCheckpoints
 
 
 /**
@@ -7,7 +7,7 @@ global function SpawnCheckpoints
  * one being a start trigger (does not need the checkpoint visual); last entry will
  * also not be spawned as a checkpoint, but as a finish trigger.
  **/
-void function SpawnCheckpoints( vector startMins, vector startMaxs, vector endMins, vector endMaxs )
+void function PK_SpawnCheckpoints( vector startMins, vector startMaxs, vector endMins, vector endMaxs )
 {
 	int checkpointsCount = checkpoints.len()-1
 
@@ -99,7 +99,7 @@ void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 					localStats[playerName].isRunning = true
 					Remote_CallFunction_NonReplay( player, "ServerCallback_PK_UpdateNextCheckpointMarker", checkpointEntities[0].GetEncodedEHandle(), 0, checkpointsCount )
 					EmitSoundOnEntityOnlyToPlayer( player, player, "training_scr_gaunlet_start" )
-					AddPlayerParkourStat( player, ePlayerParkourStatType.Starts )
+					PK_AddPlayerParkourStat( player, ePlayerParkourStatType.Starts )
 				}
 			}
 		}
@@ -166,8 +166,8 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 					ResetPlayerCooldowns(player)
 
 					// Score update
-					StoreNewLeaderboardEntry( player, duration )
-					AddPlayerParkourStat(player, ePlayerParkourStatType.Finishes)
+					PK_StoreNewLeaderboardEntry( player, duration )
+					PK_AddPlayerParkourStat(player, ePlayerParkourStatType.Finishes)
 				}
 			}
 		}

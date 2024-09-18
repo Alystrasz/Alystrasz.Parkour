@@ -1,6 +1,6 @@
-global function AddPlayerParkourStat
-global function InitPlayerStats
-global function ResetPlayerStats
+global function PK_AddPlayerParkourStat
+global function PK_InitPlayerStats
+global function PK_ResetPlayerStats
 global struct PlayerStats
 {
 	bool isRunning = false
@@ -27,7 +27,7 @@ global enum ePlayerParkourStatType
     Top3_scores
 }
 
-void function AddPlayerParkourStat( entity player, int type )
+void function PK_AddPlayerParkourStat( entity player, int type )
 {
     string playerName = player.GetPlayerName()
     PlayerStats stats = localStats[playerName]
@@ -58,7 +58,7 @@ void function AddPlayerParkourStat( entity player, int type )
  * player already have statistics in the current match.
  * If yes, this will update the tab scoreboard with said stats.
  **/
-void function InitPlayerStats(entity player)
+void function PK_InitPlayerStats(entity player)
 {
     string playerName = player.GetPlayerName()
 
@@ -69,14 +69,14 @@ void function InitPlayerStats(entity player)
         player.SetPlayerGameStat( PGS_ASSAULT_SCORE, stats.finishes )
         player.SetPlayerGameStat( PGS_TITAN_KILLS, stats.top3scores )
     }
-    ResetPlayerStats(player)
+    PK_ResetPlayerStats(player)
 }
 
 /**
  * Resets a player's run statistics (check the PlayerStats struct for default
  * values).
  **/
-void function ResetPlayerStats(entity player, bool preserveBestTime = false)
+void function PK_ResetPlayerStats(entity player, bool preserveBestTime = false)
 {
 	string playerName = player.GetPlayerName()
 	PlayerStats stats = {

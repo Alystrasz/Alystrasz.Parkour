@@ -1,4 +1,4 @@
-global function InitializeMapConfiguration
+global function PK_InitializeMapConfiguration
 
 /**
  * This global object holds parkour API information needed to interact
@@ -63,7 +63,7 @@ struct {
  *
  * Map configuration can be fetched from two sources: Parkour API or local file.
  **/
-void function InitializeMapConfiguration()
+void function PK_InitializeMapConfiguration()
 {
     // Load map configuration either from local file or distant API
     bool useLocal = GetConVarInt("parkour_use_local_config") == 1
@@ -80,9 +80,9 @@ void function InitializeMapConfiguration()
     }
 
     // Set up world
-	SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
+	PK_SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
     SpawnZiplines( file.ziplines )
-    SpawnAmbientMarvin( robot.origin, robot.angles, robot.talkableRadius, robot.animation )
+    PK_SpawnAmbientMarvin( robot.origin, robot.angles, robot.talkableRadius, robot.animation )
 
     // Init players
     foreach(player in GetPlayerArray())
@@ -110,26 +110,26 @@ void function LoadParkourMapConfiguration(table data)
         // Checkpoints
         array fCheckpoints = expect array(data["checkpoints"])
         foreach( checkpoint in fCheckpoints ) {
-            checkpoints.push( ArrayToFloatVector(expect array(checkpoint)) )
+            checkpoints.push( PK_ArrayToFloatVector(expect array(checkpoint)) )
         }
         table startData = expect table(data["start"])
-        vector start = ArrayToFloatVector( expect array(startData["origin"]) )
+        vector start = PK_ArrayToFloatVector( expect array(startData["origin"]) )
         checkpoints.insert( 0, start )
-        vector angles = ArrayToIntVector( expect array(startData["angles"]) )
+        vector angles = PK_ArrayToIntVector( expect array(startData["angles"]) )
         startAngles = angles
         table endData = expect table(data["end"])
-        vector end = ArrayToFloatVector( expect array(endData["origin"]) )
+        vector end = PK_ArrayToFloatVector( expect array(endData["origin"]) )
         checkpoints.append( end )
 
         // Start/finish lines
         // Start
         table startLineData = expect table(data["start_line"])
-        ParkourLine startLine = BuildParkourLine(startLineData)
+        ParkourLine startLine = PK_BuildParkourLine(startLineData)
         file.startMins = startLine.triggerMins
         file.startMaxs = startLine.triggerMaxs
         // End
         table finishLineData = expect table(data["finish_line"])
-        ParkourLine endLine = BuildParkourLine(finishLineData)
+        ParkourLine endLine = PK_BuildParkourLine(finishLineData)
         file.endMins = endLine.triggerMins
         file.endMaxs = endLine.triggerMaxs
         // Leaderboards
@@ -145,14 +145,14 @@ void function LoadParkourMapConfiguration(table data)
 
         // Robot
         table robotData = expect table(data["robot"])
-        robot.origin = ArrayToFloatVector( expect array(robotData["origin"]) )
-        robot.angles = ArrayToIntVector( expect array(robotData["angles"]) )
+        robot.origin = PK_ArrayToFloatVector( expect array(robotData["origin"]) )
+        robot.angles = PK_ArrayToIntVector( expect array(robotData["angles"]) )
         robot.talkableRadius = expect int(robotData["talkable_radius"])
         robot.animation = expect string(robotData["animation"])
 
         // Start indicator
         table startIndicator = expect table(data["indicator"])
-        vector startIndicatorOrigin = ArrayToFloatVector( expect array(startIndicator["coordinates"]) )
+        vector startIndicatorOrigin = PK_ArrayToFloatVector( expect array(startIndicator["coordinates"]) )
         int startIndicatorRadius = expect int(startIndicator["trigger_radius"])
         SetUpStartIndicator( startIndicatorOrigin, startIndicatorRadius )
 
@@ -202,7 +202,7 @@ void function SpawnZiplines( array coordinates )
         array zipline = expect array(c)
         array startCoordinates = expect array(zipline[0])
         array endCoordinates = expect array(zipline[1])
-		CreateZipline( ArrayToFloatVector(startCoordinates), ArrayToFloatVector(endCoordinates) )
+		CreateZipline( PK_ArrayToFloatVector(startCoordinates), PK_ArrayToFloatVector(endCoordinates) )
 	}
 }
 
@@ -248,7 +248,7 @@ void function InitializeMapConfigurationFromFile()
     {
         table data = DecodeJSON(result)
         LoadParkourMapConfiguration( expect table(data["configuration"]) )
-        ApplyPerks( expect table(data["perks"]) )
+        PK_ApplyPerks( expect table(data["perks"]) )
         mapConfiguration.finishedFetchingData = true;
     }
     NSLoadFile(fileName, onFileLoad)
@@ -378,11 +378,11 @@ void function FindMapIdentifier()
             if ( map_name.find( mapName) != null ) {
                 print("==> Parkour map found!")
                 credentials.mapId = expect string(map["id"])
-                thread WorldLeaderboard_StartPeriodicFetching()
+                thread PK_WorldLeaderboard_StartPeriodicFetching()
                 has_api_access = true
 
                 table perks = expect table(map["perks"]);
-                ApplyPerks( perks )
+                PK_ApplyPerks( perks )
 
                 return;
             }
