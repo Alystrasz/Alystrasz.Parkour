@@ -33,11 +33,6 @@ void function _PK_Init() {
 	AddCallback_OnClientConnected( PK_OnPlayerConnected )
 	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
 
-	// Save endpoint address, to send it to players on connection
-	table t = {}
-	t["url"] <- GetConVarString("parkour_api_endpoint")
-	endpoint = EncodeJSON( t )
-
 	// Prepare map for parkour gamemode
 	thread PK_InitializeMapConfiguration()
 }
@@ -52,6 +47,15 @@ void function PK_OnPlayerConnected(entity player)
 {
 	// Do nothing if called during server initialization
 	if (PK_mapConfiguration.finishedFetchingData == false) return
+
+	// Init endpoint object if needed
+	if (endpoint == "")
+	{
+		// Save endpoint address, to send it to players on connection
+		table t = {}
+		t["url"] <- format( "%s?route=%s", GetConVarString("parkour_api_endpoint"), PK_credentials.routeId )
+		endpoint = EncodeJSON( t )
+	}
 
 	// Put all players in the same team
 	SetTeam( player, TEAM_IMC )

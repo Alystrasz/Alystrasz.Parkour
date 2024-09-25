@@ -68,7 +68,7 @@ void function PK_WorldLeaderboard_FetchScores()
 {
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = format("%s/v1/maps/%s/scores", PK_credentials.endpoint, PK_credentials.mapId)
+    request.url = format("%s/v1/routes/%s/scores", PK_credentials.endpoint, PK_credentials.routeId)
     table<string, array<string> > headers
     headers[ "authentication" ] <- [PK_credentials.secret]
     request.headers = headers
@@ -95,7 +95,7 @@ void function PK_SendWorldLeaderboardEntryToAPI( PK_LeaderboardEntry entry )
 {
     HttpRequest request
     request.method = HttpRequestMethod.POST
-    request.url = format("%s/v1/maps/%s/scores", PK_credentials.endpoint, PK_credentials.mapId )
+    request.url = format("%s/v1/routes/%s/scores", PK_credentials.endpoint, PK_credentials.routeId )
     table<string, array<string> > headers
     headers[ "authentication" ] <- [PK_credentials.secret]
     request.headers = headers

@@ -11,6 +11,7 @@ global function PK_InitializeMapConfiguration
 global struct PK_Credentials {
     string eventId = ""
     string mapId = ""
+    string routeId = ""
     string endpoint
     string secret
 }
@@ -157,6 +158,11 @@ void function LoadParkourMapConfiguration(table data)
         SetUpStartIndicator( startIndicatorOrigin, startIndicatorRadius )
 
         file.ziplines = expect array(data["ziplines"])
+
+        // Apply perks
+        table perks = expect table(data["perks"]);
+        PK_ApplyPerks( perks )
+
         PK_mapConfiguration.finishedFetchingData = true
     } catch (err) {
         print("Error while loading map configuration: " + err)
@@ -248,7 +254,6 @@ void function InitializeMapConfigurationFromFile()
     {
         table data = DecodeJSON(result)
         LoadParkourMapConfiguration( expect table(data["configuration"]) )
-        PK_ApplyPerks( expect table(data["perks"]) )
         PK_mapConfiguration.finishedFetchingData = true;
     }
     NSLoadFile(fileName, onFileLoad)
@@ -284,7 +289,7 @@ void function InitializeMapConfigurationFromAPI()
         WaitFrame()
     }
 
-    thread FetchMapConfigurationFromAPI()
+    thread FetchMapConfigurationsFromAPI()
 }
 
 
@@ -378,12 +383,7 @@ void function FindMapIdentifier()
             if ( map_name.find( mapName) != null ) {
                 print("==> Parkour map found!")
                 PK_credentials.mapId = expect string(map["id"])
-                thread PK_WorldLeaderboard_StartPeriodicFetching()
                 PK_has_api_access = true
-
-                table perks = expect table(map["perks"]);
-                PK_ApplyPerks( perks )
-
                 return;
             }
         }
@@ -405,7 +405,7 @@ void function FindMapIdentifier()
 
 
 /**
- * This method fetches the `maps` resource of the Parkour API to retrieve the map
+ * This method fetches the `routes` resource of the Parkour API to retrieve the map
  * configuration for the current match: where to spawn leaderboards and start/finish
  * lines, what are the checkpoints coordinates etc.
  *
@@ -413,20 +413,29 @@ void function FindMapIdentifier()
  *
  * If HTTP call fails, no further HTTP request will occur during the current match.
  **/
-void function FetchMapConfigurationFromAPI()
+void function FetchMapConfigurationsFromAPI()
 {
     HttpRequest request
     request.method = HttpRequestMethod.GET
-    request.url = format("%s/v1/maps/%s/configuration", PK_credentials.endpoint, PK_credentials.mapId)
+    request.url = format("%s/v1/maps/%s/routes", PK_credentials.endpoint, PK_credentials.mapId)
     table<string, array<string> > headers
     headers[ "authentication" ] <- [PK_credentials.secret]
     request.headers = headers
 
     void functionref( HttpRequestResponse ) onSuccess = void function ( HttpRequestResponse response )
     {
-        print("==> Parkour map configuration retrieved!")
-        table data = DecodeJSON(response.body)
-        LoadParkourMapConfiguration(data)
+        print("==> Parkour map configurations retrieved!")
+
+        string inputStr = "{\"data\":" + response.body + "}"
+        table data = DecodeJSON(inputStr)
+        array configurations = expect array(data["data"])
+
+        // todo: round-robin over configurations
+        table configuration = expect table(configurations[0])
+        PK_credentials.routeId = expect string(configuration["id"])
+
+        LoadParkourMapConfiguration(configuration)
+        thread PK_WorldLeaderboard_StartPeriodicFetching()
     }
 
     void functionref( HttpRequestFailure ) onFailure = void function ( HttpRequestFailure failure )

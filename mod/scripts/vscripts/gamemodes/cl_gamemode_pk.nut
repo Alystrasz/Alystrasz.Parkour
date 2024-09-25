@@ -29,6 +29,7 @@ struct {
 
     bool canTalktoRobot = false
     string endpoint = ""
+    string routeId = ""
 } file;
 
 
@@ -312,7 +313,7 @@ void function ServerCallback_PK_SetRobotTalkState( bool canTalk )
 void function ServerCallback_PK_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
-    RunUIScript( "Parkour_OpenRobotDialog", GetMapName(), file.endpoint )
+    RunUIScript( "Parkour_OpenRobotDialog", file.endpoint )
 }
 
 
