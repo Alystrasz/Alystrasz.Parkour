@@ -29,7 +29,6 @@ struct {
 
     bool canTalktoRobot = false
     string endpoint = ""
-    string routeId = ""
 } file;
 
 
