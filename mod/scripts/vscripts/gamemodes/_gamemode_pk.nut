@@ -54,6 +54,7 @@ void function PK_OnPlayerConnected(entity player)
 		// Save endpoint address, to send it to players on connection
 		table t = {}
 		t["url"] <- format( "%s?route=%s", GetConVarString("parkour_api_endpoint"), PK_credentials.routeId )
+		t["routeId"] <- PK_credentials.routeId
 		endpoint = EncodeJSON( t )
 	}
 

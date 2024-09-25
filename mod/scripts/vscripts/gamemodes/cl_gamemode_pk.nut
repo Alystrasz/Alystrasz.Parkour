@@ -35,6 +35,7 @@ struct {
 
     bool canTalktoRobot = false
     string endpoint = ""
+    string routeId = ""
 } file;
 
 
@@ -261,8 +262,14 @@ void function ServerCallback_PK_StopRun( float runDuration, bool isBestTime )
     // Update chronometer RUI
     if (isBestTime)
     {
-        RuiSetFloat( file.timerRUI, "bestTime", runDuration )
-        file.bestTime = runDuration
+        // Even if server thinks this is a match best time, locally stored PB could mean a better time was recorded
+        // in a previous match
+        if ( runDuration < file.bestTime )
+        {
+            file.bestTime = runDuration
+            RuiSetFloat( file.timerRUI, "bestTime", runDuration )
+            PK_StoreRouteBestTime( file.routeId, runDuration )
+        }
     }
     RuiSetBool( file.timerRUI, "runFinished", true )
 	RuiSetFloat( file.timerRUI, "finalTime", runDuration )
@@ -319,6 +326,23 @@ void function ServerCallback_SaveParkourEndpoint( array<string> args )
 {
     table endpoint = DecodeJSON( args[0] )
     file.endpoint = expect string( endpoint["url"] )
+    file.routeId = expect string( endpoint["routeId"] )
+    thread LoadPB()
+}
+
+void function LoadPB()
+{
+    // Retrieve local PB
+    float time = PK_GetRouteBestTime( file.routeId )
+    if ( time < 0)
+    {
+        print("=> No local PB found.")
+    }
+    else
+    {
+        print("=> Local PB found.")
+        file.bestTime = time
+    }
 }
 
 void function ServerCallback_PK_SetRobotTalkState( bool canTalk )

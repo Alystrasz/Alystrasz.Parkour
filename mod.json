@@ -50,6 +50,10 @@
             "RunOn": "CLIENT"
         },
         {
+            "Path": "client/cl_personal_best.nut",
+            "RunOn": "CLIENT"
+        },
+        {
             "Path": "utils/perks.nut",
             "RunOn": "SERVER"
         },
