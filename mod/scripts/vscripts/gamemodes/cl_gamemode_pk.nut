@@ -13,11 +13,17 @@ struct {
 
     table< int, entity > cache
 
+    // Starting/end lines
+    ParkourLine &startLine
+    ParkourLine &endLine
+
     var worldLeaderboard
     var leaderboard
     var timerRUI
     var splashStartRUI
     var splashEndRUI
+    var startLineRUI
+    var endLineRUI
     var newHighscoreRUI
 	var checkpointsCountRUI
     var startIndicatorRUI
@@ -94,6 +100,8 @@ void function DestroyRemainingRUIs()
     SafeDestroyRUI( file.nextCheckpointRui )
     SafeDestroyRUI( file.newHighscoreRUI )
     SafeDestroyRUI( file.checkpointsCountRUI )
+    SafeDestroyRUI( file.startLineRUI )
+    SafeDestroyRUI( file.endLineRUI )
 	HidePlayerHint("#RESET_RUN_HINT")
 }
 
@@ -143,6 +151,10 @@ void function StartRun( int checkpointsCount )
 
     // Reset hint message
     thread ShowResetHint()
+
+    // Spawn/despawn start+end lines
+    DespawnStartLine()
+    SpawnEndLine()
 }
 
 void function ShowResetHint()
@@ -155,6 +167,7 @@ void function ShowResetHint()
 void function ServerCallback_PK_ResetRun()
 {
     DestroyRemainingRUIs()
+    SpawnStartLine()
 	file.isRunning = false
 }
 
@@ -235,6 +248,10 @@ void function ServerCallback_PK_StopRun( float runDuration, bool isBestTime )
 
     SafeDestroyRUI( file.nextCheckpointRui )
     float stopRunRUIsDuration = 5
+
+    // Spawn/despawn start+end lines
+    SpawnStartLine()
+    DespawnEndLine()
 
     // Finish splash message
     file.splashEndRUI = RuiCreate( $"ui/gauntlet_splash.rpak", clGlobal.topoCockpitHud, RUI_DRAW_COCKPIT, 0 )
@@ -329,10 +346,16 @@ void function ServerCallback_CreateLine( array<string> args )
 {
     bool isStartLine = args[0] == "start"
     table data = DecodeJSON(args[1]);
-    ParkourLine line = PK_BuildParkourLine( data )
-	var topo = CreateTopology(line.origin, line.angles, line.dimensions[0].tofloat(), line.dimensions[1].tofloat())
-    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", isStartLine ? "#GAUNTLET_START_TEXT" : "#GAUNTLET_FINISH_TEXT" )
+    if ( isStartLine )
+    {
+        file.startLine = PK_BuildParkourLine( data )
+        if ( file.startLineRUI == null)
+            SpawnStartLine()
+    }
+    else
+    {
+        file.endLine = PK_BuildParkourLine( data )
+    }
 }
 
 void function ServerCallback_CreateLeaderboard( array<string> args )
@@ -369,4 +392,44 @@ void function ServerCallback_PK_CreateStartIndicator( int indicatorEntityHandle 
     RuiSetImage( file.startIndicatorRUI, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
     RuiSetString( file.startIndicatorRUI, "statusText", "#PARKOUR_START" )
     RuiTrackFloat3( file.startIndicatorRUI, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
+}
+
+
+/*
+██╗     ██╗███╗   ██╗███████╗███████╗
+██║     ██║████╗  ██║██╔════╝██╔════╝
+██║     ██║██╔██╗ ██║█████╗  ███████╗
+██║     ██║██║╚██╗██║██╔══╝  ╚════██║
+███████╗██║██║ ╚████║███████╗███████║
+╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝
+*/
+
+void function SpawnStartLine()
+{
+    var topo = CreateTopology(file.startLine.origin, file.startLine.angles, file.startLine.dimensions[0].tofloat(), file.startLine.dimensions[1].tofloat())
+    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
+    file.startLineRUI = startRui
+}
+
+void function SpawnEndLine()
+{
+    var topo = CreateTopology(file.endLine.origin, file.endLine.angles, file.endLine.dimensions[0].tofloat(), file.endLine.dimensions[1].tofloat())
+    var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
+    file.endLineRUI = endRui
+}
+
+void function DespawnStartLine()
+{
+    if ( file.startLineRUI != null )
+		RuiDestroyIfAlive( file.startLineRUI )
+	file.startLineRUI = null
+}
+
+void function DespawnEndLine()
+{
+    if ( file.endLineRUI != null )
+		RuiDestroyIfAlive( file.endLineRUI )
+	file.endLineRUI = null
 }
