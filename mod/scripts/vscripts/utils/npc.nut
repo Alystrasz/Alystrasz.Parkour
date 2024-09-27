@@ -32,6 +32,7 @@ void function PK_SpawnAmbientMarvin( vector origin, vector angles, int talkableR
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
         Remote_CallFunction_NonReplay( player, "ServerCallback_PK_SetRobotTalkState", false)
     })
+	DebugDrawCircleOnEnt( npc_marvin, talkableRadius.tofloat() + 6, 255, 255, 255, 10000.0 )
 
 	// Set robot as talkable to
 	npc_marvin.SetUsable()
