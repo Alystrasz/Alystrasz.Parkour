@@ -25,6 +25,7 @@ struct {
     var startLineRUI
     var endLineRUI
     var newHighscoreRUI
+    var resetHintRUI
 	var checkpointsCountRUI
     var startIndicatorRUI
     int startIndicatorTime = 0
@@ -103,7 +104,7 @@ void function DestroyRemainingRUIs()
     SafeDestroyRUI( file.checkpointsCountRUI )
     SafeDestroyRUI( file.startLineRUI )
     SafeDestroyRUI( file.endLineRUI )
-	HidePlayerHint("#RESET_RUN_HINT")
+    SafeDestroyRUI( file.resetHintRUI )
 }
 
 void function StartRun( int checkpointsCount )
@@ -151,18 +152,59 @@ void function StartRun( int checkpointsCount )
     RuiSetFloat2( file.checkpointsCountRUI, "offset", < 0, -250, 0 > )
 
     // Reset hint message
-    thread ShowResetHint()
+    thread ResetHintThink()
 
     // Spawn/despawn start+end lines
     DespawnStartLine()
     SpawnEndLine()
 }
 
-void function ShowResetHint()
+void function ResetHintThink()
 {
-    wait 5
-	if (file.isRunning)
-    	AddPlayerHint( 5.0, 0.5, $"", "#RESET_RUN_HINT" )
+    SafeDestroyRUI( file.resetHintRUI )
+    entity player = GetLocalViewPlayer()
+    int time = GetUnixTimestamp()
+    bool isMoving = true
+
+    while (GetGameState() <= eGameState.SuddenDeath)
+    {
+        if (!file.isRunning)
+            return
+        if ( !IsValid( player ) )
+            return
+
+        vector movement = player.GetVelocity()
+        if ( movement.x == 0 && movement.y == 0 )
+        {
+            if ( isMoving )
+            {
+                time = GetUnixTimestamp()
+                isMoving = false
+            }
+
+            if ( GetUnixTimestamp() - time >= 2 )
+                break
+        }
+        else
+        {
+            isMoving = true
+        }
+
+        WaitFrame()
+    }
+
+    // Don't show element on match end
+    if ( GetGameState() >= eGameState.SuddenDeath )
+        return
+
+    file.resetHintRUI = CreatePermanentCockpitRui( $"ui/death_hint_mp.rpak" )
+    RuiSetString( file.resetHintRUI, "hintText", Localize( "#RESET_RUN_HINT" ) )
+    RuiSetGameTime( file.resetHintRUI, "startTime", Time() )
+    RuiSetFloat3( file.resetHintRUI, "bgColor", < 0, 0, 0 > )
+    RuiSetFloat( file.resetHintRUI, "bgAlpha", 0.5 )
+
+    wait 7
+    SafeDestroyRUI( file.resetHintRUI )
 }
 
 void function ServerCallback_PK_ResetRun()
