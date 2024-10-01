@@ -253,7 +253,7 @@ void function InitializeMapConfigurationFromFile()
     void functionref( string ) onFileLoad = void function ( string result )
     {
         table data = DecodeJSON(result)
-        LoadParkourMapConfiguration( expect table(data["configuration"]) )
+        LoadParkourMapConfiguration( data )
         PK_mapConfiguration.finishedFetchingData = true;
     }
     NSLoadFile(fileName, onFileLoad)
