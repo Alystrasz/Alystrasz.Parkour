@@ -66,6 +66,7 @@ void function PK_OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitLine end " + PK_mapConfiguration.finishLineStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard local " + PK_mapConfiguration.localLeaderboardStr)
 	ServerToClientStringCommand( player, "ParkourInitLeaderboard world " + PK_mapConfiguration.worldLeaderboardStr)
+	ServerToClientStringCommand( player, "ParkourInitRouteName " + PK_mapConfiguration.routeNameStr)
 	ServerToClientStringCommand( player, "ParkourInitEndpoint " + endpoint )
 	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_CreateStartIndicator", PK_mapConfiguration.startIndicator.GetEncodedEHandle() )
 
