@@ -457,8 +457,12 @@ void function ServerCallback_CreateRouteName( array<string> args )
     array dimensions = expect array( data["dimensions"] )
 
     var topo = CreateTopology(origin, angles, expect int(dimensions[0]).tofloat(), expect int(dimensions[1]).tofloat())
-    var rui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( rui, "displayText", name )
+    var rui = RuiCreate( $"ui/big_button_hint.rpak", topo, RUI_DRAW_WORLD, 0 )
+    RuiSetString(rui, "msgText", name)
+    RuiSetString( rui, "msgTextPC", name )
+    RuiSetFloat(rui, "duration", 10000)
+    RuiSetGameTime(rui, "startTime", Time())
+    RuiSetFloat(rui, "msgFontSize", 550)
 }
 
 void function ServerCallback_PK_CreateStartIndicator( int indicatorEntityHandle )
