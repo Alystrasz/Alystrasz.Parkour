@@ -30,6 +30,7 @@ global struct PK_MapConfiguration {
     string finishLineStr
     string localLeaderboardStr
     string worldLeaderboardStr
+    string routeNameStr
 }
 global PK_MapConfiguration PK_mapConfiguration
 
@@ -152,6 +153,12 @@ void function LoadParkourMapConfiguration(table data)
         PK_mapConfiguration.finishLineStr = EncodeJSON(finishLineData)
         PK_mapConfiguration.localLeaderboardStr = EncodeJSON(localLeaderboardData)
         PK_mapConfiguration.worldLeaderboardStr = EncodeJSON(worldLeaderboardData)
+
+        // Serialize route name
+        string routeName = expect string(data["name"])
+        table routeNameData = expect table(data["route_name"])
+        routeNameData["name"] <- routeName
+        PK_mapConfiguration.routeNameStr = EncodeJSON(routeNameData)
 
         // Robot
         table robotData = expect table(data["robot"])

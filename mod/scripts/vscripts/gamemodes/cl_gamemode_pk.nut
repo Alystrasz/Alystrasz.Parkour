@@ -70,6 +70,7 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
+    AddServerToClientStringCommandCallback( "ParkourInitRouteName", ServerCallback_CreateRouteName )
     AddServerToClientStringCommandCallback( "ParkourInitEndpoint", ServerCallback_SaveParkourEndpoint )
 
     // hide boost progress
@@ -445,6 +446,23 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 	topo = CreateTopology(pl.sourceOrigin, pl.sourceAngles, pl.sourceDimensions[0].tofloat(), pl.sourceDimensions[1].tofloat())
     rui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
+}
+
+void function ServerCallback_CreateRouteName( array<string> args )
+{
+    table data = DecodeJSON(args[0]);
+    string name = expect string(data["name"])
+    vector origin = PK_ArrayToFloatVector( expect array(data["origin"]) )
+    vector angles = PK_ArrayToIntVector( expect array(data["angles"]) )
+    array dimensions = expect array( data["dimensions"] )
+
+    var topo = CreateTopology(origin, angles, expect int(dimensions[0]).tofloat(), expect int(dimensions[1]).tofloat())
+    var rui = RuiCreate( $"ui/big_button_hint.rpak", topo, RUI_DRAW_WORLD, 0 )
+    RuiSetString(rui, "msgText", name)
+    RuiSetString( rui, "msgTextPC", name )
+    RuiSetFloat(rui, "duration", 10000)
+    RuiSetGameTime(rui, "startTime", Time())
+    RuiSetFloat(rui, "msgFontSize", 550)
 }
 
 void function ServerCallback_PK_CreateStartIndicator( int indicatorEntityHandle )
