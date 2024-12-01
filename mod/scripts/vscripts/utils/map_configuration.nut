@@ -1,4 +1,5 @@
 global function PK_InitializeMapConfiguration
+global function DebugPK_GetEntity
 
 /**
  * This global object holds parkour API information needed to interact
@@ -53,6 +54,7 @@ struct {
     vector endMaxs
     array ziplines
     array<MapEntity> entities
+    entity lastSpawnedProp
 } file;
 
 /**
@@ -263,7 +265,13 @@ void function SpawnEntities()
         prop.SetScriptPropFlags( SPF_BLOCKS_AI_NAVIGATION | SPF_CUSTOM_SCRIPT_3 )
         prop.AllowMantle()
         DispatchSpawn( prop )
+        file.lastSpawnedProp = prop
     }
+}
+
+entity function DebugPK_GetEntity()
+{
+    return file.lastSpawnedProp
 }
 
 
