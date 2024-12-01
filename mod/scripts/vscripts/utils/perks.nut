@@ -6,6 +6,7 @@ global struct PK_Perks {
 	string weapon = ""
 	string grenade = ""
 	int kit = -1 // numerical value of the passive ability
+	bool floorIsLava = false
 }
 global PK_Perks PK_perks
 
@@ -36,6 +37,12 @@ void function PK_ApplyPerks( table tPerks ) {
 		string kit = expect string(tPerks["kit"])
 		print(format("Applying kit perk (%s)", kit))
 		PK_perks.kit = kit.tointeger()
+	}
+
+	if ("floor_is_lava" in tPerks) {
+		PK_perks.floorIsLava = true
+		print("Applying floor_is_lava perk")
+		RiffFloorIsLava_Init()
 	}
 }
 

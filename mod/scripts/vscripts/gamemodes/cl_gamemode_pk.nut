@@ -2,6 +2,7 @@ global function Cl_Parkour_Init
 global function ServerCallback_PK_UpdateNextCheckpointMarker
 global function ServerCallback_PK_StopRun
 global function ServerCallback_PK_ResetRun
+global function ServerCallback_PK_ApplyClientsidePerks
 global function ServerCallback_PK_SetRobotTalkState
 global function ServerCallback_PK_TalkToRobot
 global function ServerCallback_PK_CreateStartIndicator
@@ -75,6 +76,21 @@ void function Cl_Parkour_Init()
 
     // hide boost progress
     Cl_GGEarnMeter_Init(ClGamemodePK_GetWeaponIcon, ClGamemodePK_ShouldChangeWeaponIcon)
+
+    // register callbacks to prepare eventual perks
+    AddCreateCallback( "player", FloorIsLavaPlayerCreated )
+}
+
+void function FloorIsLavaPlayerCreated( entity player )
+{
+    table s = expect table(player.s)
+    s.inLavaFog <- false
+}
+
+// No arguments for now, until we need some.
+void function ServerCallback_PK_ApplyClientsidePerks()
+{
+    ClRiffFloorIsLava_Init()
 }
 
 asset function ClGamemodePK_GetWeaponIcon()

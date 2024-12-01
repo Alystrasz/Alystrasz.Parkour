@@ -70,6 +70,11 @@ void function PK_OnPlayerConnected(entity player)
 	ServerToClientStringCommand( player, "ParkourInitEndpoint " + endpoint )
 	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_CreateStartIndicator", PK_mapConfiguration.startIndicator.GetEncodedEHandle() )
 
+	// Apply clientside perks
+	if (PK_perks.floorIsLava) {
+		Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ApplyClientsidePerks" )
+	}
+
 	PK_UpdatePlayerLeaderboard( player, 0 )
 	PK_UpdatePlayerLeaderboard( player, 0, true )
 
