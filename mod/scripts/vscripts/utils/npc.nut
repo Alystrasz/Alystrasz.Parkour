@@ -23,6 +23,11 @@ void function PK_SpawnAmbientMarvin( vector origin, vector angles, int talkableR
 	info_target.SetAngles( angles )
 
     thread PlayAnim( npc_marvin, animation, info_target, null, 0.6 )
+	// sad marvin
+	if ( animation == "mv_arctool_steal_endidle" )
+	{
+		npc_marvin.SetSkin(2)
+	}
 
 	// Check if player is close to robot
     entity trigger = CreateTriggerRadiusMultiple( origin, talkableRadius.tofloat() + 6, [], TRIG_FLAG_PLAYERONLY, 80, -80)

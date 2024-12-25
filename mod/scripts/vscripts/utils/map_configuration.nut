@@ -1,4 +1,5 @@
 global function PK_InitializeMapConfiguration
+global function DebugPK_GetEntity
 
 /**
  * This global object holds parkour API information needed to interact
@@ -34,6 +35,13 @@ global struct PK_MapConfiguration {
 }
 global PK_MapConfiguration PK_mapConfiguration
 
+struct MapEntity {
+    string model_name
+    int scale
+    vector coordinates
+    vector angles
+}
+
 /**
  * This object stores start and finish triggers plus ziplines coordinates.
  * Those are used to spawn related entities after map configuration fetching
@@ -45,6 +53,8 @@ struct {
     vector endMins
     vector endMaxs
     array ziplines
+    array<MapEntity> entities
+    entity lastSpawnedProp
 } file;
 
 /**
@@ -84,6 +94,7 @@ void function PK_InitializeMapConfiguration()
     // Set up world
 	PK_SpawnCheckpoints( file.startMins, file.startMaxs, file.endMins, file.endMaxs )
     SpawnZiplines( file.ziplines )
+    SpawnEntities()
     PK_SpawnAmbientMarvin( robot.origin, robot.angles, robot.talkableRadius, robot.animation )
 
     // Init players
@@ -164,7 +175,20 @@ void function LoadParkourMapConfiguration(table data)
         int startIndicatorRadius = expect int(startIndicator["trigger_radius"])
         SetUpStartIndicator( startIndicatorOrigin, startIndicatorRadius )
 
+        // Store object references
         file.ziplines = expect array(data["ziplines"])
+        array entities = expect array(data["entities"])
+        foreach(ent in entities)
+        {
+            MapEntity me
+            table raw_ent = expect table(ent)
+            me.model_name = expect string(raw_ent.model_name)
+            me.scale = expect int(raw_ent.scale)
+            me.coordinates = PK_ArrayToFloatVector( expect array(raw_ent.coordinates) )
+            me.angles = PK_ArrayToFloatVector( expect array(raw_ent.angles) )
+            PrecacheModel( StringToAsset( me.model_name ) )
+            file.entities.append(me)
+        }
 
         // Apply perks
         table perks = expect table(data["perks"]);
@@ -217,6 +241,37 @@ void function SpawnZiplines( array coordinates )
         array endCoordinates = expect array(zipline[1])
 		CreateZipline( PK_ArrayToFloatVector(startCoordinates), PK_ArrayToFloatVector(endCoordinates) )
 	}
+}
+
+/**
+ * Spawns stuff on the map (thanks Zanieon for that!).
+ **/
+void function SpawnEntities()
+{
+    foreach(obj in file.entities)
+    {
+        entity prop = CreateEntity( "prop_script" )
+        prop.SetValueForModelKey( StringToAsset( obj.model_name ) )
+        prop.SetOrigin( obj.coordinates )
+        prop.SetAngles( obj.angles )
+        prop.kv.modelscale = obj.scale
+        prop.kv.fadedist = -1
+        prop.kv.renderamt = 255
+        prop.kv.rendercolor = "255 255 255"
+        prop.kv.solid = 6
+        ToggleNPCPathsForEntity( prop, false )
+        prop.SetAIObstacle( true )
+        prop.SetTakeDamageType( DAMAGE_NO )
+        prop.SetScriptPropFlags( SPF_BLOCKS_AI_NAVIGATION | SPF_CUSTOM_SCRIPT_3 )
+        prop.AllowMantle()
+        DispatchSpawn( prop )
+        file.lastSpawnedProp = prop
+    }
+}
+
+entity function DebugPK_GetEntity()
+{
+    return file.lastSpawnedProp
 }
 
 
