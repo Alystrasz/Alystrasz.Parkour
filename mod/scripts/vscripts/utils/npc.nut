@@ -39,8 +39,8 @@ void function PK_SpawnAmbientMarvin( vector origin, vector angles, int talkableR
     })
 
 	// Set robot as talkable to
-	npc_marvin.SetUsable()
+	/*npc_marvin.SetUsable()
 	npc_marvin.SetUsableRadius( talkableRadius )
 	npc_marvin.AddUsableValue( USABLE_BY_PILOTS | USABLE_HINT_ONLY )
-	npc_marvin.SetUsePrompts( "#ROBOT_INTERACTION_PROMPT", "#ROBOT_INTERACTION_PROMPT" )
+	npc_marvin.SetUsePrompts( "#ROBOT_INTERACTION_PROMPT", "#ROBOT_INTERACTION_PROMPT" )*/
 }

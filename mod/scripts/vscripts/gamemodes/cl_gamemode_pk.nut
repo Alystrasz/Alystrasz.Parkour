@@ -407,6 +407,14 @@ void function LoadPB()
 void function ServerCallback_PK_SetRobotTalkState( bool canTalk )
 {
     file.canTalktoRobot = canTalk
+    if ( canTalk )
+    {
+        AddPlayerHint( 1800.0, 0.25, $"", "#ROBOT_INTERACTION_PROMPT" )
+    }
+    else
+    {
+        HidePlayerHint( "#ROBOT_INTERACTION_PROMPT" )
+    }
 }
 
 void function ServerCallback_PK_TalkToRobot()
