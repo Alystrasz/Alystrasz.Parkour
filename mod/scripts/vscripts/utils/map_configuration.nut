@@ -40,6 +40,7 @@ struct MapEntity {
     int scale
     vector coordinates
     vector angles
+    bool hidden
 }
 
 /**
@@ -186,6 +187,13 @@ void function LoadParkourMapConfiguration(table data)
             me.scale = expect int(raw_ent.scale)
             me.coordinates = PK_ArrayToFloatVector( expect array(raw_ent.coordinates) )
             me.angles = PK_ArrayToFloatVector( expect array(raw_ent.angles) )
+
+            me.hidden = false
+            if ( "hidden" in raw_ent && expect bool(raw_ent["hidden"]) == true )
+            {
+                me.hidden = true
+            }
+
             PrecacheModel( StringToAsset( me.model_name ) )
             file.entities.append(me)
         }
@@ -265,6 +273,12 @@ void function SpawnEntities()
         prop.SetScriptPropFlags( SPF_BLOCKS_AI_NAVIGATION | SPF_CUSTOM_SCRIPT_3 )
         prop.AllowMantle()
         DispatchSpawn( prop )
+
+        if ( obj.hidden )
+        {
+            prop.Hide()
+        }
+
         file.lastSpawnedProp = prop
     }
 }
