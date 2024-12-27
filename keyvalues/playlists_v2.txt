@@ -56,6 +56,7 @@ playlists
                         mp_thaw 1
 						mp_angel_city 1
 						mp_wargames 1
+						mp_lf_deck 1
 						mp_lf_traffic 1
 					}
 				}

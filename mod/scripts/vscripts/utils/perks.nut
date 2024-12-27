@@ -6,6 +6,7 @@ global struct PK_Perks {
 	string weapon = ""
 	string grenade = ""
 	int kit = -1 // numerical value of the passive ability
+	bool floorIsLava = false
 }
 global PK_Perks PK_perks
 
@@ -37,6 +38,41 @@ void function PK_ApplyPerks( table tPerks ) {
 		print(format("Applying kit perk (%s)", kit))
 		PK_perks.kit = kit.tointeger()
 	}
+
+	if ("floor_is_lava" in tPerks) {
+		print("Applying floor_is_lava perk")
+		PK_perks.floorIsLava = true
+
+		// In original "floor is lava" riff (located in
+		// `Northstar.CustomServers/mod/scripts/vscripts/gamemodes/_riff_floor_is_lava.nut`),
+		// fog is set up through a `AddSpawnCallback` call:
+		//
+		//		AddSpawnCallback( "env_fog_controller", InitLavaFogController )
+		//
+		// however in this mod, `PK_ApplyPerks` is called after `env_fog_controller` entities
+		// are created, meaning we have to call `InitLavaFogController` ourselves on each
+		// spawned `env_fog_controller` entity.
+		foreach ( entity fogController in GetEntArrayByClass_Expensive("env_fog_controller") )
+		{
+			InitLavaFogController( fogController )
+		}
+
+		RiffFloorIsLava_Init()
+	}
+}
+
+// Imported from Northstar.CustomServers/mod/scripts/vscripts/gamemodes/_riff_floor_is_lava.nut
+void function InitLavaFogController( entity fogController )
+{
+	fogController.kv.fogztop = GetVisibleFogTop()
+	fogController.kv.fogzbottom = GetVisibleFogBottom()
+	fogController.kv.foghalfdisttop = "60000"
+	fogController.kv.foghalfdistbottom = "200"
+	fogController.kv.fogdistoffset = "0"
+	fogController.kv.fogdensity = "1.25"
+
+	fogController.kv.forceontosky = true
+	//fogController.kv.foghalfdisttop = "10000"
 }
 
 /**
