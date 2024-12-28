@@ -234,6 +234,12 @@ void function SetUpStartIndicator( vector origin, int triggerRadius )
             Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", true )
         }
     })
+
+    // Debugging
+    // Height is indicative here, as `trigger` has infinite height
+    float cylinderHeight = 800.0
+    DebugDrawCylinder( <origin.x, origin.y, origin.z - cylinderHeight>, <90, 0, 0>, triggerRadius.tofloat(), -2*cylinderHeight, 80, 80, 255, true, 10000.0 )
+    DebugDrawSphere( origin, 25.0, 80, 80, 255, true, 10000.0 )
 }
 
 

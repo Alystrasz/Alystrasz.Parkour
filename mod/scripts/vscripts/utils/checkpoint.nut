@@ -68,6 +68,10 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
         callback(player)
     })
 
+	// Debugging
+    float cylinderHeight = 160.0
+    DebugDrawCylinder( <origin.x, origin.y, origin.z + cylinderHeight>, <90, 0, 0>, 140.0, cylinderHeight, 0, 255, 0, true, 10000.0 )
+
     return point
 }
 
@@ -80,6 +84,9 @@ entity function CreateCheckpoint(vector origin, void functionref(entity) callbac
 void function SpawnStartTrigger( vector volumeMins, vector volumeMaxs )
 {
 	int checkpointsCount = PK_checkpoints.len()-1
+
+	// Debugging
+	DebugDrawBox( <0,0,0>, volumeMins, volumeMaxs, 255, 0, 0, 10, 10000.0 )
 
 	while (GetGameState() <= eGameState.SuddenDeath)
 	{
@@ -121,6 +128,11 @@ entity function SpawnEndTrigger( vector origin, vector volumeMins, vector volume
     point.Hide()
     DispatchSpawn( point )
     thread FinishTriggerThink(volumeMins, volumeMaxs)
+
+	// Debugging
+	DebugDrawBox( origin, volumeMins - origin, volumeMaxs - origin, 255, 255, 0, 10, 10000.0 )
+	DebugDrawSphere( origin, 25.0, 255, 255, 0, true, 10000.0 )
+
     return point
 }
 
