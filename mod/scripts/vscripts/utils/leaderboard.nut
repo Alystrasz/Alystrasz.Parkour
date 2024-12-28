@@ -1,8 +1,8 @@
-global function StoreNewLeaderboardEntry
-global function UpdatePlayersLeaderboard
-global function UpdatePlayerLeaderboard
+global function PK_StoreNewLeaderboardEntry
+global function PK_UpdatePlayersLeaderboard
+global function PK_UpdatePlayerLeaderboard
 
-global struct LeaderboardEntry
+global struct PK_LeaderboardEntry
 {
 	string playerName
 	float time
@@ -19,7 +19,7 @@ global struct LeaderboardEntry
  * sending whole leaderboard on new score registration that's not the best time
  * of the match.
  **/
-void function StoreNewLeaderboardEntry( entity player, float duration )
+void function PK_StoreNewLeaderboardEntry( entity player, float duration )
 {
 	print("New time for " + player.GetPlayerName() + ": " + duration)
 	int insertionIndex = 0
@@ -29,7 +29,7 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 	// Check if new entry will fit leaderboard
 	{
 		// Check if there's a previous time (and if player improved his time)
-		foreach (LeaderboardEntry entry in leaderboard)
+		foreach (PK_LeaderboardEntry entry in PK_leaderboard)
 		{
 			if (entry.playerName == player.GetPlayerName())
 			{
@@ -40,13 +40,13 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 		}
 
 		// If leaderboard is not full, new entry will fit
-		if (leaderboard.len() < 10)
+		if (PK_leaderboard.len() < 10)
 			leaderboardNeedsUpdating = true
 
 		// Check if input time should appear in leaderboard
-		if (!leaderboardNeedsUpdating && leaderboard.len() >= 10)
+		if (!leaderboardNeedsUpdating && PK_leaderboard.len() >= 10)
 		{
-			float lastTime = leaderboard[9].time
+			float lastTime = PK_leaderboard[9].time
 			if (duration < lastTime)
 			{
 				leaderboardNeedsUpdating = true
@@ -62,20 +62,20 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 
 		// Remove eventual previous player entry
 		array<string> entriesNames = []
-		foreach (LeaderboardEntry entry in leaderboard) {
+		foreach (PK_LeaderboardEntry entry in PK_leaderboard) {
 			entriesNames.append( entry.playerName )
 		}
 		int playerIndex = entriesNames.find( player.GetPlayerName() )
 		if (playerIndex != -1)
-			leaderboard.remove( playerIndex )
+			PK_leaderboard.remove( playerIndex )
 
 		// Add actual entry
-		LeaderboardEntry entry = { ... }
+		PK_LeaderboardEntry entry = { ... }
 		entry.playerName = player.GetPlayerName()
 		entry.time = duration
-		leaderboard.append( entry )
+		PK_leaderboard.append( entry )
 
-		leaderboard.sort(int function(LeaderboardEntry a, LeaderboardEntry b) {
+		PK_leaderboard.sort(int function(PK_LeaderboardEntry a, PK_LeaderboardEntry b) {
 			if (a.time > b.time) return 1
 			else if (b.time < a.time) return -1
 			return 0;
@@ -83,7 +83,7 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 
 		// Update insertionIndex
 		entriesNames = []
-		foreach (LeaderboardEntry entry in leaderboard) {
+		foreach (PK_LeaderboardEntry entry in PK_leaderboard) {
 			entriesNames.append( entry.playerName )
 		}
 		insertionIndex = entriesNames.find( player.GetPlayerName() )
@@ -91,31 +91,31 @@ void function StoreNewLeaderboardEntry( entity player, float duration )
 
 		// Update player stats
 		if (insertionIndex <= 2)
-			AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
+			PK_AddPlayerParkourStat(player, ePlayerParkourStatType.Top3_scores)
 
 		// Send new score to API
 		// If score should appear in world scoreboard, refresh world scoreboard
-		if ( has_api_access ) {
-			SendWorldLeaderboardEntryToAPI( entry )
+		if ( PK_has_api_access ) {
+			PK_SendWorldLeaderboardEntryToAPI( entry )
 
-			int length = worldLeaderboard.len()
-			if (length < 10 || entry.time < worldLeaderboard[length-1].time ) {
+			int length = PK_worldLeaderboard.len()
+			if (length < 10 || entry.time < PK_worldLeaderboard[length-1].time ) {
 				// Leave some time to API to store new score
 				wait 1
 				print("Forcing world scores updating.")
-				WorldLeaderboard_FetchScores()
+				PK_WorldLeaderboard_FetchScores()
 			}
 		}
 	}
 
-	UpdatePlayersLeaderboard( insertionIndex )
+	PK_UpdatePlayersLeaderboard( insertionIndex )
 }
 
 /**
  * If a new time enters the leaderboard, we don't need to send all 10 entries to all players
  * (if new entry has 7th position, we only need to send 7th, 8th, 9th and 10th entries for instance).
  **/
-void function UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderboard = false )
+void function PK_UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderboard = false )
 {
 	foreach(player in GetPlayerArray())
 	{
@@ -123,20 +123,20 @@ void function UpdatePlayersLeaderboard( int startIndex, bool updateWorldLeaderbo
 			continue
 		}
 		
-		UpdatePlayerLeaderboard( player, startIndex, updateWorldLeaderboard )
+		PK_UpdatePlayerLeaderboard( player, startIndex, updateWorldLeaderboard )
 	}
 }
 
-void function UpdatePlayerLeaderboard( entity player, int startIndex, bool updateWorldLeaderboard = false )
+void function PK_UpdatePlayerLeaderboard( entity player, int startIndex, bool updateWorldLeaderboard = false )
 {
-	array<LeaderboardEntry> board = updateWorldLeaderboard ? worldLeaderboard : leaderboard;
+	array<PK_LeaderboardEntry> board = updateWorldLeaderboard ? PK_worldLeaderboard : PK_leaderboard;
 
 	for (int i=startIndex; i<board.len(); i++)
 	{
 		// Leaderboard RUI has 10 entries only
 		if (i >= 10) return;
 
-		LeaderboardEntry entry = board[i]
+		PK_LeaderboardEntry entry = board[i]
 		ServerToClientStringCommand( player, "ParkourUpdateLeaderboard " + entry.playerName + " " + entry.time + " " + i + " " + (updateWorldLeaderboard ? 1 : 0).tostring())
 	}
 }

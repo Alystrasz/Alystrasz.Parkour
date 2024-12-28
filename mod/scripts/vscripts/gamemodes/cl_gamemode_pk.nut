@@ -1,11 +1,12 @@
 global function Cl_Parkour_Init
-global function ServerCallback_UpdateNextCheckpointMarker
-global function ServerCallback_StopRun
-global function ServerCallback_ResetRun
-global function ServerCallback_SetRobotTalkState
-global function ServerCallback_TalkToRobot
-global function ServerCallback_CreateStartIndicator
-global function ServerCallback_ToggleStartIndicatorDisplay
+global function ServerCallback_PK_UpdateNextCheckpointMarker
+global function ServerCallback_PK_StopRun
+global function ServerCallback_PK_ResetRun
+global function ServerCallback_PK_ApplyClientsidePerks
+global function ServerCallback_PK_SetRobotTalkState
+global function ServerCallback_PK_TalkToRobot
+global function ServerCallback_PK_CreateStartIndicator
+global function ServerCallback_PK_ToggleStartIndicatorDisplay
 
 struct {
     entity mover
@@ -13,12 +14,19 @@ struct {
 
     table< int, entity > cache
 
+    // Starting/end lines
+    ParkourLine &startLine
+    ParkourLine &endLine
+
     var worldLeaderboard
     var leaderboard
     var timerRUI
     var splashStartRUI
     var splashEndRUI
+    var startLineRUI
+    var endLineRUI
     var newHighscoreRUI
+    var resetHintRUI
 	var checkpointsCountRUI
     var startIndicatorRUI
     int startIndicatorTime = 0
@@ -29,6 +37,7 @@ struct {
 
     bool canTalktoRobot = false
     string endpoint = ""
+    string routeId = ""
 } file;
 
 
@@ -62,10 +71,26 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourUpdateLeaderboard", ServerCallback_UpdateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitLine", ServerCallback_CreateLine )
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
+    AddServerToClientStringCommandCallback( "ParkourInitRouteName", ServerCallback_CreateRouteName )
     AddServerToClientStringCommandCallback( "ParkourInitEndpoint", ServerCallback_SaveParkourEndpoint )
 
     // hide boost progress
     Cl_GGEarnMeter_Init(ClGamemodePK_GetWeaponIcon, ClGamemodePK_ShouldChangeWeaponIcon)
+
+    // register callbacks to prepare eventual perks
+    AddCreateCallback( "player", FloorIsLavaPlayerCreated )
+}
+
+void function FloorIsLavaPlayerCreated( entity player )
+{
+    table s = expect table(player.s)
+    s.inLavaFog <- false
+}
+
+// No arguments for now, until we need some.
+void function ServerCallback_PK_ApplyClientsidePerks()
+{
+    ClRiffFloorIsLava_Init()
 }
 
 asset function ClGamemodePK_GetWeaponIcon()
@@ -94,7 +119,9 @@ void function DestroyRemainingRUIs()
     SafeDestroyRUI( file.nextCheckpointRui )
     SafeDestroyRUI( file.newHighscoreRUI )
     SafeDestroyRUI( file.checkpointsCountRUI )
-	HidePlayerHint("#RESET_RUN_HINT")
+    SafeDestroyRUI( file.startLineRUI )
+    SafeDestroyRUI( file.endLineRUI )
+    SafeDestroyRUI( file.resetHintRUI )
 }
 
 void function StartRun( int checkpointsCount )
@@ -142,19 +169,65 @@ void function StartRun( int checkpointsCount )
     RuiSetFloat2( file.checkpointsCountRUI, "offset", < 0, -250, 0 > )
 
     // Reset hint message
-    thread ShowResetHint()
+    thread ResetHintThink()
+
+    // Spawn/despawn start+end lines
+    DespawnStartLine()
+    SpawnEndLine()
 }
 
-void function ShowResetHint()
+void function ResetHintThink()
 {
-    wait 5
-	if (file.isRunning)
-    	AddPlayerHint( 5.0, 0.5, $"", "#RESET_RUN_HINT" )
+    SafeDestroyRUI( file.resetHintRUI )
+    entity player = GetLocalViewPlayer()
+    int time = GetUnixTimestamp()
+    bool isMoving = true
+
+    while (GetGameState() <= eGameState.SuddenDeath)
+    {
+        if (!file.isRunning)
+            return
+        if ( !IsValid( player ) )
+            return
+
+        vector movement = player.GetVelocity()
+        if ( movement.x == 0 && movement.y == 0 )
+        {
+            if ( isMoving )
+            {
+                time = GetUnixTimestamp()
+                isMoving = false
+            }
+
+            if ( GetUnixTimestamp() - time >= 2 )
+                break
+        }
+        else
+        {
+            isMoving = true
+        }
+
+        WaitFrame()
+    }
+
+    // Don't show element on match end
+    if ( GetGameState() >= eGameState.SuddenDeath )
+        return
+
+    file.resetHintRUI = CreatePermanentCockpitRui( $"ui/death_hint_mp.rpak" )
+    RuiSetString( file.resetHintRUI, "hintText", Localize( "#RESET_RUN_HINT" ) )
+    RuiSetGameTime( file.resetHintRUI, "startTime", Time() )
+    RuiSetFloat3( file.resetHintRUI, "bgColor", < 0, 0, 0 > )
+    RuiSetFloat( file.resetHintRUI, "bgAlpha", 0.5 )
+
+    wait 7
+    SafeDestroyRUI( file.resetHintRUI )
 }
 
-void function ServerCallback_ResetRun()
+void function ServerCallback_PK_ResetRun()
 {
     DestroyRemainingRUIs()
+    SpawnStartLine()
 	file.isRunning = false
 }
 
@@ -207,7 +280,7 @@ void function ShowNewHighscoreMessage( string playerName, float playerTime )
     SafeDestroyRUI( file.newHighscoreRUI )
 }
 
-void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, int checkpointIndex, int totalCheckpointsCount )
+void function ServerCallback_PK_UpdateNextCheckpointMarker ( int checkpointHandle, int checkpointIndex, int totalCheckpointsCount )
 {
 	entity checkpoint = GetEntityFromEncodedEHandle( checkpointHandle )
 	if (!IsValid(checkpoint))
@@ -228,13 +301,17 @@ void function ServerCallback_UpdateNextCheckpointMarker ( int checkpointHandle, 
     RuiTrackFloat3( file.nextCheckpointRui, "pos", checkpoint, RUI_TRACK_OVERHEAD_FOLLOW )
 }
 
-void function ServerCallback_StopRun( float runDuration, bool isBestTime )
+void function ServerCallback_PK_StopRun( float runDuration, bool isBestTime )
 {
     file.isRunning = false
 	thread DestroyCheckpointsCountRUI()
 
     SafeDestroyRUI( file.nextCheckpointRui )
     float stopRunRUIsDuration = 5
+
+    // Spawn/despawn start+end lines
+    SpawnStartLine()
+    DespawnEndLine()
 
     // Finish splash message
     file.splashEndRUI = RuiCreate( $"ui/gauntlet_splash.rpak", clGlobal.topoCockpitHud, RUI_DRAW_COCKPIT, 0 )
@@ -244,8 +321,14 @@ void function ServerCallback_StopRun( float runDuration, bool isBestTime )
     // Update chronometer RUI
     if (isBestTime)
     {
-        RuiSetFloat( file.timerRUI, "bestTime", runDuration )
-        file.bestTime = runDuration
+        // Even if server thinks this is a match best time, locally stored PB could mean a better time was recorded
+        // in a previous match
+        if ( runDuration < file.bestTime )
+        {
+            file.bestTime = runDuration
+            RuiSetFloat( file.timerRUI, "bestTime", runDuration )
+            PK_StoreRouteBestTime( file.routeId, runDuration )
+        }
     }
     RuiSetBool( file.timerRUI, "runFinished", true )
 	RuiSetFloat( file.timerRUI, "finalTime", runDuration )
@@ -270,7 +353,7 @@ void function DestroyCheckpointsCountRUI()
     SafeDestroyRUI( file.checkpointsCountRUI )
 }
 
-void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
+void function ServerCallback_PK_ToggleStartIndicatorDisplay( bool show )
 {
     RuiSetBool( file.startIndicatorRUI, "isVisible", show )
     if (show) {
@@ -279,7 +362,7 @@ void function ServerCallback_ToggleStartIndicatorDisplay( bool show )
         // Only display warning message once every two minutes
         int now = GetUnixTimestamp()
         if ( show && now - file.startIndicatorTime > 120) {
-            string prefix = format("\x1b[93m%s:\x1b[0m ", ROBOT_NAME)
+            string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
             string message = Localize("#ROBOT_LOST_PLAYER", GetLocalClientPlayer().GetPlayerName())
             Chat_GameWriteLine(prefix + message)
             file.startIndicatorTime = GetUnixTimestamp()
@@ -302,17 +385,42 @@ void function ServerCallback_SaveParkourEndpoint( array<string> args )
 {
     table endpoint = DecodeJSON( args[0] )
     file.endpoint = expect string( endpoint["url"] )
+    file.routeId = expect string( endpoint["routeId"] )
+    thread LoadPB()
 }
 
-void function ServerCallback_SetRobotTalkState( bool canTalk )
+void function LoadPB()
+{
+    // Retrieve local PB
+    float time = PK_GetRouteBestTime( file.routeId )
+    if ( time < 0)
+    {
+        print("=> No local PB found.")
+    }
+    else
+    {
+        print("=> Local PB found.")
+        file.bestTime = time
+    }
+}
+
+void function ServerCallback_PK_SetRobotTalkState( bool canTalk )
 {
     file.canTalktoRobot = canTalk
+    if ( canTalk )
+    {
+        AddPlayerHint( 1800.0, 0.25, $"", "#ROBOT_INTERACTION_PROMPT" )
+    }
+    else
+    {
+        HidePlayerHint( "#ROBOT_INTERACTION_PROMPT" )
+    }
 }
 
-void function ServerCallback_TalkToRobot()
+void function ServerCallback_PK_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
-    RunUIScript( "Parkour_OpenRobotDialog", GetMapName(), file.endpoint )
+    RunUIScript( "Parkour_OpenRobotDialog", file.endpoint )
 }
 
 
@@ -329,17 +437,23 @@ void function ServerCallback_CreateLine( array<string> args )
 {
     bool isStartLine = args[0] == "start"
     table data = DecodeJSON(args[1]);
-    ParkourLine line = BuildParkourLine( data )
-	var topo = CreateTopology(line.origin, line.angles, line.dimensions[0].tofloat(), line.dimensions[1].tofloat())
-    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", isStartLine ? "#GAUNTLET_START_TEXT" : "#GAUNTLET_FINISH_TEXT" )
+    if ( isStartLine )
+    {
+        file.startLine = PK_BuildParkourLine( data )
+        if ( file.startLineRUI == null)
+            SpawnStartLine()
+    }
+    else
+    {
+        file.endLine = PK_BuildParkourLine( data )
+    }
 }
 
 void function ServerCallback_CreateLeaderboard( array<string> args )
 {
     bool isLocalLeaderboard = args[0] == "local"
     table data = DecodeJSON(args[1]);
-    ParkourLeaderboard pl = BuildParkourLeaderboard( data )
+    ParkourLeaderboard pl = PK_BuildParkourLeaderboard( data )
 
     // Build leaderboard
     var topo = CreateTopology(pl.origin, pl.angles, pl.dimensions[0].tofloat(), pl.dimensions[1].tofloat())
@@ -358,7 +472,24 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
 }
 
-void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
+void function ServerCallback_CreateRouteName( array<string> args )
+{
+    table data = DecodeJSON(args[0]);
+    string name = expect string(data["name"])
+    vector origin = PK_ArrayToFloatVector( expect array(data["origin"]) )
+    vector angles = PK_ArrayToIntVector( expect array(data["angles"]) )
+    array dimensions = expect array( data["dimensions"] )
+
+    var topo = CreateTopology(origin, angles, expect int(dimensions[0]).tofloat(), expect int(dimensions[1]).tofloat())
+    var rui = RuiCreate( $"ui/big_button_hint.rpak", topo, RUI_DRAW_WORLD, 0 )
+    RuiSetString(rui, "msgText", name)
+    RuiSetString( rui, "msgTextPC", name )
+    RuiSetFloat(rui, "duration", 10000)
+    RuiSetGameTime(rui, "startTime", Time())
+    RuiSetFloat(rui, "msgFontSize", 550)
+}
+
+void function ServerCallback_PK_CreateStartIndicator( int indicatorEntityHandle )
 {
     entity indicator = GetEntityFromEncodedEHandle( indicatorEntityHandle )
     if (!IsValid(indicator))
@@ -369,4 +500,44 @@ void function ServerCallback_CreateStartIndicator( int indicatorEntityHandle )
     RuiSetImage( file.startIndicatorRUI, "icon", $"rui/hud/titanfall_marker_arrow_ready" )
     RuiSetString( file.startIndicatorRUI, "statusText", "#PARKOUR_START" )
     RuiTrackFloat3( file.startIndicatorRUI, "pos", indicator, RUI_TRACK_ABSORIGIN_FOLLOW )
+}
+
+
+/*
+██╗     ██╗███╗   ██╗███████╗███████╗
+██║     ██║████╗  ██║██╔════╝██╔════╝
+██║     ██║██╔██╗ ██║█████╗  ███████╗
+██║     ██║██║╚██╗██║██╔══╝  ╚════██║
+███████╗██║██║ ╚████║███████╗███████║
+╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝
+*/
+
+void function SpawnStartLine()
+{
+    var topo = CreateTopology(file.startLine.origin, file.startLine.angles, file.startLine.dimensions[0].tofloat(), file.startLine.dimensions[1].tofloat())
+    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
+    file.startLineRUI = startRui
+}
+
+void function SpawnEndLine()
+{
+    var topo = CreateTopology(file.endLine.origin, file.endLine.angles, file.endLine.dimensions[0].tofloat(), file.endLine.dimensions[1].tofloat())
+    var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
+    file.endLineRUI = endRui
+}
+
+void function DespawnStartLine()
+{
+    if ( file.startLineRUI != null )
+		RuiDestroyIfAlive( file.startLineRUI )
+	file.startLineRUI = null
+}
+
+void function DespawnEndLine()
+{
+    if ( file.endLineRUI != null )
+		RuiDestroyIfAlive( file.endLineRUI )
+	file.endLineRUI = null
 }
