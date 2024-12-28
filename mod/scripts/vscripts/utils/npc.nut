@@ -37,11 +37,14 @@ void function PK_SpawnAmbientMarvin( vector origin, vector angles, int talkableR
     AddCallback_ScriptTriggerLeave( trigger, void function (entity trigger, entity player) {
         Remote_CallFunction_NonReplay( player, "ServerCallback_PK_SetRobotTalkState", false)
     })
-	DebugDrawCircleOnEnt( npc_marvin, talkableRadius.tofloat() + 6, 255, 255, 255, 10000.0 )
+
+	float cylinderHeight = 40.0
+	DebugDrawCylinder( <origin.x, origin.y, origin.z>, <90, 0, 0>, talkableRadius.tofloat(), -2*cylinderHeight, 255, 255, 255, true, 10000.0 )
 
 	// Set robot as talkable to
 	/*npc_marvin.SetUsable()
 	npc_marvin.SetUsableRadius( talkableRadius )
 	npc_marvin.AddUsableValue( USABLE_BY_PILOTS | USABLE_HINT_ONLY )
 	npc_marvin.SetUsePrompts( "#ROBOT_INTERACTION_PROMPT", "#ROBOT_INTERACTION_PROMPT" )*/
+	// DebugDrawCircleOnEnt( npc_marvin, talkableRadius.tofloat() + 6, 255, 255, 255, 10000.0 )
 }
