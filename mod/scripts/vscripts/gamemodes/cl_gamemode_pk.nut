@@ -33,7 +33,7 @@ struct {
 
     bool isRunning = false
     var nextCheckpointRui
-    float bestTime = 0
+    float bestTime = 65535
 
     bool canTalktoRobot = false
     string endpoint = ""
@@ -140,7 +140,7 @@ void function StartRun( int checkpointsCount )
     // Chronometer
     file.timerRUI = RuiCreate( $"ui/gauntlet_hud.rpak", clGlobal.topoCockpitHud, RUI_DRAW_COCKPIT, 0 )
     RuiSetGameTime( file.timerRUI, "startTime", Time() )
-    if (file.bestTime != 0)
+    if (file.bestTime != 65535)
         RuiSetFloat( file.timerRUI, "bestTime", file.bestTime )
 
     // Track speed
@@ -254,6 +254,11 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
     entity localPlayer = GetLocalViewPlayer()
     if (playerName == localPlayer.GetPlayerName()) {
         RuiSetInt( world ? file.worldLeaderboard : file.leaderboard, "activeEntryIdx", index )
+
+        // When reconnecting to a server where a score has previously been registered,
+        // restore it as best time.
+        if (file.bestTime == 65535)
+            file.bestTime = time
     }
 
     // Stop here for world scores
@@ -264,11 +269,6 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
     {
         thread ShowNewHighscoreMessage( playerName, time )
     }
-
-    // When reconnecting to a server where a score has previously been registered,
-    // restore it as best time.
-    if (localPlayer.GetPlayerName() == playerName && file.bestTime == 0)
-        file.bestTime = time
 }
 
 void function ShowNewHighscoreMessage( string playerName, float playerTime )

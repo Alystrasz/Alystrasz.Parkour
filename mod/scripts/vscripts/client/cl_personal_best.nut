@@ -10,7 +10,10 @@ const string fileName = "route_pbs.json"
 float function PK_GetRouteBestTime( string routeId )
 {
     if ( !NSDoesFileExist( fileName) )
+    {
+        NSSaveFile(fileName, "{}")
         return -2
+    }
     
     // Read file
     void functionref( string ) onFileLoad = void function ( string result ): ( routeId )
@@ -30,10 +33,20 @@ float function PK_GetRouteBestTime( string routeId )
 
 void function PK_StoreRouteBestTime( string routeId, float time )
 {
-    if ( !NSDoesFileExist( fileName) )
+    thread PK_StoreRouteBestTime_Think( routeId, time )
+}
+
+void function PK_StoreRouteBestTime_Think ( string routeId, float time )
+{
+    if ( !NSDoesFileExist( fileName ) )
     {
         print("=> Creating PBs file")
-        NSSaveFile(fileName, "")
+        NSSaveFile(fileName, "{}")
+    }
+
+    while ( !NSDoesFileExist( fileName) )
+    {
+        WaitFrame()
     }
 
     // Read file
