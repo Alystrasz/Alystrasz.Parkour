@@ -37,7 +37,7 @@ global PK_MapConfiguration PK_mapConfiguration
 
 struct MapEntity {
     string model_name
-    int scale
+    float scale
     vector coordinates
     vector angles
     bool hidden
@@ -185,7 +185,7 @@ void function LoadParkourMapConfiguration(table data)
             MapEntity me
             table raw_ent = expect table(ent)
             me.model_name = expect string(raw_ent.model_name)
-            me.scale = expect int(raw_ent.scale)
+            me.scale = expect float(raw_ent.scale)
             me.coordinates = PK_ArrayToFloatVector( expect array(raw_ent.coordinates) )
             me.angles = PK_ArrayToFloatVector( expect array(raw_ent.angles) )
 
