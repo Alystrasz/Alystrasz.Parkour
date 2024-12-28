@@ -190,6 +190,12 @@ void function ResetHintThink()
         if ( !IsValid( player ) )
             return
 
+        if (!IsAlive( player ))
+        {
+            WaitFrame()
+            continue
+        }
+
         vector movement = player.GetVelocity()
         if ( movement.x == 0 && movement.y == 0 )
         {
