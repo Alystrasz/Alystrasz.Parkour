@@ -128,6 +128,7 @@ void function LoadParkourMapConfiguration(table data)
         }
         table startData = expect table(data["start"])
         vector start = PK_ArrayToFloatVector( expect array(startData["origin"]) )
+        PK_startOrigin = start
         PK_checkpoints.insert( 0, start )
         vector angles = PK_ArrayToIntVector( expect array(startData["angles"]) )
         PK_startAngles = angles

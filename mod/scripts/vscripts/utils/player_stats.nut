@@ -7,6 +7,7 @@ global struct PK_PlayerStats
 	bool isResetting = false
     bool justFinished = false
 	int currentCheckpoint = 0
+	array<vector> checkpointPassages
 	array<vector> checkpointAngles
 	float startTime
 	float bestTime = 65535
@@ -83,6 +84,7 @@ void function PK_ResetPlayerStats(entity player, bool preserveBestTime = false)
 		...
 	}
 
+    stats.checkpointPassages = [PK_startOrigin]
     stats.checkpointAngles = [PK_startAngles]
 
 	if (preserveBestTime) {

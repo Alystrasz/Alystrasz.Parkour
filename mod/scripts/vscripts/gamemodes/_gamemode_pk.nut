@@ -6,6 +6,7 @@ global array<PK_LeaderboardEntry> PK_leaderboard = []
 global array<PK_LeaderboardEntry> PK_worldLeaderboard = []
 global array<vector> PK_checkpoints = []
 global array<entity> PK_checkpointEntities = []
+global vector PK_startOrigin
 global vector PK_startAngles
 
 global bool PK_has_api_access = false
@@ -128,10 +129,12 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 		player.FreezeControlsOnServer()
 	}
 
-	int checkpointIndex = PK_localStats[player.GetPlayerName()].currentCheckpoint
-	vector checkpoint = PK_checkpoints[checkpointIndex]
-	player.SetOrigin( checkpoint )
-	player.SetAngles(PK_localStats[player.GetPlayerName()].checkpointAngles[checkpointIndex])
+	string playerName = player.GetPlayerName()
+	int checkpointIndex = PK_localStats[playerName].currentCheckpoint
+	/*vector checkpoint = PK_checkpoints[checkpointIndex]
+	player.SetOrigin( checkpoint )*/
+	player.SetOrigin(PK_localStats[playerName].checkpointPassages[checkpointIndex])
+	player.SetAngles(PK_localStats[playerName].checkpointAngles[checkpointIndex])
 
 	// Give player predefined weapons
 	PK_ForcePlayerLoadout(player)

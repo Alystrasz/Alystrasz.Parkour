@@ -29,7 +29,8 @@ void function PK_SpawnCheckpoints( vector startMins, vector startMaxs, vector en
 				// Only update player info if their currentCheckpoint index is the previous one!
 				if (pStats.isRunning && !pStats.isResetting && pStats.currentCheckpoint == index-1)
 				{
-					pStats.checkpointAngles.append( player.GetAngles() )	// Saves player orientation when checkpoint was reached
+					pStats.checkpointPassages.append( player.GetOrigin() )	// Saves player location+angles when checkpoint is reached
+					pStats.checkpointAngles.append( player.GetAngles() )
 					pStats.currentCheckpoint = index						// Updates player's last reached checkpoint
 					Remote_CallFunction_NonReplay( 							// Send player's client next checkpoint location, for it to be RUI displayed
 						player,
@@ -163,6 +164,7 @@ void function FinishTriggerThink(vector volumeMins, vector volumeMaxs)
 					thread PreventPlayerToImmediatelyStartAgain(playerStats)
                     playerStats.isRunning = false
                     playerStats.currentCheckpoint = 0
+					playerStats.checkpointPassages = [PK_startOrigin]
                     playerStats.checkpointAngles = [PK_startAngles]
 
                     bool isBestTime = duration < playerStats.bestTime
