@@ -7,6 +7,7 @@ global function ServerCallback_PK_SetRobotTalkState
 global function ServerCallback_PK_TalkToRobot
 global function ServerCallback_PK_CreateStartIndicator
 global function ServerCallback_PK_ToggleStartIndicatorDisplay
+global function ServerCallback_PK_AnnonceMapVote
 
 struct {
     entity mover
@@ -471,6 +472,13 @@ void function ServerCallback_AnnounceNextMap(array<string> args)
     string map = args[0]
     string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
     string message = Localize("#MAP_VOTE_RESULT_ANNOUNCEMENT", Localize("#" + map))
+    Chat_GameWriteLine(prefix + message)
+}
+
+void function ServerCallback_PK_AnnonceMapVote()
+{
+    string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
+    string message = Localize("#MAP_VOTE_START_ANNOUNCEMENT")
     Chat_GameWriteLine(prefix + message)
 }
 

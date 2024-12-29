@@ -13,6 +13,10 @@ void function PK_StartMapVote_Think()
         return
     }
 
+    // Tell players vote is starting
+    foreach ( entity player in GetPlayerArray() )
+        Remote_CallFunction_NonReplay( player, "ServerCallback_PK_AnnonceMapVote" )
+
     float voteDuration = 10
     int now = GetUnixTimestamp()
 
