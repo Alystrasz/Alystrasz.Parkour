@@ -6,7 +6,7 @@ struct {
 void function Parkour_OpenRobotDialog( string endpoint )
 {
     file.scoreboardUrl = endpoint
-    EmitUISound( "diag_spectre_gs_LeechStart_01_1" )
+    EmitUISound( "diag_mcor_marvin_vocal_excited_short" )
 
     DialogData dialogData
     dialogData.image = $"rui/faction/faction_logo_mrvn"
@@ -26,7 +26,7 @@ void function Parkour_OpenRobotDialog( string endpoint )
 
 void function ParkourShowMoreDetails()
 {
-    EmitUISound( "diag_spectre_gs_LeechAborted_01_1" )
+    EmitUISound( "diag_mcor_marvin_vocal_excited_short" )
 
     DialogData dialogData
     dialogData.image = $"rui/faction/faction_logo_mrvn"
@@ -48,7 +48,7 @@ void function ParkourShowMoreDetails()
 
 void function ParkourExitDialog()
 {
-    EmitUISound( "diag_spectre_gs_LeechEnd_01_1" )
+    EmitUISound( "diag_mcor_marvin_vocal_command_short" )
 }
 
 /**

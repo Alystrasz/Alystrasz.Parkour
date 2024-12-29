@@ -410,10 +410,10 @@ void function ServerCallback_PK_ToggleStartIndicatorDisplay( bool show )
             string message = Localize("#ROBOT_LOST_PLAYER", GetLocalClientPlayer().GetPlayerName())
             Chat_GameWriteLine(prefix + message)
             file.startIndicatorTime = GetUnixTimestamp()
-            EmitSoundOnEntity( player, "diag_spectre_gs_LeechStart_01_1" )
-        } else {
-            EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
+            EmitSoundOnEntity( player, "diag_mcor_marvin_vocal_help" )
         }
+
+        EmitSoundOnEntity( player, "UI_Spawn_FriendlyPilot" )
     }
 }
 
