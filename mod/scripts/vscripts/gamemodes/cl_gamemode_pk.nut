@@ -473,6 +473,7 @@ void function ServerCallback_AnnounceNextMap(array<string> args)
     string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
     string message = Localize("#MAP_VOTE_RESULT_ANNOUNCEMENT", Localize("#" + map))
     Chat_GameWriteLine(prefix + message)
+    EmitSoundOnEntity( GetLocalClientPlayer(), "diag_mcor_marvin_vocal_help" )
 }
 
 void function ServerCallback_PK_AnnonceMapVote()
@@ -480,6 +481,7 @@ void function ServerCallback_PK_AnnonceMapVote()
     string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
     string message = Localize("#MAP_VOTE_START_ANNOUNCEMENT")
     Chat_GameWriteLine(prefix + message)
+    EmitSoundOnEntity( GetLocalClientPlayer(), "diag_mcor_marvin_vocal_command_short" )
 }
 
 
