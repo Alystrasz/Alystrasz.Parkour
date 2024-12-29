@@ -164,7 +164,7 @@ void function StartRun( int checkpointsCount )
     file.checkpointsCountRUI = CreatePermanentCockpitRui( $"ui/at_wave_intro.rpak" )
     RuiSetInt( file.checkpointsCountRUI, "listPos", 0 )
     RuiSetGameTime( file.checkpointsCountRUI, "startFadeInTime", Time() )
-    RuiSetString( file.checkpointsCountRUI, "titleText", "0/" + checkpointsCount )
+    RuiSetString( file.checkpointsCountRUI, "titleText", "[0/" + checkpointsCount + "]" )
     RuiSetString( file.checkpointsCountRUI, "itemText", "#REACHED_CHECKPOINTS" )
     RuiSetFloat2( file.checkpointsCountRUI, "offset", < 0, -250, 0 > )
 
@@ -300,7 +300,7 @@ void function ServerCallback_PK_UpdateNextCheckpointMarker ( int checkpointHandl
     else
     {
         // Update checkpoints count RUI
-		RuiSetString( file.checkpointsCountRUI, "titleText", checkpointIndex + "/" + totalCheckpointsCount )
+		RuiSetString( file.checkpointsCountRUI, "titleText", "[" + checkpointIndex + "/" + totalCheckpointsCount + "]")
     }
 
     // Update checkpoint overhead icon
