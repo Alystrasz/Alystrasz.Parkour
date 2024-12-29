@@ -45,7 +45,7 @@ void function PK_StartMapVote_Think()
     }
 
     // Decide map
-    string map = ""
+    string map = GetMapName() // defaults to current map if nobody answers
     int votes = 0
     foreach ( key, val in results )
     {
