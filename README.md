@@ -1,6 +1,6 @@
 # Parkour
 
-![Screenshot showing checkpoints](./assets/checkpoints.png)
+![Screenshot showing checkpoints](https://raw.githubusercontent.com/Alystrasz/Alystrasz.Parkour/refs/heads/main/assets/checkpoints.png)
 
 A gamemode where players have to cross checkpoints and race between each other for the leaderboard 1st position. Remember single player mission [The Pilot's Gauntlet](https://titanfall.fandom.com/wiki/The_Pilot's_Gauntlet)? Well, it's the same story, but in multiplayer!
 
@@ -14,7 +14,7 @@ For games to be fair, all players have the same loadout: same weapon, same grena
 
 ### Interface
 
-![Interface screenshot](./assets/ui.png)
+![Interface screenshot](https://raw.githubusercontent.com/Alystrasz/Alystrasz.Parkour/main/assets/ui.png)
 
 When you start a parkour run, several elements appear on your HUD:
 * the number of checkpoints you validated;
@@ -23,7 +23,7 @@ When you start a parkour run, several elements appear on your HUD:
 
 ### Leaderboards
 
-![Screenshot of both local and world leaderboards](./assets/leaderboards.png)
+![Screenshot of both local and world leaderboards](https://raw.githubusercontent.com/Alystrasz/Alystrasz.Parkour/refs/heads/main/assets/leaderboards.png)
 
 Scores of all players are displayed on leaderboards, not far from starting and finish lines. There are two leaderboards:
 * the **local** leaderboard displays scores for the current match;
@@ -39,7 +39,7 @@ Progress is tracked in this [GitHub board](https://github.com/users/Alystrasz/pr
 
 Map configuration (*i.e.* coordinates of all entities, including start/finish lines, checkpoints and ziplines) is fetched from the [Parkour API](https://github.com/Alystrasz/parkour-api).
 
-To locally create a new parkour route, you can make your local server load map configuration from a local JSON file instead by following the [local setup guide](./docs/LOCAL.md).
+To locally create a new parkour route, you can make your local server load map configuration from a local JSON file instead by following the [local setup guide](https://github.com/Alystrasz/Alystrasz.Parkour/blob/main/docs/LOCAL.md).
 
 ### Positioning triggers
 
@@ -49,7 +49,7 @@ sv_cheats 1
 enable_debug_overlays 1
 ```
 
-![Screenshot of triggers on mp_thaw](./assets/triggers.png)
+![Screenshot of triggers on mp_thaw](https://raw.githubusercontent.com/Alystrasz/Alystrasz.Parkour/main/assets/triggers.png)
 
 * start trigger appears in red;
 * end trigger is colored yellow;
