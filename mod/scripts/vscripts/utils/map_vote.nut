@@ -13,8 +13,6 @@ void function PK_StartMapVote_Think()
         return
     }
 
-    print("map vote has started")
-
     float voteDuration = 10
     int now = GetUnixTimestamp()
 
@@ -54,7 +52,7 @@ void function PK_StartMapVote_Think()
         }
     }
 
-    print("Next map is " + map)
+    TellPlayersMapChoice( map )
 }
 
 void function CreatePoll( float duration )
@@ -68,4 +66,12 @@ void function CreatePoll( float duration )
 
     foreach(entity player in GetPlayerArray())
         NSCreatePollOnPlayer(player, "Vote for the next map", names, duration)
+}
+
+void function TellPlayersMapChoice( string map )
+{
+    foreach ( entity player in GetPlayerArray() )
+    {
+        ServerToClientStringCommand( player, "ParkourNextMap " + map)
+    }
 }

@@ -75,6 +75,7 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourInitLeaderboard", ServerCallback_CreateLeaderboard )
     AddServerToClientStringCommandCallback( "ParkourInitRouteName", ServerCallback_CreateRouteName )
     AddServerToClientStringCommandCallback( "ParkourInitEndpoint", ServerCallback_SaveParkourEndpoint )
+    AddServerToClientStringCommandCallback( "ParkourNextMap", ServerCallback_AnnounceNextMap )
 
     // hide boost progress
     Cl_GGEarnMeter_Init(ClGamemodePK_GetWeaponIcon, ClGamemodePK_ShouldChangeWeaponIcon)
@@ -463,6 +464,14 @@ void function ServerCallback_PK_TalkToRobot()
 {
     if (!file.canTalktoRobot) return
     RunUIScript( "Parkour_OpenRobotDialog", file.endpoint )
+}
+
+void function ServerCallback_AnnounceNextMap(array<string> args)
+{
+    string map = args[0]
+    string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
+    string message = Localize("#MAP_VOTE_RESULT_ANNOUNCEMENT", Localize("#" + map))
+    Chat_GameWriteLine(prefix + message)
 }
 
 
