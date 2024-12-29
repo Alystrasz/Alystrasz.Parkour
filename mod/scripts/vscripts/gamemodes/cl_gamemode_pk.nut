@@ -35,6 +35,8 @@ struct {
     var nextCheckpointRui
     float bestTime = 65535
 
+    bool receivedTopWorldEntry = false
+
     bool canTalktoRobot = false
     string endpoint = ""
     string routeId = ""
@@ -269,28 +271,42 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
             file.bestTime = time
     }
 
-    // Stop here for world scores
-    if (world) return;
-
     // Display a special message on new highscore
     if (index == 0)
     {
-        thread ShowNewHighscoreMessage( playerName, time )
+        thread ShowNewHighscoreMessage( playerName, time, world )
     }
 }
 
-void function ShowNewHighscoreMessage( string playerName, float playerTime )
+void function ShowNewHighscoreMessage( string playerName, float playerTime, bool isWorldRecord )
 {
-    SafeDestroyRUI(  file.newHighscoreRUI )
+    // Since `ServerCallback_UpdateLeaderboard` is called on player connection (to initialize their leaderboard
+    // state), we don't want to show the new highscore message on this occasion. 
+    if ( file.receivedTopWorldEntry == false && isWorldRecord )
+    {
+        file.receivedTopWorldEntry = true
+        return
+    }
 
-    file.newHighscoreRUI = CreatePermanentCockpitRui( $"ui/death_hint_mp.rpak" )
-    RuiSetString( file.newHighscoreRUI, "hintText", Localize( "#NEW_HIGHSCORE", playerName, format( "%.2f", playerTime ) ) )
-    RuiSetGameTime( file.newHighscoreRUI, "startTime", Time() )
-    RuiSetFloat3( file.newHighscoreRUI, "bgColor", < 0, 0, 0 > )
-    RuiSetFloat( file.newHighscoreRUI, "bgAlpha", 0.5 )
+    SafeDestroyRUI( file.newHighscoreRUI )
+
+    // $"rui/callsigns/callsign_01_col" cooper podium
+    // $"rui/callsigns/callsign_07_col" most wanter posters
+    // $"rui/callsigns/callsign_15_col" pilot with planes
+    // $"rui/callsigns/callsign_33_col" MRVNs
+    // $"rui/callsigns/callsign_38_col" pilot king of MRVNs
+    // $"rui/callsigns/callsign_78_col" spaceship (goblin/crow) pilot
+    // stopped at callsign_80 because I'm lazy
+
+    file.resetHintRUI = CreatePermanentCockpitRui($"ui/fd_tutorial_tip.rpak")
+    RuiSetImage( file.resetHintRUI, "backgroundImage", isWorldRecord ? $"rui/callsigns/callsign_07_col" : $"rui/callsigns/callsign_01_col" )
+	// RuiSetImage( file.resetHintRUI, "iconImage", $"rui/hud/gametype_icons/mfd/mfd_friendly" )
+	RuiSetString( file.resetHintRUI, "titleText", Localize( isWorldRecord ? "#NEW_WORLD_HIGHSCORE_TITLE" : "#NEW_LOCAL_HIGHSCORE_TITLE" ) )
+	RuiSetString( file.resetHintRUI, "descriptionText", Localize( isWorldRecord ? "#NEW_WORLD_HIGHSCORE_TEXT" : "#NEW_LOCAL_HIGHSCORE_TEXT", playerName, format( "%.2f", playerTime ) ) )
+	RuiSetGameTime( file.resetHintRUI, "updateTime", Time() )
+	RuiSetFloat( file.resetHintRUI, "duration", 10.0 )
 
     wait 7
-
     SafeDestroyRUI( file.newHighscoreRUI )
 }
 
