@@ -35,7 +35,7 @@ struct {
     var nextCheckpointRui
     float bestTime = 65535
 
-    bool receivedTopWorldEntry = false
+    float worldLeaderTime = -1
 
     bool canTalktoRobot = false
     string endpoint = ""
@@ -282,9 +282,18 @@ void function ShowNewHighscoreMessage( string playerName, float playerTime, bool
 {
     // Since `ServerCallback_UpdateLeaderboard` is called on player connection (to initialize their leaderboard
     // state), we don't want to show the new highscore message on this occasion. 
-    if ( file.receivedTopWorldEntry == false && isWorldRecord )
+    if ( file.worldLeaderTime == -1 && isWorldRecord )
     {
-        file.receivedTopWorldEntry = true
+        file.worldLeaderTime = playerTime
+        return
+    }
+
+    // If a local best time better that world best time is received, it means `ShowNewHighscoreMessage` is going
+    // to be called again with same player and time information, but as a world record this time; to avoid displaying
+    // two overlapping banners (local record + world record), we prevent local record from being displayed.
+    if ( !isWorldRecord && playerTime < file.worldLeaderTime )
+    {
+        file.worldLeaderTime = playerTime
         return
     }
 
