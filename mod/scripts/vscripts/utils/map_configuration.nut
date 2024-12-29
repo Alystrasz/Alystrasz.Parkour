@@ -460,13 +460,19 @@ void function FindMapIdentifier()
         table data = DecodeJSON(inputStr)
         array maps = expect array(data["data"])
 
+        // Store map names for later usage (map polling)
+        foreach (value in maps) {
+            table map = expect table(value)
+            string map_name = expect string(map["map_name"])
+            PK_credentials.maps.append( map_name )
+        }
+
         // Looking for a map whose name matches current map's name.
         string mapName = GetMapName()
         foreach (value in maps) {
             table map = expect table(value)
             string map_name = expect string(map["map_name"])
-            PK_credentials.maps.append( map_name )
-            if ( map_name.find( mapName) != null ) {
+            if ( map_name.find( mapName ) != null ) {
                 print("==> Parkour map found!")
                 PK_credentials.mapId = expect string(map["id"])
                 PK_has_api_access = true
