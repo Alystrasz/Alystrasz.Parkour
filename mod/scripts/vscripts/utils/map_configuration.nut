@@ -100,13 +100,14 @@ void function PK_InitializeMapConfiguration()
     PK_SpawnAmbientMarvin( robot.origin, robot.angles, robot.talkableRadius, robot.animation )
 
     // Init players
+    /*
     foreach(player in GetPlayerArray())
     {
         if ( !IsValid( player ) ) {
 			continue
 		}
         PK_OnPlayerConnected(player)
-    }
+    }*/
 }
 
 
