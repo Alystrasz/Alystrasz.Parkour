@@ -1,0 +1,18 @@
+{
+    "name":"Warm-up",
+    "start_line":{"origin":[695.193,-188.674,280.0],"angles":[0,180,0],"dimensions":[120,80],"trigger":[[442.671,-401.552,198.538],[718.985,-50.3646,395.128]]},
+    "finish_line":{"origin":[800.0,-210.0,280.0],"angles":[0,0,0],"dimensions":[120,80],"trigger":[[821.334,-400.966,206.045],[1018.86,-35.1478,387.155]]},
+    "leaderboards":{
+        "local":{"origin":[1010.0,-137.322,280.0],"angles":[0,0,0],"dimensions":[100,93],"source":{"origin":[1007.0,-137.322,350.0],"angles":[0,0,0],"dimensions":[50,33]}},
+        "world":{"origin":[1010.0,-333.0,280.0],"angles":[0,0,0],"dimensions":[100,93],"source":{"origin":[1007.0,-333.0,350.0],"angles":[0,0,0],"dimensions":[50,33]}}
+    },
+    "checkpoints":[[-528.031,-1158.74,272.031],[531.185,-1231.55,272.031],[-528.032,1584.72,272.031],[565.258,1704.76,272.031],[114.884,-635.087,256.031]],
+    "start":{"origin":[855.379, -192.914, 208.031],"angles":[0,-180,0]},
+    "end":{"origin":[807.725,-207.122,280.0]},
+    "ziplines":[],
+    "perks":{"kit":"15","weapon":"mp_weapon_epg","grenade":"mp_weapon_grenade_gravity","ability":"mp_ability_grapple"},
+    "robot":{"origin":[1040.03,-127.85,208.031],"angles":[0,180,0],"talkable_radius":60,"animation":"mv_idle_wash_window"},
+    "indicator":{"coordinates":[-331.044,-3128.37,118.0313],"trigger_radius":400},
+    "route_name":{"origin":[1007.0,-237.0,397.0],"angles":[0,0,0],"dimensions":[135,80]},
+    "entities":[]
+}

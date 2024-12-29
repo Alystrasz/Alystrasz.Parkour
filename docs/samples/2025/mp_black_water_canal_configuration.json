@@ -1,0 +1,34 @@
+{
+    "name":"Roofs",
+    "start_line":{"origin":[1192.57, 1579.88, 280.297],"angles":[0,270,0],"dimensions":[150,100],"trigger":[[907.552, 1429.41, 185.443],[1464.6, 1584.03, 456.948]]},
+    "finish_line":{"origin":[1194.04, 2089.49, 280.031],"angles":[0,270,0],"dimensions":[150,100],"trigger":[[912.64, 1655.43, 190.287],[1473.19, 2093.78, 428.994]]},
+    "leaderboards":{
+        "local":{"origin":[1456.61, 1855.55, 274.031],"angles":[0,0,0],"dimensions":[100,93],"source":{"origin":[1460.61, 1855.55, 339.031],"angles":[0,0,0],"dimensions":[50,33]}},
+        "world":{"origin":[1456.61, 1727.55, 274.031],"angles":[0,0,0],"dimensions":[100,93],"source":{"origin":[1460.61, 1727.55, 339.031],"angles":[0,0,0],"dimensions":[50,33]}}
+    },
+    "checkpoints":[
+        [1371.76, 678.058, 262.031],
+        [2316.53, -1117.53, 217.628],
+        [2951.7, -2218.36, 152.032],
+        [1829.76, -2544.17, 288.031],
+        [687.769, -2171.43, 287.987],
+        [-338.256, 495.348, 292.031],
+        [-31.6328, 1999.85, 99.1083],
+        [606.787, 3107.02, 252.73]
+    ],
+    "start":{"origin":[1190.68, 1926.13, 194.151],"angles":[0, -90, 0]},
+    "end":{"origin":[1194.04, 2089.49, 300.031]},
+    "ziplines":[],
+    "perks":{"kit":"15","weapon":"mp_weapon_epg","grenade":"mp_weapon_grenade_gravity","ability":"mp_ability_heal","floor_is_lava":"true"},
+    "robot":{"origin":[1369.12, 1619.02, 193.297],"angles":[0, -17, 0],"talkable_radius":60,"animation":"mv_idle_weld"},
+    "indicator":{"coordinates":[1185.71, 1814.9, 254.151],"trigger_radius":500},
+    "route_name":{"origin":[1460.61, 1791.55, 389.031],"angles":[0,0,0],"dimensions":[135,80]},
+    "entities":[
+        {"scale":1.0,"model_name":"models/industrial/wall_tech_128.mdl","coordinates":[1466.61, 1727.55, 274.031],"angles":[0.0,180.0,0.0]},
+        {"scale":1.0,"model_name":"models/industrial/wall_tech_128.mdl","coordinates":[1466.61, 1855.55, 274.031],"angles":[0.0,180.0,0.0]},
+        {"scale":1.0,"model_name":"models/imc_base/cargo_container_imc_01_orange.mdl","coordinates":[2505.14, -2560.08, -152.587],"angles":[1.0, -166.0, -2.0]},
+        {"scale":1.0,"model_name":"models/imc_base/cargo_container_imc_01_orange.mdl","coordinates":[2504.44, -2563.60, -60.8438],"angles":[1.0, -166.0, -2.0]},
+        {"scale":1.0,"model_name":"models/imc_base/cargo_container_imc_01_orange.mdl","coordinates":[2504.74, -2566.60, 30.8994],"angles":[1.0, -166.0, -2.0]},
+        {"scale":1.0,"model_name":"models/imc_base/cargo_container_imc_01_orange.mdl","coordinates":[2505.04, -2569.60, 122.6426],"angles":[1.0, -166.0, -2.0]}
+    ]
+}
