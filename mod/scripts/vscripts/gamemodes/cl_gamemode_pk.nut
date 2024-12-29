@@ -220,13 +220,21 @@ void function ResetHintThink()
     if ( GetGameState() >= eGameState.SuddenDeath )
         return
 
-    file.resetHintRUI = CreatePermanentCockpitRui( $"ui/death_hint_mp.rpak" )
-    RuiSetString( file.resetHintRUI, "hintText", Localize( "#RESET_RUN_HINT" ) )
-    RuiSetGameTime( file.resetHintRUI, "startTime", Time() )
-    RuiSetFloat3( file.resetHintRUI, "bgColor", < 0, 0, 0 > )
-    RuiSetFloat( file.resetHintRUI, "bgAlpha", 0.5 )
+    file.resetHintRUI = CreatePermanentCockpitRui($"ui/sp_onscreen_hint.rpak")
+    RuiSetResolutionToScreenSize( file.resetHintRUI )
+    RuiSetString( file.resetHintRUI, "locStringKBM", Localize( "#RESET_RUN_HINT" ) )
+    RuiSetBool( file.resetHintRUI, "hasLocStringKBM", true)
+	RuiSetBool( file.resetHintRUI, "displayCentered", false )
 
     wait 7
+    // RUI might already be destroyed when we fade it out
+    try
+    {
+        RuiSetBool( file.resetHintRUI, "forceFadeOut", true)
+    } catch (err) {
+        print("Tried to fade out a destroyed RUI, skipping.")
+    }
+    wait 1
     SafeDestroyRUI( file.resetHintRUI )
 }
 
