@@ -12,7 +12,7 @@
     "ziplines":[],
     "perks":{"kit":"15","weapon":"mp_weapon_epg","grenade":"mp_weapon_grenade_gravity","ability":"mp_ability_grapple"},
     "robot":{"origin":[1040.03,-127.85,208.031],"angles":[0,180,0],"talkable_radius":60,"animation":"mv_idle_wash_window"},
-    "indicator":{"coordinates":[-331.044,-3128.37,118.0313],"trigger_radius":400},
+    "indicator":{"coordinates":[809.923, -211.131, 324.677],"trigger_radius":300},
     "route_name":{"origin":[1007.0,-237.0,397.0],"angles":[0,0,0],"dimensions":[135,80]},
     "entities":[]
 }
