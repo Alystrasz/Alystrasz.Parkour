@@ -46,6 +46,10 @@
             "RunOn": "SERVER"
         },
         {
+            "Path": "utils/map_vote.nut",
+            "RunOn": "SERVER"
+        },
+        {
             "Path": "gamemodes/cl_gamemode_pk.nut",
             "RunOn": "CLIENT"
         },

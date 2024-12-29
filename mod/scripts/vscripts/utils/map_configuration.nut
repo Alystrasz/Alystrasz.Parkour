@@ -15,6 +15,7 @@ global struct PK_Credentials {
     string routeId = ""
     string endpoint
     string secret
+    array<string> maps = []
 }
 global PK_Credentials PK_credentials
 
@@ -463,6 +464,7 @@ void function FindMapIdentifier()
         foreach (value in maps) {
             table map = expect table(value)
             string map_name = expect string(map["map_name"])
+            PK_credentials.maps.append( map_name )
             if ( map_name.find( mapName) != null ) {
                 print("==> Parkour map found!")
                 PK_credentials.mapId = expect string(map["id"])

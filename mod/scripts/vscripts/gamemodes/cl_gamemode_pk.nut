@@ -268,7 +268,10 @@ void function ServerCallback_UpdateLeaderboard( array<string> args )
         // When reconnecting to a server where a score has previously been registered,
         // restore it as best time.
         if (file.bestTime == 65535)
+        {
             file.bestTime = time
+            PK_StoreRouteBestTime( file.routeId, time )
+        }
     }
 
     // Display a special message on new highscore
