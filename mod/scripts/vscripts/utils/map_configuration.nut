@@ -99,6 +99,9 @@ void function PK_InitializeMapConfiguration()
     SpawnEntities()
     PK_SpawnAmbientMarvin( robot.origin, robot.angles, robot.talkableRadius, robot.animation )
 
+    // Start map vote thread
+    PK_MapVote()
+
     // Init players
     /*
     foreach(player in GetPlayerArray())

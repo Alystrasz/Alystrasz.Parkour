@@ -6,6 +6,12 @@ struct {
 
 void function PK_MapVote()
 {
+    if ( PK_has_api_access == false )
+    {
+        print("(!) Cannot start map vote with no API access, exiting.")
+        return
+    }
+
     AddCallback_GameStateEnter(eGameState.Postmatch, PostMatch_ChangeMap)
     thread MapVoteThink()
 }
@@ -19,12 +25,6 @@ void function MapVoteThink()
 
 void function StartMapVote()
 {
-    if ( PK_has_api_access == false )
-    {
-        print("(!) Cannot start map vote with no API access, exiting.")
-        return
-    }
-
     // Tell players vote is starting
     foreach ( entity player in GetPlayerArray() )
         Remote_CallFunction_NonReplay( player, "ServerCallback_PK_AnnonceMapVote" )
