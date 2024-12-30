@@ -1,11 +1,18 @@
-global function PK_StartMapVote
+global function PK_MapVote
 
-void function PK_StartMapVote()
+void function PK_MapVote()
 {
-    thread PK_StartMapVote_Think()
+    thread MapVoteThink()
 }
 
-void function PK_StartMapVote_Think()
+void function MapVoteThink()
+{
+    float matchDuration = GetCurrentPlaylistVarFloat( "timelimit", 1 ) * 60
+    wait matchDuration - 120 // wait until 2 minutes before match end
+    StartMapVote()
+}
+
+void function StartMapVote()
 {
     if ( PK_has_api_access == false )
     {

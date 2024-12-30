@@ -36,6 +36,9 @@ void function _PK_Init() {
 
 	// Prepare map for parkour gamemode
 	thread PK_InitializeMapConfiguration()
+
+	// Start map vote thread
+	PK_MapVote()
 }
 
 
