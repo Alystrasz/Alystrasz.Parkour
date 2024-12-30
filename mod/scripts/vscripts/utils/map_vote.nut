@@ -1,7 +1,12 @@
 global function PK_MapVote
 
+struct {
+    string nextMap = ""
+} file
+
 void function PK_MapVote()
 {
+    AddCallback_GameStateEnter(eGameState.Postmatch, PostMatch_ChangeMap)
     thread MapVoteThink()
 }
 
@@ -52,18 +57,18 @@ void function StartMapVote()
     }
 
     // Decide map
-    string map = GetMapName() // defaults to current map if nobody answers
+    file.nextMap = GetMapName() // defaults to current map if nobody answers
     int votes = 0
     foreach ( key, val in results )
     {
         if ( val > votes )
         {
-            map = key
+            file.nextMap = key
             votes = val
         }
     }
 
-    TellPlayersMapChoice( map )
+    TellPlayersMapChoice()
 }
 
 void function CreatePoll( float duration )
@@ -79,10 +84,20 @@ void function CreatePoll( float duration )
         NSCreatePollOnPlayer(player, "Vote for the next map", names, duration)
 }
 
-void function TellPlayersMapChoice( string map )
+void function TellPlayersMapChoice()
 {
     foreach ( entity player in GetPlayerArray() )
     {
-        ServerToClientStringCommand( player, "ParkourNextMap " + map)
+        ServerToClientStringCommand( player, "ParkourNextMap " + file.nextMap)
     }
+}
+
+void function PostMatch_ChangeMap()
+{
+    thread ChangeMap()
+}
+
+void function ChangeMap() {
+    wait GAME_POSTMATCH_LENGTH - 1
+    GameRules_ChangeMap(file.nextMap, GameRules_GetGameMode())
 }
