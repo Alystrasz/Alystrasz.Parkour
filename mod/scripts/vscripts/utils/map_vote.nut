@@ -2,6 +2,7 @@ global function PK_MapVote
 
 struct {
     string nextMap = ""
+    array playedMaps
 } file
 
 void function PK_MapVote()
@@ -13,6 +14,7 @@ void function PK_MapVote()
     }
 
     AddCallback_GameStateEnter(eGameState.Postmatch, PostMatch_ChangeMap)
+    thread StoreCurrentMap()
     thread MapVoteThink()
 }
 
@@ -120,4 +122,63 @@ int function GetVoteAnswersCount()
     }
 
     return count
+}
+
+
+//  ███╗   ███╗ █████╗ ██████╗     ██████╗  ██████╗ ██╗   ██╗███╗   ██╗██████╗     ██████╗  ██████╗ ██████╗ ██╗███╗   ██╗
+//  ████╗ ████║██╔══██╗██╔══██╗    ██╔══██╗██╔═══██╗██║   ██║████╗  ██║██╔══██╗    ██╔══██╗██╔═══██╗██╔══██╗██║████╗  ██║
+//  ██╔████╔██║███████║██████╔╝    ██████╔╝██║   ██║██║   ██║██╔██╗ ██║██║  ██║    ██████╔╝██║   ██║██████╔╝██║██╔██╗ ██║
+//  ██║╚██╔╝██║██╔══██║██╔═══╝     ██╔══██╗██║   ██║██║   ██║██║╚██╗██║██║  ██║    ██╔══██╗██║   ██║██╔══██╗██║██║╚██╗██║
+//  ██║ ╚═╝ ██║██║  ██║██║         ██║  ██║╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝    ██║  ██║╚██████╔╝██████╔╝██║██║ ╚████║
+//  ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝         ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝
+
+const string fileName = "maps_round_robin.json"
+
+/**
+ * The aim for this section is to circle over all event maps in a round-robin fashion,
+ * to avoid replaying the same map over and over if no player answers map poll.
+ **/
+
+void function StoreCurrentMap()
+{
+    string currentMap = GetMapName()
+
+    if ( !NSDoesFileExist( fileName) )
+    {
+        NSSaveFile(fileName, "[\"" + currentMap + "\"]")
+        file.playedMaps = [ currentMap ]
+        return
+    }
+
+    void functionref( string ) onFileLoad = void function ( string result ): ( currentMap )
+    {
+        string inputStr = "{\"data\":" + result + "}"
+        table data = DecodeJSON(inputStr)
+        array fileMaps = expect array(data["data"])
+
+        // add current map if not found in file
+        foreach ( map in fileMaps )
+            if ( map == currentMap )
+                return
+        fileMaps.append( currentMap )
+        file.playedMaps = fileMaps
+        NSSaveFile(fileName, ArrayToString(fileMaps))
+    }
+    NSLoadFile(fileName, onFileLoad)
+}
+
+string function ArrayToString( array a )
+{
+    string s = "["
+    int l = a.len()
+    for ( int i=0; i<l; i++ )
+    {
+        s += "\"" + expect string(a[i]) + "\""
+        if ( i < l-1 )
+        {
+            s += ","
+        }
+    }
+    s += "]"
+    return s
 }
