@@ -29,7 +29,7 @@ void function StartMapVote()
     foreach ( entity player in GetPlayerArray() )
         Remote_CallFunction_NonReplay( player, "ServerCallback_PK_AnnonceMapVote" )
 
-    float voteDuration = 10
+    float voteDuration = 30
     int now = GetUnixTimestamp()
 
     CreatePoll( voteDuration )
