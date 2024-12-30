@@ -34,9 +34,13 @@ void function StartMapVote()
 
     CreatePoll( voteDuration )
 
-    // Wait poll duration
+    // Wait poll duration, or until all players answered
     while ( GetUnixTimestamp() - now < voteDuration )
     {
+        if ( GetVoteAnswersCount() >= GetPlayerArray().len() )
+        {
+            break
+        }
         WaitFrame()
     }
 
@@ -100,4 +104,19 @@ void function PostMatch_ChangeMap()
 void function ChangeMap() {
     wait GAME_POSTMATCH_LENGTH - 1
     GameRules_ChangeMap(file.nextMap, GameRules_GetGameMode())
+}
+
+int function GetVoteAnswersCount()
+{
+    int count = 0
+
+    foreach ( entity player in GetPlayerArray() )
+    {
+        int result = NSGetPlayerResponse( player )
+        if ( result == -1 )
+            continue
+        count += 1
+    }
+
+    return count
 }
