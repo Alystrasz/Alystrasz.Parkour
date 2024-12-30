@@ -32,6 +32,7 @@ void function StartMapVote()
     float voteDuration = 30
     int now = GetUnixTimestamp()
 
+    wait 2
     CreatePoll( voteDuration )
 
     // Wait poll duration, or until all players answered
