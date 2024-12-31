@@ -33,6 +33,7 @@ void function _PK_Init() {
 	// teleport connected players to map start
 	AddCallback_OnClientConnected( PK_OnPlayerConnected )
 	AddCallback_OnPlayerRespawned( RespawnPlayerToConfirmedCheckpoint )
+	AddCallback_OnPlayerRespawned( PK_ForcePlayerWeapon )
 
 	// Prepare map for parkour gamemode
 	thread PK_InitializeMapConfiguration()
@@ -140,7 +141,7 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	player.SetOrigin(PK_localStats[playerName].checkpointPassages[checkpointIndex])
 	player.SetAngles(PK_localStats[playerName].checkpointAngles[checkpointIndex])
 
-	// Give player predefined weapons
+	// Give player predefined loadout
 	PK_ForcePlayerLoadout(player)
 
 	// Disable boost meter

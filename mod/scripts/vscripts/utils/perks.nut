@@ -1,5 +1,6 @@
 global function PK_ApplyPerks
 global function PK_ForcePlayerLoadout
+global function PK_ForcePlayerWeapon
 
 global struct PK_Perks {
 	string ability = ""
@@ -76,20 +77,11 @@ void function InitLavaFogController( entity fogController )
 }
 
 /**
- * This gives player predefined weapon, grenade and ability.
+ * This gives player predefined grenade and ability.
  **/
 void function PK_ForcePlayerLoadout(entity player) {
 	if (IsAlive(player) && player != null)
 	{
-		// Weapon switch (removes all weapons and give one perk weapon)
-		if (PK_perks.weapon != "") {
-			foreach ( int index, entity weapon in player.GetMainWeapons() ) {
-				player.TakeWeaponNow( weapon.GetWeaponClassName() )
-				if (weapon.GetWeaponClassName().find("mp_weapon_") != null && index == 0)
-					player.GiveWeapon( PK_perks.weapon, [] )
-			}
-		}
-
 		// Ability+grenade switch
 		bool abilityGiven = false;
 		bool grenadeGiven = false;
@@ -111,6 +103,20 @@ void function PK_ForcePlayerLoadout(entity player) {
 		// Kit
 		if (PK_perks.kit != -1) {
 			GivePassive (player, PK_perks.kit)
+		}
+	}
+}
+
+void function PK_ForcePlayerWeapon(entity player) {
+	if (IsAlive(player) && player != null)
+	{
+		// Weapon switch (removes all weapons and give one perk weapon)
+		if (PK_perks.weapon != "") {
+			foreach ( int index, entity weapon in player.GetMainWeapons() ) {
+				player.TakeWeaponNow( weapon.GetWeaponClassName() )
+				if (weapon.GetWeaponClassName().find("mp_weapon_") != null && index == 0)
+					player.GiveWeapon( PK_perks.weapon, [] )
+			}
 		}
 	}
 }
