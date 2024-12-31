@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.0.3
+## 0.3.0
 
 ### Features
 
@@ -20,6 +20,7 @@
 * Players can no longer benefit from multiple stim boosts;
 * Players cannot checkpoint-respawn into the ground or walls;
 * "START" and "FINISH" panels are not displayed at the same time;
+* Weapon name is not shown on run reset;
 * MRVN redirects players to web scoreboard using HTTP link provided by the server;
 * All messages are now properly (clientside) translated;
 * Cleaned code base.
