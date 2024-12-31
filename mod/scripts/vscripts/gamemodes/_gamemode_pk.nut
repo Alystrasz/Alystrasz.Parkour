@@ -36,9 +36,6 @@ void function _PK_Init() {
 
 	// Prepare map for parkour gamemode
 	thread PK_InitializeMapConfiguration()
-
-	// Start map vote thread
-	PK_MapVote()
 }
 
 
@@ -199,6 +196,14 @@ int function ParkourDecideWinner()
 		}
 	}
 
-	Chat_ServerBroadcast( format("%s is the winner of the match with a run of %.2f seconds!", winnerName, time), false )
+	// Tell players about the winner
+	foreach ( player in GetPlayerArray() )
+	{
+		if ( !IsValid( player ) )
+			continue
+
+        ServerToClientStringCommand( player, "ParkourResults " + winnerName + " " + format("%.2f", time) )
+	}
+
 	return found ? TEAM_MILITIA : TEAM_UNASSIGNED
 }

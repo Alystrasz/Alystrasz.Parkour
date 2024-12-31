@@ -77,6 +77,7 @@ void function Cl_Parkour_Init()
     AddServerToClientStringCommandCallback( "ParkourInitRouteName", ServerCallback_CreateRouteName )
     AddServerToClientStringCommandCallback( "ParkourInitEndpoint", ServerCallback_SaveParkourEndpoint )
     AddServerToClientStringCommandCallback( "ParkourNextMap", ServerCallback_AnnounceNextMap )
+    AddServerToClientStringCommandCallback( "ParkourResults", ServerCallback_AnnonceResults)
 
     // hide boost progress
     Cl_GGEarnMeter_Init(ClGamemodePK_GetWeaponIcon, ClGamemodePK_ShouldChangeWeaponIcon)
@@ -482,6 +483,16 @@ void function ServerCallback_PK_AnnonceMapVote()
     string message = Localize("#MAP_VOTE_START_ANNOUNCEMENT")
     Chat_GameWriteLine(prefix + message)
     EmitSoundOnEntity( GetLocalClientPlayer(), "diag_mcor_marvin_vocal_command_short" )
+}
+
+void function ServerCallback_AnnonceResults(array<string> args)
+{
+    string winnerName = args[0]
+    string time = args[1]
+    string prefix = format("\x1b[93m%s:\x1b[0m ", PK_ROBOT_NAME)
+    string message = Localize("#RESULTS_ANNOUNCEMENT", winnerName, time)
+    Chat_GameWriteLine(prefix + message)
+    EmitSoundOnEntity( GetLocalClientPlayer(), "diag_mcor_marvin_vocal_excited_long" )
 }
 
 
