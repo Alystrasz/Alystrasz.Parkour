@@ -2,6 +2,7 @@ global function PK_MapVote
 
 struct {
     string nextMap = ""
+    string nextDefaultMap = ""
     array playedMaps
 } file
 
@@ -34,6 +35,9 @@ void function StartMapVote()
     float voteDuration = 30
     int now = GetUnixTimestamp()
 
+    // Init next default map (round-robin to avoid circling over same map if nobody answers the poll)
+    LoadNextMap()
+
     wait 2
     CreatePoll( voteDuration )
 
@@ -64,7 +68,7 @@ void function StartMapVote()
     }
 
     // Decide map
-    file.nextMap = GetMapName() // defaults to current map if nobody answers
+    file.nextMap = file.nextDefaultMap
     int votes = 0
     foreach ( key, val in results )
     {
@@ -155,11 +159,13 @@ void function StoreCurrentMap()
         string inputStr = "{\"data\":" + result + "}"
         table data = DecodeJSON(inputStr)
         array fileMaps = expect array(data["data"])
+        file.playedMaps = fileMaps
 
         // add current map if not found in file
         foreach ( map in fileMaps )
             if ( map == currentMap )
                 return
+
         fileMaps.append( currentMap )
         file.playedMaps = fileMaps
         NSSaveFile(fileName, ArrayToString(fileMaps))
@@ -181,4 +187,36 @@ string function ArrayToString( array a )
     }
     s += "]"
     return s
+}
+
+void function LoadNextMap()
+{
+    // If all maps have been played, loop back to the first map
+    if ( file.playedMaps.len() == PK_credentials.maps.len() )
+    {
+        file.nextDefaultMap = PK_credentials.maps[0]
+        print("=> If no player answers map poll, next map will be " + file.nextDefaultMap + ".")
+        NSDeleteFile( fileName )
+        return
+    }
+
+    // Else, pick first map that haven't been played yet
+    foreach ( map in PK_credentials.maps )
+    {
+        bool found = false;
+        foreach ( playedMap in file.playedMaps )
+        {
+            if ( playedMap == map )
+            {
+                found = true
+                break
+            }
+        }
+        if ( found == false )
+        {
+            file.nextDefaultMap = map
+            print("=> If no player answers map poll, next map will be " + file.nextDefaultMap + ".")
+            return
+        }
+    }
 }
