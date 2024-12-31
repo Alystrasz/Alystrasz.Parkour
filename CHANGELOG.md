@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.0.3
+
+### Features
+
+* A map poll triggers 2 minutes before the end of the match, asking players which map they want to play next;
+* Map configuration names now appear in game;
+* Speedmeter component shows the PB time of the entire event (not just of the local match);
+* Added support for props (meaning server can spawn objects on the map);
+* Added support for `floor_is_lava` riff (*i.e.* deadly fog can be spawned);
+* Added debug utils to ease the creation of new routes;
+* Added configuration samples for 3 new routes.
+
+### Fixes
+
+* Highscore and reset banners don't overlap;
+* Dead players aren't prompted with run reset;
+* Run reset prompt is shown to immobile players only;
+* Players can no longer benefit from multiple stim boosts;
+* Players cannot checkpoint-respawn into the ground or walls;
+* "START" and "FINISH" panels are not displayed at the same time;
+* MRVN redirects players to web scoreboard using HTTP link provided by the server;
+* All messages are now properly (clientside) translated;
+* Cleaned code base.
+
 ## 0.2.1
 
 ### Fixes
