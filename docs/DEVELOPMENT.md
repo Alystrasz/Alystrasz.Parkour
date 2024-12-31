@@ -24,3 +24,8 @@ enable_debug_overlays 1
 * end trigger is colored yellow;
 * checkpoint triggers are painted green;
 * "building" trigger (used to show the way to players who stray a little too far from starting line) appears in blue.
+
+### External resources:
+
+* Parkour API: https://github.com/Alystrasz/parkour-api
+* Parkour server config: https://github.com/Alystrasz/ParkourDedicatedConfiguration
