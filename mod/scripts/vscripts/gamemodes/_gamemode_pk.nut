@@ -111,6 +111,10 @@ void function OnPlayerReset(entity player) {
 
 	// Reset weapons as well
 	PK_ForcePlayerLoadout(player)
+
+	// Stop ongoing stim boost
+	player.Signal("OnChangedPlayerClass")
+
 	Remote_CallFunction_NonReplay( player, "ServerCallback_PK_ToggleStartIndicatorDisplay", false )
 }
 
