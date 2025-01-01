@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+### Fixes
+
+* Fix clientside crash happening after many resets.
+
 ## 0.3.0
 
 ### Features
