@@ -32,6 +32,10 @@ struct {
     var startIndicatorRUI
     int startIndicatorTime = 0
 
+    // RUI topologies
+    var startLineTopology
+    var endLineTopology
+
     bool isRunning = false
     var nextCheckpointRui
     float bestTime = 65535
@@ -586,17 +590,19 @@ void function ServerCallback_PK_CreateStartIndicator( int indicatorEntityHandle 
 
 void function SpawnStartLine()
 {
-    var topo = CreateTopology(file.startLine.origin, file.startLine.angles, file.startLine.dimensions[0].tofloat(), file.startLine.dimensions[1].tofloat())
-    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
+    if ( file.startLineTopology == null )
+        file.startLineTopology = CreateTopology(file.startLine.origin, file.startLine.angles, file.startLine.dimensions[0].tofloat(), file.startLine.dimensions[1].tofloat())
+    var startRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", file.startLineTopology, RUI_DRAW_WORLD, 0 )
+    RuiSetString( startRui, "displayText", "#GAUNTLET_START_TEXT" )
     file.startLineRUI = startRui
 }
 
 void function SpawnEndLine()
 {
-    var topo = CreateTopology(file.endLine.origin, file.endLine.angles, file.endLine.dimensions[0].tofloat(), file.endLine.dimensions[1].tofloat())
-    var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
-	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
+    if ( file.endLineTopology == null )
+        file.endLineTopology = CreateTopology(file.endLine.origin, file.endLine.angles, file.endLine.dimensions[0].tofloat(), file.endLine.dimensions[1].tofloat())
+    var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", file.endLineTopology, RUI_DRAW_WORLD, 0 )
+    RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
     file.endLineRUI = endRui
 }
 
