@@ -82,6 +82,12 @@ void function InitLavaFogController( entity fogController )
 void function PK_ForcePlayerLoadout(entity player) {
 	if (IsAlive(player) && player != null)
 	{
+		// Fill up main weapon ammo
+		foreach ( entity weapon in player.GetMainWeapons() )
+		{
+			weapon.SetWeaponPrimaryClipCount(weapon.GetWeaponPrimaryClipCountMax())
+		}
+
 		// Ability+grenade switch
 		bool abilityGiven = false;
 		bool grenadeGiven = false;
