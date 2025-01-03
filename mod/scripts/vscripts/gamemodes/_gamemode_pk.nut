@@ -111,7 +111,7 @@ void function OnPlayerReset(entity player) {
 	PK_AddPlayerParkourStat(player, ePlayerParkourStatType.Resets)
 
 	// Destroy all projectiles (bullets + grenades)
-	array<entity> projectiles = GetProjectileArrayEx( "any", TEAM_ANY, TEAM_IMC, Vector( 0, 0, 0 ), -1 )
+	array<entity> projectiles = GetProjectileArrayEx( "any", TEAM_IMC, TEAM_ANY, Vector( 0, 0, 0 ), -1 )
 	foreach( projectile in projectiles )
 	{
 		if ( projectile.GetOwner() != player )
