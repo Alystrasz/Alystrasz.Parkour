@@ -140,7 +140,11 @@ void function GravityGrenadeThink( entity projectile, entity hitEnt, vector norm
 	gravTrig.SearchForNewTouchingEntity()
 	trig.SearchForNewTouchingEntity()
 
-	EmitSoundOnEntity( projectile, "default_gravitystar_impact_3p" )
+	entity projectileOwner = projectile.GetOwner()
+	if ( !IsValid( projectileOwner ))
+		return
+
+	EmitSoundOnEntityOnlyToPlayer( projectile, projectileOwner, "default_gravitystar_impact_3p" )
 	entity FX = StartParticleEffectOnEntity_ReturnEntity( projectile, GetParticleSystemIndex( GRAVITY_VORTEX_FX ), FX_PATTACH_ABSORIGIN_FOLLOW, -1 )
 //	EmitSoundOnEntity( projectile, "gravitystar_vortex" )
 
@@ -161,10 +165,12 @@ void function GravityGrenadeThink( entity projectile, entity hitEnt, vector norm
 	)
 
 	wait POP_DELAY
+	if ( !IsValid( projectileOwner ))
+		return
 
 	entity mover = CreateOwnedScriptMover( projectile )
 	projectile.SetParent( mover, "ref", true )
-	EmitSoundOnEntity( projectile, "weapon_gravitystar_preexplo" )
+	EmitSoundOnEntityOnlyToPlayer( projectile, projectileOwner, "weapon_gravitystar_preexplo" )
 
 	if ( hitEnt == svGlobal.worldspawn )
 	{
