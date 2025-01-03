@@ -110,9 +110,6 @@ void function OnPlayerReset(entity player) {
 	Remote_CallFunction_NonReplay(player, "ServerCallback_PK_ResetRun")
 	PK_AddPlayerParkourStat(player, ePlayerParkourStatType.Resets)
 
-	// Reset weapons as well
-	PK_ForcePlayerLoadout(player)
-
 	// Destroy all projectiles (bullets + grenades)
 	array<entity> projectiles = GetProjectileArrayEx( "any", TEAM_ANY, TEAM_IMC, Vector( 0, 0, 0 ), -1 )
 	foreach( projectile in projectiles )
