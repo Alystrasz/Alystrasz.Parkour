@@ -113,6 +113,15 @@ void function OnPlayerReset(entity player) {
 	// Reset weapons as well
 	PK_ForcePlayerLoadout(player)
 
+	// Destroy all projectiles (bullets + grenades)
+	array<entity> projectiles = GetProjectileArrayEx( "any", TEAM_ANY, TEAM_IMC, Vector( 0, 0, 0 ), -1 )
+	foreach( projectile in projectiles )
+	{
+		if ( projectile.GetOwner() != player )
+			continue
+		projectile.Destroy()
+	}
+
 	// Stop ongoing stim boost
 	player.Signal("OnChangedPlayerClass")
 
