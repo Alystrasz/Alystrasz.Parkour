@@ -150,6 +150,9 @@ void function RespawnPlayerToConfirmedCheckpoint(entity player)
 	// Give player predefined loadout
 	PK_ForcePlayerLoadout(player)
 
+	// Destroy all dropped weapons
+	ClearDroppedWeapons()
+
 	// Disable boost meter
 	thread OnPlayerRespawned_Threaded( player )
 }
