@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.2
+
+### Fixes
+
+* Projectiles are removed on run reset;
+* Gravity star sounds are only emitted on the thrower;
+* All dropped weapons are now destroyed;
+* Weapon ammunition is refilled on run reset;
+* Code optimizations.
+
 ## 0.3.1
 
 ### Fixes
