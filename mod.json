@@ -2,7 +2,7 @@
     "Name": "Parkour",
     "Description": "Reach all checkpoints and end the race as fast as you can.",
     "LoadPriority": 2,
-    "Version": "0.3.2",
+    "Version": "0.3.3",
     "RequiredOnClient": true,
     "ConVars": [
         {
@@ -11,11 +11,11 @@
         },
         {
             "Name": "parkour_api_secret",
-            "DefaultValue": "396a4d7d-b9ff-43d2-8b7f-2478d1b0bd07"
+            "DefaultValue": "my_little_secret"
         },
         {
             "Name": "parkour_use_local_config",
-            "DefaultValue": "1"
+            "DefaultValue": "0"
         }
     ],
     "Scripts": [

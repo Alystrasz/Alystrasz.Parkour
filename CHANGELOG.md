@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3
+
+### Fixes
+
+* Removed leaked API key :>
+
 ## 0.3.2
 
 ### Fixes
