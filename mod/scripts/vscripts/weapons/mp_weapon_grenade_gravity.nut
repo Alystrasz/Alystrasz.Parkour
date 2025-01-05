@@ -145,20 +145,20 @@ void function GravityGrenadeThink( entity projectile, entity hitEnt, vector norm
 		return
 
 	EmitSoundOnEntityOnlyToPlayer( projectile, projectileOwner, "default_gravitystar_impact_3p" )
-	entity FX = StartParticleEffectOnEntity_ReturnEntity( projectile, GetParticleSystemIndex( GRAVITY_VORTEX_FX ), FX_PATTACH_ABSORIGIN_FOLLOW, -1 )
+	// entity FX = StartParticleEffectOnEntity_ReturnEntity( projectile, GetParticleSystemIndex( GRAVITY_VORTEX_FX ), FX_PATTACH_ABSORIGIN_FOLLOW, -1 )
 //	EmitSoundOnEntity( projectile, "gravitystar_vortex" )
 
 	string noSpawnArea = CreateNoSpawnArea( TEAM_INVALID, projectile.GetTeam(), projectile.GetOrigin(), MAX_WAIT_TIME + POP_DELAY + PULL_DELAY + EXPLOSION_DELAY + 0.1, PULL_RANGE * 3.0 )
 
 	OnThreadEnd(
-		function() : ( gravTrig, trig, FX, noSpawnArea )
+		function() : ( gravTrig, trig, /*FX,*/ noSpawnArea )
 		{
 			if ( IsValid( trig ) )
 				trig.Destroy()
 			if ( IsValid( gravTrig ) )
 				gravTrig.Destroy()
 
-			EntFireByHandle( FX, "kill", "", FX_END_CAP_TIME, null, null )
+			// EntFireByHandle( FX, "kill", "", FX_END_CAP_TIME, null, null )
 
 			DeleteNoSpawnArea( noSpawnArea )
 		}
