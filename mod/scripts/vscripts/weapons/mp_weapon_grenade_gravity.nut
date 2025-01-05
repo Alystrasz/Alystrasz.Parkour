@@ -189,7 +189,14 @@ void function GravityGrenadeThink( entity projectile, entity hitEnt, vector norm
 	projectile.SetGrenadeTimer( EXPLOSION_DELAY )
 	wait EXPLOSION_DELAY - 0.1 // ensure gravTrig is destroyed before detonation
 
-	thread DestroyAfterDelay( mover, 0.25 )
+	// Emit explosion sound to thrower player only
+	if ( IsValid( projectileOwner ))
+	{
+		EmitSoundOnEntityOnlyToPlayer( mover, projectileOwner, "gravitystar_explo_3p_int" )
+	}
+
+	// Leaving some additional time for explosion sound to end before destroying mover
+	thread DestroyAfterDelay( mover, 3 ) // 0.25 )
 }
 
 void function OnGravGrenadeTrigEnter( entity trigger, entity ent )

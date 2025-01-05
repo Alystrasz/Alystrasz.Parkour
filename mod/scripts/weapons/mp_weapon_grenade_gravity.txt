@@ -31,7 +31,7 @@ WeaponData
 
 	// Effects
 	"bounce_effect_table"							"gravity_grenade_bounce_table"
-	"impact_effect_table" 							"exp_gravity_grenade"
+	"impact_effect_table" 							"" // Explosion sound is emitted in vscript to thrower player only (og: "exp_gravity_grenade")
 	"projectile_trail_effect_0" 					"wpn_grenade_frag_blue"
 	"grenade_indicator_icon_friendly"				"P_wpn_grenade_frag_blue_icon"
 	"grenade_indicator_icon_enemy"					"P_wpn_grenade_frag_blue_icon"
