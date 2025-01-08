@@ -85,6 +85,8 @@ void function PK_ForcePlayerLoadout(entity player) {
 		// Fill up main weapon ammo
 		foreach ( entity weapon in player.GetMainWeapons() )
 		{
+			if ( weapon.GetWeaponClassName() != PK_perks.weapon )
+				continue
 			weapon.SetWeaponPrimaryClipCount(weapon.GetWeaponPrimaryClipCountMax())
 		}
 
