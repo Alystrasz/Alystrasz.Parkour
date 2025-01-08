@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4
+
+### Fixes
+
+* Prevent crash when loading onto map with the Charge riffle.
+
 ## 0.3.3
 
 ### Fixes
