@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.5
+
+## Fixes
+
+* Mod is not trying to load in campaign anymore.
+
 ## 0.3.4
 
 ### Fixes
