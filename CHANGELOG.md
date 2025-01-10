@@ -2,7 +2,7 @@
 
 ## 0.3.5
 
-## Fixes
+### Fixes
 
 * Route loadout is correctly applied to joining players;
 * Robot dialog is interrupted if you unexpectedly get away from it;
