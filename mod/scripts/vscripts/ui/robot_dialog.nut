@@ -1,4 +1,6 @@
 global function Parkour_OpenRobotDialog
+global function Parkour_CloseCurrentRobotDialog
+
 struct {
     string scoreboardUrl = ""
 } file;
@@ -61,4 +63,9 @@ void function ParkourOpenWebScoreboard()
 
     wait 0.8
     LaunchExternalWebBrowser(file.scoreboardUrl, WEBBROWSER_FLAG_FORCEEXTERNAL)
+}
+
+void function Parkour_CloseCurrentRobotDialog()
+{
+    CloseAllDialogs()
 }

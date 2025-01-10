@@ -5,7 +5,8 @@
 ## Fixes
 
 * Route loadout is correctly applied to joining players;
-* Mod is not trying to load in campaign anymore.
+* Robot dialog is interrupted if you unexpectedly get away from it;
+* Mod is not loaded in singleplayer levels anymore.
 
 Many thanks to `Chill Spirit` for helping me test this release.
 

@@ -463,6 +463,7 @@ void function ServerCallback_PK_SetRobotTalkState( bool canTalk )
     else
     {
         HidePlayerHint( "#ROBOT_INTERACTION_PROMPT" )
+        RunUIScript( "Parkour_CloseCurrentRobotDialog" )
     }
 }
 
