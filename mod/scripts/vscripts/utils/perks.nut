@@ -122,9 +122,10 @@ void function PK_ForcePlayerWeapon(entity player) {
 		if (PK_perks.weapon != "") {
 			foreach ( int index, entity weapon in player.GetMainWeapons() ) {
 				player.TakeWeaponNow( weapon.GetWeaponClassName() )
-				if (weapon.GetWeaponClassName().find("mp_weapon_") != null && index == 0)
-					player.GiveWeapon( PK_perks.weapon, [] )
 			}
 		}
+
+		// Give weapon after taking them all
+		player.GiveWeapon( PK_perks.weapon, [] )
 	}
 }

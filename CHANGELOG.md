@@ -4,7 +4,10 @@
 
 ## Fixes
 
+* Route loadout is correctly applied to joining players;
 * Mod is not trying to load in campaign anymore.
+
+Many thanks to `Chill Spirit` for helping me test this release.
 
 ## 0.3.4
 
