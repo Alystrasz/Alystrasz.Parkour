@@ -17,9 +17,9 @@ const float PULL_VERT_VEL = 220
 const float PUSH_STRENGTH_MAX = 125.0
 const float EXPLOSION_DELAY = 0.1
 const float FX_END_CAP_TIME = 1.5
-//const float PULL_VERTICAL_KNOCKUP_MAX = 75.0
-//const float PULL_VERTICAL_KNOCKUP_MIN = 55.0
-//const float PUSH_STRENGTH_MIN = 100.0
+// const float PULL_VERTICAL_KNOCKUP_MAX = 75.0
+// const float PULL_VERTICAL_KNOCKUP_MIN = 55.0
+// const float PUSH_STRENGTH_MIN = 100.0
 struct
 {
 	int cockpitFxHandle = -1
@@ -37,8 +37,8 @@ void function MpWeaponGrenadeGravity_Init()
 	RegisterSignal( "LeftGravityMine" )
 
 	#if CLIENT
- 	StatusEffect_RegisterEnabledCallback( eStatusEffect.gravity_grenade_visual, GravityScreenFXEnable )
- 	StatusEffect_RegisterDisabledCallback( eStatusEffect.gravity_grenade_visual, GravityScreenFXDisable )
+		StatusEffect_RegisterEnabledCallback( eStatusEffect.gravity_grenade_visual, GravityScreenFXEnable )
+		StatusEffect_RegisterDisabledCallback( eStatusEffect.gravity_grenade_visual, GravityScreenFXDisable )
 	#endif
 }
 
@@ -57,251 +57,257 @@ void function OnProjectileCollision_weapon_grenade_gravity( entity projectile, v
 }
 
 #if SERVER
-void function TriggerWait( entity trig, float maxtime )
-{
-	trig.CheckForLOS()
-	trig.EndSignal( "TouchVisible" )
-	wait maxtime
-}
+	void function TriggerWait( entity trig, float maxtime )
+	{
+		trig.CheckForLOS()
+		trig.EndSignal( "TouchVisible" )
+		wait maxtime
+	}
 
-void function SetGravityGrenadeTriggerFilters( entity gravityMine, entity trig )
-{
-	if ( gravityMine.GetTeam() == TEAM_IMC )
-		trig.kv.triggerFilterTeamIMC = "0"
-	else if ( gravityMine.GetTeam() == TEAM_MILITIA )
-		trig.kv.triggerFilterTeamMilitia = "0"
-	trig.kv.triggerFilterNonCharacter = "0"
-}
+	void function SetGravityGrenadeTriggerFilters( entity gravityMine, entity trig )
+	{
+		if ( gravityMine.GetTeam() == TEAM_IMC )
+			trig.kv.triggerFilterTeamIMC = "0"
+		else if ( gravityMine.GetTeam() == TEAM_MILITIA )
+			trig.kv.triggerFilterTeamMilitia = "0"
+		trig.kv.triggerFilterNonCharacter = "0"
+	}
 
-bool function GravityGrenadeTriggerThink( entity gravityMine )
-{
-	// EmitSoundOnEntity( gravityMine, "SonarGrenade_On" )
+	bool function GravityGrenadeTriggerThink( entity gravityMine )
+	{
+		// EmitSoundOnEntity( gravityMine, "SonarGrenade_On" )
 
-	entity trig = CreateEntity( "trigger_cylinder" )
-	trig.SetRadius( PULL_RANGE )
-	trig.SetAboveHeight( PULL_RANGE )
-	trig.SetBelowHeight( PULL_RANGE )
-	trig.SetAbsOrigin( gravityMine.GetOrigin() )
+		entity trig = CreateEntity( "trigger_cylinder" )
+		trig.SetRadius( PULL_RANGE )
+		trig.SetAboveHeight( PULL_RANGE )
+		trig.SetBelowHeight( PULL_RANGE )
+		trig.SetAbsOrigin( gravityMine.GetOrigin() )
 
-	SetGravityGrenadeTriggerFilters( gravityMine, trig )
+		SetGravityGrenadeTriggerFilters( gravityMine, trig )
 
-	DispatchSpawn( trig )
-	trig.SearchForNewTouchingEntity()
+		DispatchSpawn( trig )
+		trig.SearchForNewTouchingEntity()
 
-	OnThreadEnd(
-		function() : ( trig )
-		{
-			trig.Destroy()
-		}
-	)
-
-	waitthread TriggerWait( trig, MAX_WAIT_TIME )
-
-	return trig.IsTouched()
-}
-
-
-void function GravityGrenadeThink( entity projectile, entity hitEnt, vector normal, vector pos )
-{
-	projectile.EndSignal( "OnDestroy" )
-
-	WaitFrame()
-
-	//SetTeam( projectile, TEAM_UNASSIGNED ) // TEMP TEST
-
-	vector pullPosition
-	if ( hitEnt == svGlobal.worldspawn )
-		pullPosition = pos + normal * POP_HEIGHT
-	else
-		pullPosition = projectile.GetOrigin()
-
-	entity gravTrig = CreateEntity( "trigger_point_gravity" )
-	// pull inner radius, pull outer radius, reduce speed inner radius, reduce speed outer radius, pull accel, pull speed, 0
-	gravTrig.SetParams( 0.0, PULL_RANGE * 2, 32, 128, 1500, 600 ) // more subtle pulling effect before popping up
-	gravTrig.SetOrigin( projectile.GetOrigin() )
-	projectile.ClearParent()
-	projectile.SetParent( gravTrig )
-	gravTrig.RoundOriginAndAnglesToNearestNetworkValue()
-
-	entity trig = CreateEntity( "trigger_cylinder" )
-	trig.SetRadius( PULL_RANGE )
-	trig.SetAboveHeight( PULL_RANGE )
-	trig.SetBelowHeight( PULL_RANGE )
-	trig.SetOrigin( projectile.GetOrigin() )
-	SetGravityGrenadeTriggerFilters( projectile, trig )
-	trig.kv.triggerFilterPlayer = "none" // player effects
-	trig.SetEnterCallback( OnGravGrenadeTrigEnter )
-	trig.SetLeaveCallback( OnGravGrenadeTrigLeave )
-
-	SetTeam( gravTrig, projectile.GetTeam() )
-	SetTeam( trig, projectile.GetTeam() )
-	DispatchSpawn( gravTrig )
-	DispatchSpawn( trig )
-	gravTrig.SearchForNewTouchingEntity()
-	trig.SearchForNewTouchingEntity()
-
-	entity projectileOwner = projectile.GetOwner()
-	if ( !IsValid( projectileOwner ))
-		return
-
-	EmitSoundOnEntityOnlyToPlayer( projectile, projectileOwner, "default_gravitystar_impact_3p" )
-	// entity FX = StartParticleEffectOnEntity_ReturnEntity( projectile, GetParticleSystemIndex( GRAVITY_VORTEX_FX ), FX_PATTACH_ABSORIGIN_FOLLOW, -1 )
-//	EmitSoundOnEntity( projectile, "gravitystar_vortex" )
-
-	string noSpawnArea = CreateNoSpawnArea( TEAM_INVALID, projectile.GetTeam(), projectile.GetOrigin(), MAX_WAIT_TIME + POP_DELAY + PULL_DELAY + EXPLOSION_DELAY + 0.1, PULL_RANGE * 3.0 )
-
-	OnThreadEnd(
-		function() : ( gravTrig, trig, /*FX,*/ noSpawnArea )
-		{
-			if ( IsValid( trig ) )
+		OnThreadEnd(
+			function() : ( trig )
+			{
 				trig.Destroy()
-			if ( IsValid( gravTrig ) )
-				gravTrig.Destroy()
+			}
+		)
 
-			// EntFireByHandle( FX, "kill", "", FX_END_CAP_TIME, null, null )
+		waitthread TriggerWait( trig, MAX_WAIT_TIME )
 
-			DeleteNoSpawnArea( noSpawnArea )
-		}
-	)
+		return trig.IsTouched()
+	}
 
-	wait POP_DELAY
-	if ( !IsValid( projectileOwner ))
-		return
-
-	entity mover = CreateOwnedScriptMover( projectile )
-	projectile.SetParent( mover, "ref", true )
-	EmitSoundOnEntityOnlyToPlayer( projectile, projectileOwner, "weapon_gravitystar_preexplo" )
-
-	if ( hitEnt == svGlobal.worldspawn )
+	void function GravityGrenadeThink( entity projectile, entity hitEnt, vector normal, vector pos )
 	{
-		mover.NonPhysicsMoveTo( pullPosition, POP_DELAY, 0, POP_DELAY )
-		gravTrig.SetOrigin( pullPosition )
+		projectile.EndSignal( "OnDestroy" )
+
+		WaitFrame()
+
+		// SetTeam( projectile, TEAM_UNASSIGNED ) // TEMP TEST
+
+		vector pullPosition
+		if ( hitEnt == svGlobal.worldspawn )
+			pullPosition = pos + normal * POP_HEIGHT
+		else
+			pullPosition = projectile.GetOrigin()
+
+		entity gravTrig = CreateEntity( "trigger_point_gravity" )
+		// pull inner radius, pull outer radius, reduce speed inner radius, reduce speed outer radius, pull accel, pull speed, 0
+		gravTrig.SetParams( 0.0, PULL_RANGE * 2, 32, 128, 1500, 600 ) // more subtle pulling effect before popping up
+		gravTrig.SetOrigin( projectile.GetOrigin() )
+		projectile.ClearParent()
+		projectile.SetParent( gravTrig )
 		gravTrig.RoundOriginAndAnglesToNearestNetworkValue()
+
+		entity trig = CreateEntity( "trigger_cylinder" )
+		trig.SetRadius( PULL_RANGE )
+		trig.SetAboveHeight( PULL_RANGE )
+		trig.SetBelowHeight( PULL_RANGE )
+		trig.SetOrigin( projectile.GetOrigin() )
+		SetGravityGrenadeTriggerFilters( projectile, trig )
+		trig.kv.triggerFilterPlayer = "none" // player effects
+		trig.SetEnterCallback( OnGravGrenadeTrigEnter )
+		trig.SetLeaveCallback( OnGravGrenadeTrigLeave )
+
+		SetTeam( gravTrig, projectile.GetTeam() )
+		SetTeam( trig, projectile.GetTeam() )
+		DispatchSpawn( gravTrig )
+		DispatchSpawn( trig )
+		gravTrig.SearchForNewTouchingEntity()
+		trig.SearchForNewTouchingEntity()
+
+		entity projectileOwner = projectile.GetOwner()
+		if ( !IsValid( projectileOwner ) )
+			return
+
+		EmitSoundOnEntityOnlyToPlayer( projectile, projectileOwner, "default_gravitystar_impact_3p" )
+		// entity FX = StartParticleEffectOnEntity_ReturnEntity( projectile, GetParticleSystemIndex( GRAVITY_VORTEX_FX ), FX_PATTACH_ABSORIGIN_FOLLOW, -1 )
+		// 	EmitSoundOnEntity( projectile, "gravitystar_vortex" )
+
+		string noSpawnArea = CreateNoSpawnArea(
+			TEAM_INVALID,
+			projectile.GetTeam(),
+			projectile.GetOrigin(),
+			MAX_WAIT_TIME + POP_DELAY + PULL_DELAY + EXPLOSION_DELAY + 0.1,
+			PULL_RANGE * 3.0
+		)
+
+		OnThreadEnd(
+			function() : ( gravTrig, trig, /* FX, */ noSpawnArea )
+			{
+				if ( IsValid( trig ) )
+					trig.Destroy()
+				if ( IsValid( gravTrig ) )
+					gravTrig.Destroy()
+
+				// EntFireByHandle( FX, "kill", "", FX_END_CAP_TIME, null, null )
+
+				DeleteNoSpawnArea( noSpawnArea )
+			}
+		)
+
+		wait POP_DELAY
+		if ( !IsValid( projectileOwner ) )
+			return
+
+		entity mover = CreateOwnedScriptMover( projectile )
+		projectile.SetParent( mover, "ref", true )
+		EmitSoundOnEntityOnlyToPlayer( projectile, projectileOwner, "weapon_gravitystar_preexplo" )
+
+		if ( hitEnt == svGlobal.worldspawn )
+		{
+			mover.NonPhysicsMoveTo( pullPosition, POP_DELAY, 0, POP_DELAY )
+			gravTrig.SetOrigin( pullPosition )
+			gravTrig.RoundOriginAndAnglesToNearestNetworkValue()
+		}
+
+		// full strength radius, outer radius, reduce vel radius, accel, maxvel
+		gravTrig.SetParams( PULL_RANGE, PULL_RANGE * 2, 32, 128, 2000, 400 ) // more intense pull
+
+		AI_CreateDangerousArea( projectile, projectile, PULL_RANGE * 2.0, TEAM_INVALID, true, false )
+
+		wait PULL_DELAY
+
+		projectile.SetGrenadeTimer( EXPLOSION_DELAY )
+		wait EXPLOSION_DELAY - 0.1 // ensure gravTrig is destroyed before detonation
+
+		// Emit explosion sound to thrower player only
+		if ( IsValid( projectileOwner ) )
+		{
+			EmitSoundOnEntityOnlyToPlayer( mover, projectileOwner, "gravitystar_explo_3p_int" )
+		}
+
+		// Leaving some additional time for explosion sound to end before destroying mover
+		thread DestroyAfterDelay( mover, 3 ) // 0.25 )
 	}
 
-	// full strength radius, outer radius, reduce vel radius, accel, maxvel
-	gravTrig.SetParams( PULL_RANGE, PULL_RANGE * 2, 32, 128, 2000, 400 ) // more intense pull
-
-	AI_CreateDangerousArea( projectile, projectile, PULL_RANGE * 2.0, TEAM_INVALID, true, false )
-
-	wait PULL_DELAY
-
-	projectile.SetGrenadeTimer( EXPLOSION_DELAY )
-	wait EXPLOSION_DELAY - 0.1 // ensure gravTrig is destroyed before detonation
-
-	// Emit explosion sound to thrower player only
-	if ( IsValid( projectileOwner ))
+	void function OnGravGrenadeTrigEnter( entity trigger, entity ent )
 	{
-		EmitSoundOnEntityOnlyToPlayer( mover, projectileOwner, "gravitystar_explo_3p_int" )
+		if ( ent.GetTeam() == trigger.GetTeam() ) // trigger filters handle this except in FFA
+			return
+
+		if ( ent.IsNPC() && ( IsGrunt( ent ) || IsSpectre( ent ) || IsStalker( ent ) ) && IsAlive( ent ) && !ent.ContextAction_IsActive() && ent.IsInterruptable() )
+		{
+			ent.ContextAction_SetBusy()
+			ent.Anim_ScriptedPlayActivityByName( "ACT_FALL", true, 0.2 )
+
+			if ( IsGrunt( ent ) )
+				EmitSoundOnEntity( ent, "diag_efforts_gravStruggle_gl_grunt_3p" )
+
+			thread EndNPCGravGrenadeAnim( ent )
+		}
 	}
 
-	// Leaving some additional time for explosion sound to end before destroying mover
-	thread DestroyAfterDelay( mover, 3 ) // 0.25 )
-}
-
-void function OnGravGrenadeTrigEnter( entity trigger, entity ent )
-{
-	if ( ent.GetTeam() == trigger.GetTeam() ) // trigger filters handle this except in FFA
-		return
-
-	if ( ent.IsNPC() && ( IsGrunt( ent ) || IsSpectre( ent ) || IsStalker( ent ) ) && IsAlive( ent ) && !ent.ContextAction_IsActive() && ent.IsInterruptable() )
+	void function OnGravGrenadeTrigLeave( entity trigger, entity ent )
 	{
-		ent.ContextAction_SetBusy()
-		ent.Anim_ScriptedPlayActivityByName( "ACT_FALL", true, 0.2 )
-
-		if ( IsGrunt( ent ) )
-			EmitSoundOnEntity( ent, "diag_efforts_gravStruggle_gl_grunt_3p" )
-
-		thread EndNPCGravGrenadeAnim( ent )
+		if ( IsValid( ent ) )
+		{
+			ent.Signal( "LeftGravityMine" )
+		}
 	}
-}
 
-void function OnGravGrenadeTrigLeave( entity trigger, entity ent )
-{
-	if ( IsValid( ent ) )
+	void function EndNPCGravGrenadeAnim( entity ent )
 	{
-		ent.Signal( "LeftGravityMine" )
+		ent.EndSignal( "OnDestroy" )
+		ent.EndSignal( "OnAnimationInterrupted" )
+		ent.EndSignal( "OnAnimationDone" )
+
+		ent.WaitSignal( "LeftGravityMine", "OnDeath" )
+
+		ent.ContextAction_ClearBusy()
+		ent.Anim_Stop()
 	}
-}
 
-void function EndNPCGravGrenadeAnim( entity ent )
-{
-	ent.EndSignal( "OnDestroy" )
-	ent.EndSignal( "OnAnimationInterrupted" )
-	ent.EndSignal( "OnAnimationDone" )
-
-	ent.WaitSignal( "LeftGravityMine", "OnDeath" )
-
-	ent.ContextAction_ClearBusy()
-	ent.Anim_Stop()
-}
-
-void function Proto_SetEnemyVelocity_Pull( entity enemy, vector projOrigin )
-{
-	if ( enemy.IsPhaseShifted() )
-		return
-	vector enemyOrigin = enemy.GetOrigin()
-	vector dir = Normalize( projOrigin - enemy.GetOrigin() )
-	float dist = Distance( enemyOrigin, projOrigin )
-	float distZ = enemyOrigin.z - projOrigin.z
-	vector newVelocity = enemy.GetVelocity() * GraphCapped( dist, 50, PULL_RANGE, 0, 1 ) + dir * GraphCapped( dist, 50, PULL_RANGE, 0, PULL_STRENGTH_MAX ) + < 0, 0, GraphCapped( distZ, -50, 0, PULL_VERT_VEL, 0 )>
-	if ( enemy.IsTitan() )
-		newVelocity.z = 0
-	enemy.SetVelocity( newVelocity )
-}
-
-array<entity> function GetNearbyEnemiesForGravGrenade( entity projectile )
-{
-	int team = projectile.GetTeam()
-	entity owner = projectile.GetOwner()
-	vector origin = projectile.GetOrigin()
-	array<entity> nearbyEnemies
-	array<entity> guys = GetPlayerArrayEx( "any", TEAM_ANY, TEAM_ANY, origin, PULL_RANGE )
-	foreach ( guy in guys )
+	void function Proto_SetEnemyVelocity_Pull( entity enemy, vector projOrigin )
 	{
-		if ( !IsAlive( guy ) )
-			continue
-
-		if ( IsEnemyTeam( team, guy.GetTeam() ) || (IsValid( owner ) && guy == owner) )
-			nearbyEnemies.append( guy )
+		if ( enemy.IsPhaseShifted() )
+			return
+		vector enemyOrigin = enemy.GetOrigin()
+		vector dir = Normalize( projOrigin - enemy.GetOrigin() )
+		float dist = Distance( enemyOrigin, projOrigin )
+		float distZ = enemyOrigin.z - projOrigin.z
+		vector newVelocity = enemy.GetVelocity() * GraphCapped( dist, 50, PULL_RANGE, 0, 1 ) + dir * GraphCapped( dist, 50, PULL_RANGE, 0, PULL_STRENGTH_MAX ) +
+			< 0, 0, GraphCapped( distZ, -50, 0, PULL_VERT_VEL, 0 ) >
+		if ( enemy.IsTitan() )
+			newVelocity.z = 0
+		enemy.SetVelocity( newVelocity )
 	}
 
-	array<entity> ai = GetNPCArrayEx( "any", TEAM_ANY, team, origin, PULL_RANGE )
-	foreach ( guy in ai )
+	array<entity> function GetNearbyEnemiesForGravGrenade( entity projectile )
 	{
-		if ( IsAlive( guy ) )
-			nearbyEnemies.append( guy )
+		int team = projectile.GetTeam()
+		entity owner = projectile.GetOwner()
+		vector origin = projectile.GetOrigin()
+		array<entity> nearbyEnemies
+		array<entity> guys = GetPlayerArrayEx( "any", TEAM_ANY, TEAM_ANY, origin, PULL_RANGE )
+		foreach ( guy in guys )
+		{
+			if ( !IsAlive( guy ) )
+				continue
+
+			if ( IsEnemyTeam( team, guy.GetTeam() ) || ( IsValid( owner ) && guy == owner ) )
+				nearbyEnemies.append( guy )
+		}
+
+		array<entity> ai = GetNPCArrayEx( "any", TEAM_ANY, team, origin, PULL_RANGE )
+		foreach ( guy in ai )
+		{
+			if ( IsAlive( guy ) )
+				nearbyEnemies.append( guy )
+		}
+
+		return nearbyEnemies
 	}
 
-	return nearbyEnemies
-}
-
-array<entity> function GetNearbyProjectilesForGravGrenade( entity gravGrenade )
-{
-	int team = gravGrenade.GetTeam()
-	entity owner = gravGrenade.GetOwner()
-	vector origin = gravGrenade.GetOrigin()
-
-	array<entity> projectiles = GetProjectileArrayEx( "any", TEAM_ANY, TEAM_ANY, origin, PULL_RANGE )
-
-	array<entity> affectedProjectiles
-
-	entity projectileOwner
-	foreach( projectile in projectiles )
+	array<entity> function GetNearbyProjectilesForGravGrenade( entity gravGrenade )
 	{
-		if ( projectile == gravGrenade )
-			continue
+		int team = gravGrenade.GetTeam()
+		entity owner = gravGrenade.GetOwner()
+		vector origin = gravGrenade.GetOrigin()
 
-		projectileOwner = projectile.GetOwner()
-		if ( IsEnemyTeam( team, projectile.GetTeam() ) || ( IsValid( projectileOwner ) && projectileOwner == owner ) )
-			affectedProjectiles.append( projectile )
+		array<entity> projectiles = GetProjectileArrayEx( "any", TEAM_ANY, TEAM_ANY, origin, PULL_RANGE )
+
+		array<entity> affectedProjectiles
+
+		entity projectileOwner
+		foreach ( projectile in projectiles )
+		{
+			if ( projectile == gravGrenade )
+				continue
+
+			projectileOwner = projectile.GetOwner()
+			if ( IsEnemyTeam( team, projectile.GetTeam() ) || ( IsValid( projectileOwner ) && projectileOwner == owner ) )
+				affectedProjectiles.append( projectile )
+		}
+
+		return affectedProjectiles
 	}
 
-	return affectedProjectiles
-}
-
-//point_push version - hard to control motion with this.
-/*
+	// point_push version - hard to control motion with this.
+	/*
 void function CreateGravitationalForce( float mag, vector org )
 {
 	entity point_push = CreateEntity( "point_push" )
@@ -315,8 +321,8 @@ void function CreateGravitationalForce( float mag, vector org )
 	point_push.Fire( "Kill", "", 0.2 )
 }
 */
-//Script mover version
-/*
+	// Script mover version
+	/*
 array<entity> nearbyEnemies = GetNearbyEnemiesForGravGrenade( projectile )
 foreach ( enemy in nearbyEnemies )
 {
@@ -370,31 +376,32 @@ void function PROTO_GravGrenadePull( entity enemy, entity projectile )
 #endif
 
 #if CLIENT
-void function GravityScreenFXEnable( entity ent, int statusEffect, bool actuallyChanged )
-{
-	printt( "GravityScreenFXEnable" )
-	if ( !actuallyChanged )
-		return
-
-	if ( ent == GetLocalViewPlayer() )
+	void function GravityScreenFXEnable( entity ent, int statusEffect, bool actuallyChanged )
 	{
-		entity cockpit =GetLocalViewPlayer().GetCockpit()
-		if ( IsValid( cockpit ) )
+		printt( "GravityScreenFXEnable" )
+		if ( !actuallyChanged )
+			return
+
+		if ( ent == GetLocalViewPlayer() )
 		{
-			file.cockpitFxHandle = StartParticleEffectOnEntity( cockpit, GetParticleSystemIndex( GRAVITY_SCREEN_FX ), FX_PATTACH_POINT_FOLLOW, cockpit.LookupAttachment("CAMERA") )
+			entity cockpit = GetLocalViewPlayer().GetCockpit()
+			if ( IsValid( cockpit ) )
+			{
+				file.cockpitFxHandle =
+					StartParticleEffectOnEntity( cockpit, GetParticleSystemIndex( GRAVITY_SCREEN_FX ), FX_PATTACH_POINT_FOLLOW, cockpit.LookupAttachment( "CAMERA" ) )
+			}
 		}
 	}
-}
 
-void function GravityScreenFXDisable( entity ent, int statusEffect, bool actuallyChanged )
-{
-	printt( "GravityScreenFXDisable" )
-	if ( !actuallyChanged )
-		return
-
-	if ( ent == GetLocalViewPlayer() )
+	void function GravityScreenFXDisable( entity ent, int statusEffect, bool actuallyChanged )
 	{
-		EffectStop( file.cockpitFxHandle, false, true )
+		printt( "GravityScreenFXDisable" )
+		if ( !actuallyChanged )
+			return
+
+		if ( ent == GetLocalViewPlayer() )
+		{
+			EffectStop( file.cockpitFxHandle, false, true )
+		}
 	}
-}
 #endif
