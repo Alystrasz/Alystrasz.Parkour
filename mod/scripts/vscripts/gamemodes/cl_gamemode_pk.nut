@@ -37,6 +37,10 @@ struct
 	var startLineTopology
 	var endLineTopology
 
+	// Leaderboard Text
+	var leaderboardText
+	var worldLeaderboardText
+
 	bool isRunning = false
 	var nextCheckpointRui
 	float bestTime = 65535
@@ -526,11 +530,31 @@ void function ServerCallback_CreateLine( array<string> args )
 	if ( isStartLine )
 	{
 		file.startLine = PK_BuildParkourLine( data )
+		if ( file.startLineTopology != null )
+		{
+			UpdateTopology(
+				file.startLineTopology,
+				file.startLine.origin,
+				file.startLine.angles,
+				file.startLine.dimensions[ 0 ].tofloat(),
+				file.startLine.dimensions[ 1 ].tofloat()
+			)
+		}
 		if ( file.startLineRUI == null )
 			SpawnStartLine()
 	}
 	else
 	{
+		if ( file.endLineTopology != null )
+		{
+			UpdateTopology(
+				file.endLineTopology,
+				file.endLine.origin,
+				file.endLine.angles,
+				file.endLine.dimensions[ 0 ].tofloat(),
+				file.endLine.dimensions[ 1 ].tofloat()
+			)
+		}
 		file.endLine = PK_BuildParkourLine( data )
 	}
 }
@@ -557,7 +581,18 @@ void function ServerCallback_CreateLeaderboard( array<string> args )
 
 	// Build "LOCAL"/"WORLD" sign
 	topo = CreateTopology( pl.sourceOrigin, pl.sourceAngles, pl.sourceDimensions[ 0 ].tofloat(), pl.sourceDimensions[ 1 ].tofloat() )
+
 	rui = RuiCreate( $"ui/gauntlet_starting_line.rpak", topo, RUI_DRAW_WORLD, 0 )
+	if ( isLocalLeaderboard )
+	{
+		SafeDestroyRUI( file.leaderboardText )
+		file.leaderboardText = rui
+	}
+	else
+	{
+		SafeDestroyRUI( file.worldLeaderboardText )
+		file.worldLeaderboardText = rui
+	}
 	RuiSetString( rui, "displayText", isLocalLeaderboard ? "#LEADERBOARD_LOCAL" : "#LEADERBOARD_WORLD" )
 }
 
@@ -613,8 +648,20 @@ void function SpawnStartLine()
 void function SpawnEndLine()
 {
 	if ( file.endLineTopology == null )
+	{
 		file.endLineTopology =
 			CreateTopology( file.endLine.origin, file.endLine.angles, file.endLine.dimensions[ 0 ].tofloat(), file.endLine.dimensions[ 1 ].tofloat() )
+	}
+	else
+	{
+		UpdateTopology(
+			file.endLineTopology,
+			file.endLine.origin,
+			file.endLine.angles,
+			file.endLine.dimensions[ 0 ].tofloat(),
+			file.endLine.dimensions[ 1 ].tofloat()
+		)
+	}
 	var endRui = RuiCreate( $"ui/gauntlet_starting_line.rpak", file.endLineTopology, RUI_DRAW_WORLD, 0 )
 	RuiSetString( endRui, "displayText", "#GAUNTLET_FINISH_TEXT" )
 	file.endLineRUI = endRui
