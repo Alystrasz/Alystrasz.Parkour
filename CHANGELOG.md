@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.6
+
+### Features
+
+* Start/end lines and leaderboards can be moved at runtime.
+
+### Fixes
+
+* Source code is now formatted (with `sqformat`).
+
 ## 0.3.5
 
 ### Fixes
